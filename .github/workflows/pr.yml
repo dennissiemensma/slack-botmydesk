@@ -36,7 +36,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd app
           pip install --upgrade pip poetry
           poetry config virtualenvs.in-project true
           poetry check
@@ -44,10 +43,8 @@ jobs:
 
       - name: Check flake8
         run: |
-          cd app
           poetry run flake8
 
       - name: Check insecure packages (safety)
         run: |
-          cd app
           poetry run safety check

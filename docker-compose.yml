@@ -5,10 +5,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: app-dev
+      target: src-dev
 #    command: sleep 300  # @TODO
     volumes:
-      - ./app:/code
+      - ./src:/code
     ports:
       - '8000:8000'
     environment:

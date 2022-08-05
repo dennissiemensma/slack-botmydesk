@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config, UndefinedValueError
+from decouple import config
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,9 +27,7 @@ SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DJANGO_DEBUG", cast=str, default=False)
 
-ALLOWED_HOSTS = [
-    config("DJANGO_ALLOWED_HOST", cast=str)
-]
+ALLOWED_HOSTS = [config("DJANGO_ALLOWED_HOST", cast=str)]
 
 
 # Application definition

@@ -1,0 +1,47 @@
+name: PR
+
+on:
+  pull_request: ~
+
+jobs:
+  # The most verbose and complete job.
+  main_test:
+    name: 'Python ${{ matrix.python-version }}'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10  # Don't run forever when stale
+    strategy:
+      matrix:
+        python-version:
+          - '3.10'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install APT dependencies
+        run: |
+          sudo apt-get update
+#          sudo apt-get install -y gettext libgettextpo-dev
+
+      - name: Cached dependencies & virtualenv
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pypoetry/
+          key: dependencies-update-check-${{ hashFiles('poetry.lock') }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip poetry
+          poetry config virtualenvs.in-project true
+          poetry check
+          poetry install
+
+      - name: Check flake8
+        run: poetry run flake8
+
+      - name: Check insecure packages (safety)
+        run: poetry run safety check

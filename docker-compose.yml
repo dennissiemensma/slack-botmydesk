@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+  # http://localhost:8000
+  dev-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app-dev
+#    command: sleep 300  # @TODO
+    volumes:
+      - ./app:/code
+    ports:
+      - '8000:8000'
+    environment:
+      - DJANGO_DEBUG=True
+      - DJANGO_ALLOWED_HOST=localhost
+      - DJANGO_DATABASE_ENGINE=django.db.backends.sqlite3
+      - DJANGO_SECRET_KEY=development

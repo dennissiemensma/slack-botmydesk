@@ -1,1 +1,1 @@
-# slack-botmydesk
+# Slack: BotMyDesk

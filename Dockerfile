@@ -3,7 +3,7 @@
 FROM python:3 AS base-app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-WORKDIR /src
+WORKDIR /code
 
 RUN apt-get update && \
     apt-get install -y \
@@ -17,7 +17,7 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-COPY pyproject.toml /src/
+COPY pyproject.toml /code/
 RUN pip3 install pip --upgrade && \
     pip3 install poetry && \
     poetry install --no-dev
@@ -29,5 +29,6 @@ ENTRYPOINT python3 manage.py runserver 0.0.0.0:8000
 
 
 FROM base-app AS prod-app
+COPY src/ /code/
 RUN apt-get install -y xxd
 RUN printf "\nDJANGO_SECRET_KEY=$( xxd -l30 -ps /dev/urandom)\n" > .env

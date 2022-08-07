@@ -14,3 +14,4 @@ services:
       - DJANGO_ALLOWED_HOST=localhost
       - DJANGO_DATABASE_ENGINE=django.db.backends.sqlite3
       - DJANGO_SECRET_KEY=development
+#      - SLACK_TOKEN=secret

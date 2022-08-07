@@ -1,12 +1,10 @@
 version: "3.7"
 services:
-  # http://localhost:8000
-  dev-app:
+  dev-app:    # http://localhost:8000
     build:
       context: .
       dockerfile: Dockerfile
-      target: src-dev
-#    command: sleep 300  # @TODO
+      target: dev-app
     volumes:
       - ./src:/code
     ports:

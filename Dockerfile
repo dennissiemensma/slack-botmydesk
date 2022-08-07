@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3 AS app-base
+FROM python:3 AS base-app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 WORKDIR /src
@@ -23,11 +23,11 @@ RUN pip3 install pip --upgrade && \
     poetry install --no-dev
 
 
-FROM app-base AS app-dev
+FROM base-app AS dev-app
 RUN poetry install
 ENTRYPOINT python3 manage.py runserver 0.0.0.0:8000
 
 
-FROM app-base AS app-prod
+FROM base-app AS prod-app
 RUN apt-get install -y xxd
 RUN printf "\nDJANGO_SECRET_KEY=$( xxd -l30 -ps /dev/urandom)\n" > .env

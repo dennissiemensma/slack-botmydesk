@@ -19,8 +19,8 @@ gunicorn = "^20.1"
 python-decouple = "^3.5"
 pytz = "^2022.1"
 requests = "^2.26"
+slack_sdk = "^3.18"
 urllib3 = "^1.26"
-
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0"

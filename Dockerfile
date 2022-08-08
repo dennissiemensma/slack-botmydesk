@@ -17,18 +17,18 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-COPY pyproject.toml /code/
+COPY poetry.lock pyproject.toml /code/
 RUN pip3 install pip --upgrade && \
-    pip3 install poetry && \
-    poetry install --no-dev
+    pip3 install poetry
 
 
 FROM base-app AS dev-app
 RUN poetry install
-ENTRYPOINT python3 manage.py runserver 0.0.0.0:8000
+#ENTRYPOINT python3 manage.py runserver 0.0.0.0:8000
 
 
 FROM base-app AS prod-app
 COPY src/ /code/
+RUN poetry install --no-dev
 RUN apt-get install -y xxd
 RUN printf "\nDJANGO_SECRET_KEY=$( xxd -l30 -ps /dev/urandom)\n" > .env

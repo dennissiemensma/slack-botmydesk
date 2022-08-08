@@ -30,12 +30,12 @@ jobs:
       - name: Cached dependencies & virtualenv
         uses: actions/cache@v3
         with:
-          path: |
-            ~/.cache/pypoetry/
+          path: ~/.cache/pypoetry/
           key: dependencies-update-check-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         run: |
+          cd src
           pip install --upgrade pip poetry
           poetry config virtualenvs.in-project true
           poetry check
@@ -43,8 +43,10 @@ jobs:
 
       - name: Check flake8
         run: |
+          cd src
           poetry run flake8
 
       - name: Check insecure packages (safety)
         run: |
+          cd src
           poetry run safety check

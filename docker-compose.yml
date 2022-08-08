@@ -1,12 +1,16 @@
 version: "3.7"
 services:
-  dev-app:    # http://localhost:8000
+  dev-app:
     build:
       context: .
       dockerfile: Dockerfile
       target: dev-app
+    # http://localhost:8000
+    command: poetry run /code/manage.py runserver 0.0.0.0:8000
     volumes:
       - ./src:/code
+      - ./pyproject.toml:/code/pyproject.toml
+      - ./poetry.lock:/code/poetry.lock
     ports:
       - '8000:8000'
     environment:
@@ -14,4 +18,3 @@ services:
       - DJANGO_ALLOWED_HOST=localhost
       - DJANGO_DATABASE_ENGINE=django.db.backends.sqlite3
       - DJANGO_SECRET_KEY=development
-#      - SLACK_TOKEN=secret

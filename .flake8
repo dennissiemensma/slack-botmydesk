@@ -1,6 +1,6 @@
 [flake8]
 select = B,C,E,F,I,S,W
-ignore = B902,B903,E501,B950,E203,S311,W503
+ignore = B902,B903,C901,E501,B950,E203,S311,W503
 exclude = .venv/*,src/.venv/*,src/*/migrations/*,*/tests/*,src/botmydesk/*
 max-complexity = 10
 max-line-length = 120

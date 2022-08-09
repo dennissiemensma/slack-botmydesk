@@ -23,8 +23,6 @@ _You should configure these as env vars as well._
 ```shell
 poetry config virtualenvs.in-project true
 poetry install
-poetry run pip install pre-commit
-poetry run pre-commit install
 
 cp docker-compose.override.yml.DEV.TEMPLATE docker-compose.override.yml
 cp .env.TEMPLATE .env

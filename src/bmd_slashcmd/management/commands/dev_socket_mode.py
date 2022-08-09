@@ -8,30 +8,37 @@ import bmd_slashcmd.services
 
 
 class Command(BaseCommand):
-    """ Based on socket client sample in Slack docs. """
+    """Based on socket client sample in Slack docs."""
+
     help = "Dev only: Slack socket client"
 
     def handle(self, **options):
         if not settings.DEBUG:
-            raise CommandError('Socket client unsupported in DEBUG mode')
+            raise CommandError("Socket client unsupported in DEBUG mode")
 
         # Initialize SocketModeClient with an app-level token + WebClient
         client = SocketModeClient(
             # This app-level token will be used only for establishing a connection
             app_token=config("SLACK_APP_TOKEN", cast=str),  # xapp-A111-222-xyz
             # You will be using this WebClient for performing Web API calls in listeners
-            web_client=WebClient(token=config("SLACK_BOT_TOKEN", cast=str))  # xoxb-111-222-xyz
+            web_client=WebClient(
+                token=config("SLACK_BOT_TOKEN", cast=str)
+            ),  # xoxb-111-222-xyz
         )
 
         from slack_sdk.socket_mode.response import SocketModeResponse
         from slack_sdk.socket_mode.request import SocketModeRequest
 
         def process(client: SocketModeClient, req: SocketModeRequest):
+            print("Incoming sevent", req.type)
+
             if req.type == "slash_commands":
+                print("Incoming slash command...")
                 try:
                     bmd_slashcmd.services.on_slash_command(req.payload)
-                except NotImplementedError:
-                    pass
+                except Exception as error:
+                    print("Slash command error", error.__class__, error)
+                    return
 
             # if req.type == "events_api":
             #     # Acknowledge the request anyway
@@ -92,6 +99,8 @@ class Command(BaseCommand):
         client.connect()
         # Just not to stop this process
         from threading import Event
-        print('Awaiting something to happen in Slack...')
-        Event().wait()
 
+        print(
+            "Running socket client, now awaiting for something to interact with us in Slack..."
+        )
+        Event().wait()

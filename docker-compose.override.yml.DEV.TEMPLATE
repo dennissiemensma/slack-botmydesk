@@ -1,13 +1,11 @@
 version: "3.7"
 services:
-  app:
+  app:  # Runs by default on: http://localhost:8000
     build:
       context: .
       dockerfile: Dockerfile
       target: dev-app
-    # You can run "manage.py dev_socket_mode" for development.
-#    command: poetry run /code/manage.py dev_socket_mode
-    command: poetry run /code/manage.py runserver 0.0.0.0:8000  # http://localhost:8000
+    # You can run "poetry run /code/manage.py dev_socket_mode" inside the container during development.
     volumes:
       - ./src:/code
       - ./pyproject.toml:/code/pyproject.toml

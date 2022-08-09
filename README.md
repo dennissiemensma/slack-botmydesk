@@ -21,9 +21,13 @@ _You should configure these as env vars as well._
 ## Installation
 ### Dev
 ```shell
-cp docker-compose.override.yml.DEV.TEMPLATE docker-compose.override.yml
+poetry config virtualenvs.in-project true
+poetry install
 
+cp docker-compose.override.yml.DEV.TEMPLATE docker-compose.override.yml
 cp .env.TEMPLATE .env
+
+docker-compose up -d
 ```
 
 

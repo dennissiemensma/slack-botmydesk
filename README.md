@@ -2,14 +2,21 @@
 
 ## Setup
 - Create you app/bot: https://api.slack.com/apps
+
+Required Bot Token Scopes:
+```
+users:read
+users:read.email
+```
+
 - Make sure it has two "slash commands":
 
 _You can choose any command name you'd like and configure/override it as env var of this bot._
 
-| Slash command    | Description                                                                       | Parameters                            |
-|:-----------------|-----------------------------------------------------------------------------------|:--------------------------------------|
-| `/bmd-authorize` | Authorize bot access for your BMD account using: https://app.bookmydesk.com/login | ``email-address one-time-login-code`` |
-| `/bmd-revoke`    | Revoke bot access for your BMD account                                            | -                                     |
+| Slash command    | Description                                                                       | Parameters                           |
+|:-----------------|-----------------------------------------------------------------------------------|:-------------------------------------|
+| `/bmd-authorize` | Authorize bot access for your BMD account using: https://app.bookmydesk.com/login | ``one-time-login-code``              |
+| `/bmd-revoke`    | Revoke bot access for your BMD account                                            | -                                    |
 
 You will need your:
 - App-Level token

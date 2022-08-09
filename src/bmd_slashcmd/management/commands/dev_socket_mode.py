@@ -19,10 +19,10 @@ class Command(BaseCommand):
         # Initialize SocketModeClient with an app-level token + WebClient
         client = SocketModeClient(
             # This app-level token will be used only for establishing a connection
-            app_token=config("SLACK_APP_TOKEN", cast=str),  # xapp-A111-222-xyz
+            app_token=settings.SLACK_APP_TOKEN,  # xapp-A111-222-xyz
             # You will be using this WebClient for performing Web API calls in listeners
             web_client=WebClient(
-                token=config("SLACK_BOT_TOKEN", cast=str)
+                token=settings.SLACK_BOT_TOKEN
             ),  # xoxb-111-222-xyz
         )
 
@@ -30,14 +30,23 @@ class Command(BaseCommand):
         from slack_sdk.socket_mode.request import SocketModeRequest
 
         def process(client: SocketModeClient, req: SocketModeRequest):
-            print("Incoming sevent", req.type)
+            print("Incoming event", req.type)
 
             if req.type == "slash_commands":
-                print("Incoming slash command...")
                 try:
                     bmd_slashcmd.services.on_slash_command(req.payload)
                 except Exception as error:
                     print("Slash command error", error.__class__, error)
+
+                    response = SocketModeResponse(
+                        envelope_id=req.envelope_id,
+                        payload={
+                            "text": "Hello silently from your app! :tada:",
+                            "user": req.payload["user"],
+                        }
+                    )
+                    print(response)
+                    client.send_socket_mode_response(response)
                     return
 
             if req.type == "events_api":

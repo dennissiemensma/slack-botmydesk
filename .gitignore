@@ -130,5 +130,6 @@ dmypy.json
 .pyre/
 
 # Misc
-/code/pyproject.toml
-/code/poetry.lock
+/src/pyproject.toml
+/src/poetry.lock
+/docker-compose.override.yml

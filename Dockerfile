@@ -7,7 +7,6 @@ WORKDIR /code
 
 RUN apt-get update && \
     apt-get install -y \
-        xxd \
         python3 \
         python3-pip \
         python3-venv
@@ -19,16 +18,17 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 COPY poetry.lock pyproject.toml /code/
 RUN pip3 install pip --upgrade && \
-    pip3 install poetry
+    pip3 install poetry && \
+    poetry install --no-dev
+
 
 
 FROM base-app AS dev-app
 RUN poetry install
-#ENTRYPOINT python3 manage.py runserver 0.0.0.0:8000
+ENTRYPOINT poetry run /code/manage.py runserver 0.0.0.0:8000
+
 
 
 FROM base-app AS prod-app
 COPY src/ /code/
-RUN poetry install --no-dev
-RUN apt-get install -y xxd
-RUN printf "\nDJANGO_SECRET_KEY=$( xxd -l30 -ps /dev/urandom)\n" > .env
+ENTRYPOINT poetry run gunicorn --timeout 10 --workers 4 --max-requests 100 --bind 127.0.0.1:8080 botmydesk.wsgi

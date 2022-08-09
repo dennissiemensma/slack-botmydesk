@@ -4,3 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: prod-app
+
+  # TODO: Web Nginx proxy

@@ -17,7 +17,7 @@ def on_slash_command(user_info: UserInfo, payload: dict) -> dict:
             settings.SLACK_SLASHCOMMAND_BMD: handle_slash_command_bmd,
         }[command]
     except KeyError:
-        raise NotImplementedError(command)
+        raise NotImplementedError(f"Slash command unknown or misconfigured: {command}")
 
     return service_module(user_info, **payload)
 
@@ -29,16 +29,24 @@ def handle_slash_command_bmd(user_info: UserInfo, **payload) -> dict:
     # TODO: Check bot auth state for dynamic stuff
     return {
         "type": "modal",
-        "callback_id": "bmd-modal",
+        "callback_id": "bmd-modal-authorize-pt1",
         "title": {"type": "plain_text", "text": f"Greetings {user_info.name}!"},
         "blocks": [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "You will need to authorize me to access your BMD account (currently only your Slack email address supported).",
+                    "text": f"You will need to authorize me to access your BMD account ({user_info.email}).",
                 },
             },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"_You can always revoke my access later by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._",
+                },
+            },
+            {"type": "divider"},
             {
                 "type": "header",
                 "text": {
@@ -50,7 +58,14 @@ def handle_slash_command_bmd(user_info: UserInfo, **payload) -> dict:
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"Log in using `{user_info.email}` and await the *login code* being sent by email.",
+                    "text": f"Open BMD below, log in using `{user_info.email}` and await your *login code* being sent by email.",
+                },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Return here when you have your 6-digit login code ready.",
                 },
             },
             {
@@ -69,53 +84,6 @@ def handle_slash_command_bmd(user_info: UserInfo, **payload) -> dict:
                     }
                 ],
             },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "_Enter the *login code* in the next dialog._",
-                },
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"_ℹ️ You can revoke my access later by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._",
-                },
-            },
-            # {
-            #     "type": "section",
-            #     "text": {
-            #         "type": "mrkdwn",
-            #         "text": f"Enter you email address ({user_info.email}) over there and have BMD send you a one-time login code \n • Enter to code below to authorize me"
-            #     }
-            # },
-            # {
-            #     "type": "input",
-            #     "element": {
-            #         "type": "plain_text_input",
-            #         "action_id": "bmd_otp_code-action"
-            #     },
-            #     "label": {
-            #         "type": "plain_text",
-            #         "text": f"BMD OTP code for {user_info.email}",
-            #         "emoji": True
-            #     }
-            # },
-            # {
-            #     "type": "actions",
-            #     "elements": [
-            #         {
-            #             "type": "button",
-            #             "text": {
-            #                 "type": "plain_text",
-            #                 "text": "Authorize",
-            #                 "emoji": True
-            #             },
-            #             "value": "authorize",
-            #         }
-            #     ]
-            # },
         ],
     }
 
@@ -151,22 +119,60 @@ def handle_slash_command_bmd(user_info: UserInfo, **payload) -> dict:
 #     raise PermissionError()
 
 
-def on_interactive_action(user_info: UserInfo, action: dict) -> Optional[dict]:
+def on_interactive_action(
+    user_info: UserInfo, action: dict, **payload
+) -> Optional[dict]:
     """Respond to user (inter)actions."""
     action_value = action["value"]
     print(
-        f"Incoming interactive '{action_value}' for {user_info.name} ({user_info.slack_user_id})"
+        f"Incoming interactive ({payload['type']}) '{action_value}' for {user_info.name} ({user_info.slack_user_id})"
     )
-
+    # @TODO distinct types block_actions / view_submission
     try:
         service_module = {
             "open_bmd_login": handle_interactive_open_bmd_login,
         }[action_value]
     except KeyError:
-        raise NotImplementedError(action_value)
+        raise NotImplementedError(
+            f"Interactive action unknown or misconfigured: {action_value}"
+        )
 
     return service_module(user_info, **action)
 
 
-def handle_interactive_open_bmd_login(user_info: UserInfo, **payload):
+def handle_interactive_open_bmd_login(user_info: UserInfo, **payload) -> Optional[dict]:
     print(f"User clicked BMD login: {user_info.slack_user_id}")
+
+    return {
+        "type": "modal",
+        "callback_id": "bmd-modal-authorize-pt2",
+        "title": {"type": "plain_text", "text": f"Greetings {user_info.name}!"},
+        "submit": {"type": "plain_text", "text": "Verify login code"},
+        "blocks": [
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Step 2/2 to authorize me",
+                },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Enter your login code for {user_info.email} below.",
+                },
+            },
+            {
+                "type": "input",
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "bmd_otp_code",
+                },
+                "label": {
+                    "type": "plain_text",
+                    "text": "6-digit code",
+                },
+            },
+        ],
+    }

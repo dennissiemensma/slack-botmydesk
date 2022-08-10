@@ -1,4 +1,5 @@
 from pprint import pformat
+import traceback
 
 from slack_sdk.web import WebClient
 from slack_sdk.socket_mode import SocketModeClient
@@ -41,7 +42,7 @@ class Command(BaseCommand):
             if req.type == "slash_commands":
                 self._handle_slash_commands(client, req)
             if req.type == "interactive":
-                self._handle_interactive_commands(client, req)
+                self._handle_interactivity(client, req)
 
         # Add a new listener to receive messages from Slack
         # You can add more listeners like this
@@ -74,19 +75,21 @@ class Command(BaseCommand):
         except Exception as error:
             print(f"Slash command error: {error} ({error.__class__})")
 
+            error_trace = "\n".join(traceback.format_exc().splitlines())
             client.web_client.chat_postEphemeral(
                 channel=user_id,
                 user=user_id,
-                text="I'm not sure what to do, sorry!",
-            )
-        else:
-            client.web_client.views_open(
-                trigger_id=req.payload["trigger_id"], view=command_response
+                text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: 🤨 *{error}*\n\n```{error_trace}```",
             )
 
-    def _handle_interactive_commands(
-        self, client: SocketModeClient, req: SocketModeRequest
-    ):
+        else:
+            # @see https://app.slack.com/block-kit-builder/
+            result = client.web_client.views_open(
+                trigger_id=req.payload["trigger_id"], view=command_response
+            )
+            result.validate()
+
+    def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
         user_id = req.payload["user"]["id"]
         result = client.web_client.users_info(user=user_id)
         result.validate()
@@ -97,18 +100,29 @@ class Command(BaseCommand):
             email=result.get("user")["profile"]["email"],
         )
 
+        action_view_id = req.payload["view"]["id"]
+        action_view_hash = req.payload["view"]["hash"]
+
         for current in req.payload["actions"]:
             try:
                 interactive_response = bmd_slashcmd.services.on_interactive_action(
-                    user_info, current
+                    user_info, current, **req.payload
                 )
             except Exception as error:
                 print(f"Interactive command error: {error} ({error.__class__})")
 
+                error_trace = "\n".join(traceback.format_exc().splitlines())
                 client.web_client.chat_postEphemeral(
                     channel=user_id,
                     user=user_id,
-                    text="I'm not sure what to do, sorry!",
+                    text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: 🤨 *{error}*\n\n```{error_trace}```",
                 )
             else:
-                print("interactive_response", interactive_response)  # @TODO
+                if interactive_response is not None:
+                    # @see https://api.slack.com/surfaces/modals/using#updating_apis
+                    result = client.web_client.views_update(
+                        view_id=action_view_id,
+                        hash=action_view_hash,
+                        view=interactive_response,
+                    )
+                    result.validate()

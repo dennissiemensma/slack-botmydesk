@@ -5,22 +5,33 @@
 
 Required Bot Token Scopes:
 ```
+# App -> OAuth & Permissions -> Scopes (and NOT "User Token Scopes")
+commands
+chat:write
+im:read
+im:write
 users:read
 users:read.email
 ```
 
-- Make sure it has two "slash commands":
+- Also, ensure to activate (direct) messaging for your **App**:
+```
+# App -> Features -> App Home -> Scroll down the page.
+Allow users to send Slash commands and messages from the messages tab
+```
+
+You will also need your:
+- App-Level token
+- Bot-level token
+
+- Make sure it has the following "slash command(s)":
 
 _You can choose any command name you'd like and configure/override it as env var of this bot._
 
-| Slash command    | Description                                                                       | Parameters                           |
-|:-----------------|-----------------------------------------------------------------------------------|:-------------------------------------|
-| `/bmd-authorize` | Authorize bot access for your BMD account using: https://app.bookmydesk.com/login | ``one-time-login-code``              |
-| `/bmd-revoke`    | Revoke bot access for your BMD account                                            | -                                    |
+| Slash command  | Description        | Parameters                           |
+|:---------------|--------------------|:-------------------------------------|
+| `/botmydesk`   | Access bot options | -                                    |
 
-You will need your:
-- App-Level token
-- Bot-level token
 
 _You should configure these as env vars as well._
 

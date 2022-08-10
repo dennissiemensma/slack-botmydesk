@@ -1,10 +1,14 @@
-from decouple import config
+from pprint import pformat
+
 from slack_sdk.web import WebClient
 from slack_sdk.socket_mode import SocketModeClient
+from slack_sdk.socket_mode.response import SocketModeResponse
+from slack_sdk.socket_mode.request import SocketModeRequest
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
 import bmd_slashcmd.services
+from bmd_slashcmd.dto import UserInfo
 
 
 class Command(BaseCommand):
@@ -21,79 +25,23 @@ class Command(BaseCommand):
             # This app-level token will be used only for establishing a connection
             app_token=settings.SLACK_APP_TOKEN,  # xapp-A111-222-xyz
             # You will be using this WebClient for performing Web API calls in listeners
-            web_client=WebClient(
-                token=settings.SLACK_BOT_TOKEN
-            ),  # xoxb-111-222-xyz
+            web_client=WebClient(token=settings.SLACK_BOT_TOKEN),  # xoxb-111-222-xyz
         )
 
-        from slack_sdk.socket_mode.response import SocketModeResponse
-        from slack_sdk.socket_mode.request import SocketModeRequest
-
         def process(client: SocketModeClient, req: SocketModeRequest):
-            print("Incoming event", req.type)
+            payload_dump = pformat(req.payload, indent=4)
+            print(
+                f"Incoming request type {req.type} ({req.envelope_id}) with payload:\n{payload_dump}"
+            )
+
+            # Ack first (Slack timeout @ 3s).
+            response = SocketModeResponse(envelope_id=req.envelope_id)
+            client.send_socket_mode_response(response)
 
             if req.type == "slash_commands":
-                try:
-                    bmd_slashcmd.services.on_slash_command(req.payload)
-                except Exception as error:
-                    print("Slash command error", error.__class__, error)
-
-                    response = SocketModeResponse(
-                        envelope_id=req.envelope_id,
-                        payload={
-                            "text": "Hello silently from your app! :tada:",
-                            "user": req.payload["user"],
-                        }
-                    )
-                    print(response)
-                    client.send_socket_mode_response(response)
-                    return
-
-            if req.type == "events_api":
-                # Acknowledge the request anyway
-                response = SocketModeResponse(envelope_id=req.envelope_id)
-                client.send_socket_mode_response(response)
-
-                # Add a reaction to the message if it's a new message
-                if (
-                    req.payload["event"]["type"] == "message"
-                    and req.payload["event"].get("subtype") is None
-                ):
-                    client.web_client.reactions_add(
-                        name="eyes",
-                        channel=req.payload["event"]["channel"],
-                        timestamp=req.payload["event"]["ts"],
-                    )
-            if req.type == "interactive" and req.payload.get("type") == "shortcut":
-                if req.payload["callback_id"] == "hello-shortcut":
-                    # Acknowledge the request
-                    response = SocketModeResponse(envelope_id=req.envelope_id)
-                    client.send_socket_mode_response(response)
-                    # Open a welcome modal
-                    client.web_client.views_open(
-                        trigger_id=req.payload["trigger_id"],
-                        view={
-                            "type": "modal",
-                            "callback_id": "hello-modal",
-                            "title": {"type": "plain_text", "text": "Greetings!"},
-                            "submit": {"type": "plain_text", "text": "Good Bye"},
-                            "blocks": [
-                                {
-                                    "type": "section",
-                                    "text": {"type": "mrkdwn", "text": "Hello!"},
-                                }
-                            ],
-                        },
-                    )
-
-            if (
-                req.type == "interactive"
-                and req.payload.get("type") == "view_submission"
-            ):
-                if req.payload["view"]["callback_id"] == "hello-modal":
-                    # Acknowledge the request and close the modal
-                    response = SocketModeResponse(envelope_id=req.envelope_id)
-                    client.send_socket_mode_response(response)
+                self._handle_slash_commands(client, req)
+            if req.type == "interactive":
+                self._handle_interactive_commands(client, req)
 
         # Add a new listener to receive messages from Slack
         # You can add more listeners like this
@@ -104,6 +52,63 @@ class Command(BaseCommand):
         from threading import Event
 
         print(
-            "Running socket client, now awaiting for something to interact with us in Slack..."
+            "Running socket client, now awaiting for someone to interact with us in Slack..."
         )
         Event().wait()
+
+    def _handle_slash_commands(self, client: SocketModeClient, req: SocketModeRequest):
+        user_id = req.payload["user_id"]
+        result = client.web_client.users_info(user=user_id)
+        result.validate()
+
+        user_info = UserInfo(
+            slack_user_id=user_id,
+            name=result.get("user")["profile"]["first_name"],
+            email=result.get("user")["profile"]["email"],
+        )
+
+        try:
+            command_response = bmd_slashcmd.services.on_slash_command(
+                user_info, req.payload
+            )
+        except Exception as error:
+            print(f"Slash command error: {error} ({error.__class__})")
+
+            client.web_client.chat_postEphemeral(
+                channel=user_id,
+                user=user_id,
+                text="I'm not sure what to do, sorry!",
+            )
+        else:
+            client.web_client.views_open(
+                trigger_id=req.payload["trigger_id"], view=command_response
+            )
+
+    def _handle_interactive_commands(
+        self, client: SocketModeClient, req: SocketModeRequest
+    ):
+        user_id = req.payload["user"]["id"]
+        result = client.web_client.users_info(user=user_id)
+        result.validate()
+
+        user_info = UserInfo(
+            slack_user_id=user_id,
+            name=result.get("user")["profile"]["first_name"],
+            email=result.get("user")["profile"]["email"],
+        )
+
+        for current in req.payload["actions"]:
+            try:
+                interactive_response = bmd_slashcmd.services.on_interactive_action(
+                    user_info, current
+                )
+            except Exception as error:
+                print(f"Interactive command error: {error} ({error.__class__})")
+
+                client.web_client.chat_postEphemeral(
+                    channel=user_id,
+                    user=user_id,
+                    text="I'm not sure what to do, sorry!",
+                )
+            else:
+                print("interactive_response", interactive_response)  # @TODO

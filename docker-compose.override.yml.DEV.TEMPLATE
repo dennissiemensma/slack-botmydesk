@@ -16,8 +16,25 @@ services:
     env_file:
       - .env
     environment:
+      # TODO: Set DEV_EMAIL_ADDRESS if you dev on a different Slack workspace. Remove otherwise.
+      - DEV_EMAIL_ADDRESS=
       - DJANGO_DEBUG=True
-      - DJANGO_ALLOWED_HOST=localhost
-      - DJANGO_DATABASE_ENGINE=django.db.backends.sqlite3
       - DJANGO_SECRET_KEY=development
-      - DEV_EMAIL_ADDRESS=  # TODO: Set if you dev on a different Slack, remove otherwise.
+      # https://docs.djangoproject.com/en/4.1/ref/settings/#allowed-hosts
+      - DJANGO_ALLOWED_HOST=localhost
+      # https://docs.djangoproject.com/en/4.1/ref/databases/
+      - DJANGO_DATABASE_ENGINE=django.db.backends.mysql
+      - DJANGO_DATABASE_HOST=db
+      - DJANGO_DATABASE_PORT=3306
+      - DJANGO_DATABASE_USER=devuser
+      - DJANGO_DATABASE_PASSWORD=devpasswd
+      - DJANGO_DATABASE_NAME=botmydesk
+
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+     - MYSQL_DATABASE=botmydesk
+     - MYSQL_USER=devuser
+     - MYSQL_PASSWORD=devpasswd
+     - MYSQL_ROOT_PASSWORD=rootpasswd

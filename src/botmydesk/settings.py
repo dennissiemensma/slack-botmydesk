@@ -79,6 +79,11 @@ WSGI_APPLICATION = "botmydesk.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": config("DJANGO_DATABASE_ENGINE", cast=str),
+        "HOST": config("DJANGO_DATABASE_HOST", cast=str, default=None),
+        "PORT": config("DJANGO_DATABASE_PORT", cast=str, default=None),
+        "USER": config("DJANGO_DATABASE_USER", cast=str, default=None),
+        "PASSWORD": config("DJANGO_DATABASE_PASSWORD", cast=str, default=None),
+        "NAME": config("DJANGO_DATABASE_NAME", cast=str),
     }
 }
 
@@ -178,7 +183,6 @@ BOTMYDESK_USER_AGENT = "BotMyDesk Slack Integration"
 SLACK_APP_TOKEN = config("SLACK_APP_TOKEN", cast=str)
 SLACK_BOT_TOKEN = config("SLACK_BOT_TOKEN", cast=str)
 
-BOOKMYDESK_LOGIN_URL = config("BOOKMYDESK_LOGIN_URL", cast=str)
 BOOKMYDESK_API_URL = config("BOOKMYDESK_API_URL", cast=str)
 BOOKMYDESK_CLIENT_ID = config("BOOKMYDESK_CLIENT_ID", cast=str)
 BOOKMYDESK_CLIENT_SECRET = config("BOOKMYDESK_CLIENT_SECRET", cast=str)

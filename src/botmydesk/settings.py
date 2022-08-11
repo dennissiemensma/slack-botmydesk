@@ -124,6 +124,55 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+""" Python Logging. """
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {
+            "format": "{asctime} {levelname:8} | {message}",
+            "style": "{",
+        },
+        "verbose": {
+            "format": "{asctime} {levelname:8} {module:12} {funcName:30} {lineno:4} | {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "botmydesk": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
+        "bookmydesk_client": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            " propagate": False,
+        },
+        "console_commands": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.db": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}
+
+if DEBUG:
+    LOGGING["loggers"]["botmydesk"]["level"] = "DEBUG"
+    LOGGING["loggers"]["bookmydesk_client"]["level"] = "DEBUG"
+    LOGGING["loggers"]["console_commands"]["level"] = "DEBUG"
+
 # Project related.
 BOTMYDESK_USER_AGENT = "BotMyDesk Slack Integration"
 SLACK_APP_TOKEN = config("SLACK_APP_TOKEN", cast=str)

@@ -1,5 +1,6 @@
 from pprint import pformat
 import traceback
+import logging
 
 from slack_sdk.web import WebClient
 from slack_sdk.socket_mode import SocketModeClient
@@ -11,6 +12,10 @@ from decouple import config
 
 import bmd_slashcmd.services
 from bmd_slashcmd.dto import UserInfo
+
+
+console_commands_logger = logging.getLogger("console_commands")
+botmydesk_logger = logging.getLogger("botmydesk")
 
 
 class Command(BaseCommand):
@@ -33,7 +38,7 @@ class Command(BaseCommand):
         def process(client: SocketModeClient, req: SocketModeRequest):
             try:  # Ugly workaround, since exceptions seem to be silent otherwise.
                 payload_dump = pformat(req.payload, indent=4)
-                print(
+                botmydesk_logger.debug(
                     f"Incoming request type {req.type} ({req.envelope_id}) with payload:\n{payload_dump}"
                 )
 
@@ -42,7 +47,7 @@ class Command(BaseCommand):
                 if req.type == "interactive":
                     self._handle_interactivity(client, req)
             except Exception as error:
-                print(f"Uncaught exception: {error}")
+                console_commands_logger.exception(error)
                 raise
 
         # Add a new listener to receive messages from Slack
@@ -53,7 +58,7 @@ class Command(BaseCommand):
         # Just not to stop this process
         from threading import Event
 
-        print(
+        console_commands_logger.debug(
             "Running socket client, now awaiting for someone to interact with us in Slack..."
         )
         Event().wait()
@@ -72,7 +77,9 @@ class Command(BaseCommand):
                 user_info, req.payload
             )
         except Exception as error:
-            print(f"Slash command error: {error} ({error.__class__})")
+            console_commands_logger.error(
+                f"Slash command error: {error} ({error.__class__})"
+            )
 
             error_trace = "\n".join(traceback.format_exc().splitlines())
             client.web_client.chat_postEphemeral(
@@ -110,7 +117,9 @@ class Command(BaseCommand):
                         )
                     )
                 except Exception as error:
-                    print(f"Interactive command error: {error} ({error.__class__})")
+                    console_commands_logger.error(
+                        f"Interactive command error: {error} ({error.__class__})"
+                    )
 
                     error_trace = "\n".join(traceback.format_exc().splitlines())
                     client.web_client.chat_postEphemeral(
@@ -137,7 +146,9 @@ class Command(BaseCommand):
                     )
                 )
             except Exception as error:
-                print(f"Interactive command error: {error} ({error.__class__})")
+                console_commands_logger.error(
+                    f"Interactive command error: {error} ({error.__class__})"
+                )
 
                 error_trace = "\n".join(traceback.format_exc().splitlines())
                 client.web_client.chat_postEphemeral(
@@ -160,7 +171,9 @@ class Command(BaseCommand):
         # Dev only: Override email address when required for development.
         if settings.DEBUG and config("DEV_EMAIL_ADDRESS", cast=str, default=None):
             email_address = config("DEV_EMAIL_ADDRESS", cast=str)
-            print(f"DEV_EMAIL_ADDRESS: Overriding email address with: {email_address}")
+            console_commands_logger.debug(
+                f"DEV_EMAIL_ADDRESS: Overriding email address with: {email_address}"
+            )
         else:
             email_address = result.get("user")["profile"]["email"]
 

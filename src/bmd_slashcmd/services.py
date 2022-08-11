@@ -1,4 +1,5 @@
 from typing import Optional
+import logging
 
 from django.conf import settings
 
@@ -6,10 +7,13 @@ from bmd_slashcmd.dto import UserInfo
 import bmd_api_client.client
 
 
+botmydesk_logger = logging.getLogger("botmydesk")
+
+
 def on_slash_command(user_info: UserInfo, payload: dict) -> dict:
     """Pass me your slash command payload to map."""
     command = payload["command"]
-    print(
+    botmydesk_logger.info(
         f"{user_info.slack_user_id} ({user_info.email}): Incoming slash command '{command}'"
     )
 
@@ -25,7 +29,7 @@ def on_slash_command(user_info: UserInfo, payload: dict) -> dict:
 
 def handle_slash_command_bmd(user_info: UserInfo, **payload) -> dict:
     """Called on generic bmd."""
-    print(
+    botmydesk_logger.debug(
         f"{user_info.slack_user_id} ({user_info.email}): User triggered slash command"
     )
 
@@ -90,7 +94,7 @@ def on_interactive_block_action(
 ) -> Optional[dict]:
     """Respond to user (inter)actions."""
     action_value = action["value"]
-    print(
+    botmydesk_logger.debug(
         f"{user_info.slack_user_id} ({user_info.email}): Incoming interactive block action '{action_value}'"
     )
 
@@ -110,7 +114,7 @@ def on_interactive_block_action(
 def handle_interactive_bmd_authorize_pt1_start(
     user_info: UserInfo, **payload
 ) -> Optional[dict]:
-    print(
+    botmydesk_logger.debug(
         f"{user_info.slack_user_id} ({user_info.email}): Rendering part 1 of authorization flow for user"
     )
 
@@ -157,12 +161,12 @@ def handle_interactive_bmd_authorize_pt1_start(
 def handle_interactive_bmd_authorize_pt2_start(
     user_info: UserInfo, **payload
 ) -> Optional[dict]:
-    print(
+    botmydesk_logger.info(
         f"{user_info.slack_user_id} ({user_info.email}): Requesting BookMyDesk login code"
     )
-    bmd_api_client.client.request_login_code(email=user_info.email)  # TODO enable
+    bmd_api_client.client.request_login_code(email=user_info.email)
 
-    print(
+    botmydesk_logger.debug(
         f"{user_info.slack_user_id} ({user_info.email}): Rendering part 2 of authorization flow for user"
     )
     return {
@@ -206,7 +210,7 @@ def on_interactive_view_submission(
 ) -> Optional[dict]:
     """Respond to user (inter)actions."""
     view_callback_id = payload["view"]["callback_id"]
-    print(
+    botmydesk_logger.debug(
         f"{user_info.slack_user_id} ({user_info.email}): Incoming interactive view submission '{view_callback_id}'"
     )
 
@@ -225,13 +229,15 @@ def on_interactive_view_submission(
 def handle_interactive_bmd_authorize_pt2_submit(
     user_info: UserInfo, **payload
 ) -> Optional[dict]:
-    print(
+    botmydesk_logger.info(
         f"{user_info.slack_user_id} ({user_info.email}): Authorizing credentials entered for user"
     )
 
-    # otp = payload["view"]["state"]["values"]["otp_user_input_block"]["otp_user_input"][
-    #     "value"
-    # ]
-    # json_response = bmd_api_client.client.token_login(username=user_info.email, otp=otp)
+    otp = payload["view"]["state"]["values"]["otp_user_input_block"]["otp_user_input"][
+        "value"
+    ]
+    json_response = bmd_api_client.client.token_login(username=user_info.email, otp=otp)
+
     # @TODO Store in DB
+    print(json_response)
     return

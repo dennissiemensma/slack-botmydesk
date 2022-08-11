@@ -7,6 +7,7 @@ from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.socket_mode.request import SocketModeRequest
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from decouple import config
 
 import bmd_slashcmd.services
 from bmd_slashcmd.dto import UserInfo
@@ -30,19 +31,19 @@ class Command(BaseCommand):
         )
 
         def process(client: SocketModeClient, req: SocketModeRequest):
-            payload_dump = pformat(req.payload, indent=4)
-            print(
-                f"Incoming request type {req.type} ({req.envelope_id}) with payload:\n{payload_dump}"
-            )
+            try:  # Ugly workaround, since exceptions seem to be silent otherwise.
+                payload_dump = pformat(req.payload, indent=4)
+                print(
+                    f"Incoming request type {req.type} ({req.envelope_id}) with payload:\n{payload_dump}"
+                )
 
-            # Ack first (Slack timeout @ 3s).
-            response = SocketModeResponse(envelope_id=req.envelope_id)
-            client.send_socket_mode_response(response)
-
-            if req.type == "slash_commands":
-                self._handle_slash_commands(client, req)
-            if req.type == "interactive":
-                self._handle_interactivity(client, req)
+                if req.type == "slash_commands":
+                    self._handle_slash_commands(client, req)
+                if req.type == "interactive":
+                    self._handle_interactivity(client, req)
+            except Exception as error:
+                print(f"Uncaught exception: {error}")
+                raise
 
         # Add a new listener to receive messages from Slack
         # You can add more listeners like this
@@ -58,15 +59,13 @@ class Command(BaseCommand):
         Event().wait()
 
     def _handle_slash_commands(self, client: SocketModeClient, req: SocketModeRequest):
-        user_id = req.payload["user_id"]
-        result = client.web_client.users_info(user=user_id)
-        result.validate()
-
-        user_info = UserInfo(
-            slack_user_id=user_id,
-            name=result.get("user")["profile"]["first_name"],
-            email=result.get("user")["profile"]["email"],
+        # Ack first (Slack timeout @ 3s).
+        client.send_socket_mode_response(
+            SocketModeResponse(envelope_id=req.envelope_id)
         )
+
+        user_id = req.payload["user_id"]
+        user_info = self._get_user_info(client, slack_user_id=user_id)
 
         try:
             command_response = bmd_slashcmd.services.on_slash_command(
@@ -79,7 +78,7 @@ class Command(BaseCommand):
             client.web_client.chat_postEphemeral(
                 channel=user_id,
                 user=user_id,
-                text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: 🤨 *{error}*\n\n```{error_trace}```",
+                text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: *{error}* 🤨 \n\n```{error_trace}```",
             )
 
         else:
@@ -91,22 +90,51 @@ class Command(BaseCommand):
 
     def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
         user_id = req.payload["user"]["id"]
-        result = client.web_client.users_info(user=user_id)
-        result.validate()
-
-        user_info = UserInfo(
-            slack_user_id=user_id,
-            name=result.get("user")["profile"]["first_name"],
-            email=result.get("user")["profile"]["email"],
-        )
+        user_info = self._get_user_info(client, slack_user_id=user_id)
 
         action_view_id = req.payload["view"]["id"]
         action_view_hash = req.payload["view"]["hash"]
 
-        for current in req.payload["actions"]:
+        # Respond to view UX.
+        if req.payload["type"] == "block_actions":
+            # Ack first (Slack timeout @ 3s).
+            client.send_socket_mode_response(
+                SocketModeResponse(envelope_id=req.envelope_id)
+            )
+
+            for current in req.payload["actions"]:
+                try:
+                    interactive_response = (
+                        bmd_slashcmd.services.on_interactive_block_action(
+                            user_info, current, **req.payload
+                        )
+                    )
+                except Exception as error:
+                    print(f"Interactive command error: {error} ({error.__class__})")
+
+                    error_trace = "\n".join(traceback.format_exc().splitlines())
+                    client.web_client.chat_postEphemeral(
+                        channel=user_id,
+                        user=user_id,
+                        text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: *{error}* 🤨 \n\n```{error_trace}```",
+                    )
+                else:
+                    if interactive_response is not None:
+                        # @see https://api.slack.com/surfaces/modals/using#updating_apis
+                        result = client.web_client.views_update(
+                            view_id=action_view_id,
+                            hash=action_view_hash,
+                            view=interactive_response,
+                        )
+                        result.validate()
+
+        # Respond to submits.
+        if req.payload["type"] == "view_submission":
             try:
-                interactive_response = bmd_slashcmd.services.on_interactive_action(
-                    user_info, current, **req.payload
+                interactive_response = (
+                    bmd_slashcmd.services.on_interactive_view_submission(
+                        user_info, req.payload
+                    )
                 )
             except Exception as error:
                 print(f"Interactive command error: {error} ({error.__class__})")
@@ -115,14 +143,29 @@ class Command(BaseCommand):
                 client.web_client.chat_postEphemeral(
                     channel=user_id,
                     user=user_id,
-                    text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: 🤨 *{error}*\n\n```{error_trace}```",
+                    text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: *{error}* 🤨 \n\n```{error_trace}```",
                 )
-            else:
-                if interactive_response is not None:
-                    # @see https://api.slack.com/surfaces/modals/using#updating_apis
-                    result = client.web_client.views_update(
-                        view_id=action_view_id,
-                        hash=action_view_hash,
-                        view=interactive_response,
-                    )
-                    result.validate()
+
+            # Ack (Slack timeout @ 3s).
+            client.send_socket_mode_response(
+                SocketModeResponse(
+                    envelope_id=req.envelope_id, payload={"response_action": "clear"}
+                )
+            )
+
+    def _get_user_info(self, client: SocketModeClient, slack_user_id: str) -> UserInfo:
+        result = client.web_client.users_info(user=slack_user_id)
+        result.validate()
+
+        # Dev only: Override email address when required for development.
+        if settings.DEBUG and config("DEV_EMAIL_ADDRESS", cast=str, default=None):
+            email_address = config("DEV_EMAIL_ADDRESS", cast=str)
+            print(f"DEV_EMAIL_ADDRESS: Overriding email address with: {email_address}")
+        else:
+            email_address = result.get("user")["profile"]["email"]
+
+        return UserInfo(
+            slack_user_id=slack_user_id,
+            name=result.get("user")["profile"]["first_name"],
+            email=email_address,
+        )

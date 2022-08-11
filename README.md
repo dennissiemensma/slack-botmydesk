@@ -1,4 +1,5 @@
 # Slack: BotMyDesk
+_This project is NOT officially affiliated with BookMyDesk in any way!_
 
 ## Setup
 - Create you app/bot: https://api.slack.com/apps

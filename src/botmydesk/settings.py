@@ -125,7 +125,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Project related.
-BMD_USER_AGENT = "BotMyDesk Slack Integration"
+BOTMYDESK_USER_AGENT = "BotMyDesk Slack Integration"
 SLACK_APP_TOKEN = config("SLACK_APP_TOKEN", cast=str)
 SLACK_BOT_TOKEN = config("SLACK_BOT_TOKEN", cast=str)
 

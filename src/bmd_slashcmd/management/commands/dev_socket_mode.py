@@ -169,7 +169,7 @@ class Command(BaseCommand):
         result.validate()
 
         # Dev only: Override email address when required for development.
-        DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default='')
+        DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default="")
 
         if settings.DEBUG and DEV_EMAIL_ADDRESS:
             email_address = DEV_EMAIL_ADDRESS

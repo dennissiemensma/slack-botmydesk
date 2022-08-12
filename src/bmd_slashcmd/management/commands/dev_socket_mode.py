@@ -169,8 +169,10 @@ class Command(BaseCommand):
         result.validate()
 
         # Dev only: Override email address when required for development.
-        if settings.DEBUG and config("DEV_EMAIL_ADDRESS", cast=str, default=None):
-            email_address = config("DEV_EMAIL_ADDRESS", cast=str)
+        DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default='')
+
+        if settings.DEBUG and DEV_EMAIL_ADDRESS:
+            email_address = DEV_EMAIL_ADDRESS
             console_commands_logger.debug(
                 f"DEV_EMAIL_ADDRESS: Overriding email address with: {email_address}"
             )

@@ -16,7 +16,7 @@ services:
     env_file:
       - .env
     environment:
-      # TODO: Set DEV_EMAIL_ADDRESS if you dev on a different Slack workspace. Remove otherwise.
+      # TODO: Set DEV_EMAIL_ADDRESS if you dev on a different Slack workspace (and DJANGO_DEBUG = True). Omit otherwise.
       - DEV_EMAIL_ADDRESS=
       - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=development

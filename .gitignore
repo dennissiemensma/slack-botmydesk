@@ -134,3 +134,6 @@ dmypy.json
 /src/pyproject.toml
 /src/poetry.lock
 /docker-compose.override.yml
+/docker/sqlite/
+/docker/mysql/
+/docker/postgres/

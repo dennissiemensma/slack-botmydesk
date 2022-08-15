@@ -5,8 +5,9 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dev-app
-    # You can run "poetry run /code/manage.py dev_socket_mode" inside the container during development.
-#    command: poetry run /code/manage.py dev_socket_mode
+    # Assumes you want socket mode + autoreload during development.
+    command: poetry run /code/manage.py dev_socket_mode
+#    command: poetry run /code/manage.py runserver 0.0.0.0:8000
     volumes:
       - ./src:/code
       - ./pyproject.toml:/code/pyproject.toml

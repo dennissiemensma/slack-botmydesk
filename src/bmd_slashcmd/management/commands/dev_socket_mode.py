@@ -11,7 +11,7 @@ from django.conf import settings
 from decouple import config
 
 import bmd_slashcmd.services
-from bmd_slashcmd.dto import UserInfo
+from bmd_core.models import BotMyDeskUser
 
 
 console_commands_logger = logging.getLogger("console_commands")
@@ -70,12 +70,10 @@ class Command(BaseCommand):
         )
 
         user_id = req.payload["user_id"]
-        user_info = self._get_user_info(client, slack_user_id=user_id)
+        user = self._get_user(client, slack_user_id=user_id)
 
         try:
-            command_response = bmd_slashcmd.services.on_slash_command(
-                user_info, req.payload
-            )
+            command_response = bmd_slashcmd.services.on_slash_command(user, req.payload)
         except Exception as error:
             console_commands_logger.error(
                 f"Slash command error: {error} ({error.__class__})"
@@ -97,7 +95,7 @@ class Command(BaseCommand):
 
     def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
         user_id = req.payload["user"]["id"]
-        user_info = self._get_user_info(client, slack_user_id=user_id)
+        user = self._get_user(client, slack_user_id=user_id)
 
         action_view_id = req.payload["view"]["id"]
         action_view_hash = req.payload["view"]["hash"]
@@ -113,7 +111,7 @@ class Command(BaseCommand):
                 try:
                     interactive_response = (
                         bmd_slashcmd.services.on_interactive_block_action(
-                            user_info, current, **req.payload
+                            user, current, **req.payload
                         )
                     )
                 except Exception as error:
@@ -142,7 +140,7 @@ class Command(BaseCommand):
             try:
                 interactive_response = (
                     bmd_slashcmd.services.on_interactive_view_submission(
-                        user_info, req.payload
+                        user, req.payload
                     )
                 )
             except Exception as error:
@@ -164,7 +162,8 @@ class Command(BaseCommand):
                 )
             )
 
-    def _get_user_info(self, client: SocketModeClient, slack_user_id: str) -> UserInfo:
+    def _get_user(self, client: SocketModeClient, slack_user_id: str) -> BotMyDeskUser:
+        """Fetches Slack user info and creates/updates the user info on our side."""
         result = client.web_client.users_info(user=slack_user_id)
         result.validate()
 
@@ -179,8 +178,22 @@ class Command(BaseCommand):
         else:
             email_address = result.get("user")["profile"]["email"]
 
-        return UserInfo(
-            slack_user_id=slack_user_id,
-            name=result.get("user")["profile"]["first_name"],
-            email=email_address,
-        )
+        first_name = result.get("user")["profile"]["first_name"]
+
+        try:
+            # Ensure every user is known internally.
+            user = BotMyDeskUser.objects.by_slack_id(slack_user_id=slack_user_id)
+        except BotMyDeskUser.DoesNotExist:
+            user = BotMyDeskUser.objects.create(
+                slack_user_id=slack_user_id,
+                email=email_address,
+                name=first_name,
+            )
+        else:
+            # Update these, if it ever changes.
+            user.update(
+                email=email_address,
+                name=first_name,
+            )
+
+        return user

@@ -7,6 +7,7 @@ from slack_sdk.socket_mode import SocketModeClient
 from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.socket_mode.request import SocketModeRequest
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.autoreload import run_with_reloader
 from django.conf import settings
 from decouple import config
 
@@ -21,12 +22,16 @@ botmydesk_logger = logging.getLogger("botmydesk")
 class Command(BaseCommand):
     """Based on socket client sample in Slack docs."""
 
-    help = "Dev only: Slack socket client"
+    help = "Dev only: Slack socket client. Reloads on local file change!"
 
     def handle(self, **options):
         if not settings.DEBUG:
             raise CommandError("Socket client unsupported in DEBUG mode")
 
+        # This ensures we have a file watcher locally.
+        run_with_reloader(self._run)
+
+    def _run(self):
         # Initialize SocketModeClient with an app-level token + WebClient
         client = SocketModeClient(
             # This app-level token will be used only for establishing a connection

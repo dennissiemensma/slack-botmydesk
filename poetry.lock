@@ -467,6 +467,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "psycopg2"
+version = "2.9.3"
+description = "psycopg2 - Python-PostgreSQL Database Adapter"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "py"
 version = "1.11.0"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
@@ -591,14 +599,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "pytz"
-version = "2022.2"
-description = "World timezone definitions, modern and historical"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
@@ -703,7 +703,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-pytz"
-version = "2021.3.8"
+version = "2022.1.2"
 description = "Typing stubs for pytz"
 category = "dev"
 optional = false
@@ -776,7 +776,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "61bfdc28e4901a47b83d5f02fb4707501c298e939b03459184726c5c3af1e102"
+content-hash = "507fa8da74b915134f778f0ece9d8c2595e5cb5304e4cbe8939125a8a17c64b2"
 
 [metadata.files]
 asgiref = []
@@ -819,6 +819,7 @@ pbr = []
 platformdirs = []
 pluggy = []
 polib = []
+psycopg2 = []
 py = []
 pycodestyle = []
 pyflakes = []
@@ -829,7 +830,6 @@ pytest-django = []
 pytest-forked = []
 pytest-xdist = []
 python-decouple = []
-pytz = []
 pyyaml = []
 requests = []
 safety = []

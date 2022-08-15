@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         if not settings.DEBUG:
-            raise CommandError("Socket client unsupported in DEBUG mode")
+            raise CommandError("Socket client only supported in DEBUG mode")
 
         # This ensures we have a file watcher locally.
         run_with_reloader(self._run)

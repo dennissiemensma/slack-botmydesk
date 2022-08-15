@@ -47,6 +47,11 @@ class Command(BaseCommand):
                     f"Incoming request type {req.type} ({req.envelope_id}) with payload:\n{payload_dump}"
                 )
 
+                # Ack first (Slack timeout @ 3s).
+                client.send_socket_mode_response(
+                    SocketModeResponse(envelope_id=req.envelope_id)
+                )
+
                 if req.type == "slash_commands":
                     self._handle_slash_commands(client, req)
                 if req.type == "interactive":
@@ -64,21 +69,16 @@ class Command(BaseCommand):
         from threading import Event
 
         console_commands_logger.debug(
-            "Running socket client, now awaiting for someone to interact with us in Slack..."
+            "Running socket client, awaiting interaction in Slack..."
         )
         Event().wait()
 
     def _handle_slash_commands(self, client: SocketModeClient, req: SocketModeRequest):
-        # Ack first (Slack timeout @ 3s).
-        client.send_socket_mode_response(
-            SocketModeResponse(envelope_id=req.envelope_id)
-        )
-
         user_id = req.payload["user_id"]
         user = self._get_user(client, slack_user_id=user_id)
 
         try:
-            command_response = bmd_slashcmd.services.on_slash_command(user, req.payload)
+            bmd_slashcmd.services.on_slash_command(client, user, req.payload)
         except Exception as error:
             console_commands_logger.error(
                 f"Slash command error: {error} ({error.__class__})"
@@ -91,19 +91,9 @@ class Command(BaseCommand):
                 text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: *{error}* 🤨 \n\n```{error_trace}```",
             )
 
-        else:
-            # @see https://app.slack.com/block-kit-builder/
-            result = client.web_client.views_open(
-                trigger_id=req.payload["trigger_id"], view=command_response
-            )
-            result.validate()
-
     def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
         user_id = req.payload["user"]["id"]
         user = self._get_user(client, slack_user_id=user_id)
-
-        action_view_id = req.payload["view"]["id"]
-        action_view_hash = req.payload["view"]["hash"]
 
         # Respond to view UX.
         if req.payload["type"] == "block_actions":
@@ -114,10 +104,8 @@ class Command(BaseCommand):
 
             for current in req.payload["actions"]:
                 try:
-                    interactive_response = (
-                        bmd_slashcmd.services.on_interactive_block_action(
-                            user, current, **req.payload
-                        )
+                    bmd_slashcmd.services.on_interactive_block_action(
+                        client, user, current, **req.payload
                     )
                 except Exception as error:
                     console_commands_logger.error(
@@ -130,23 +118,12 @@ class Command(BaseCommand):
                         user=user_id,
                         text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: *{error}* 🤨 \n\n```{error_trace}```",
                     )
-                else:
-                    if interactive_response is not None:
-                        # @see https://api.slack.com/surfaces/modals/using#updating_apis
-                        result = client.web_client.views_update(
-                            view_id=action_view_id,
-                            hash=action_view_hash,
-                            view=interactive_response,
-                        )
-                        result.validate()
 
         # Respond to submits.
         if req.payload["type"] == "view_submission":
             try:
-                interactive_response = (
-                    bmd_slashcmd.services.on_interactive_view_submission(
-                        user, req.payload
-                    )
+                bmd_slashcmd.services.on_interactive_view_submission(
+                    client, user, req.payload
                 )
             except Exception as error:
                 console_commands_logger.error(
@@ -159,13 +136,6 @@ class Command(BaseCommand):
                     user=user_id,
                     text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: *{error}* 🤨 \n\n```{error_trace}```",
                 )
-
-            # Ack (Slack timeout @ 3s).
-            client.send_socket_mode_response(
-                SocketModeResponse(
-                    envelope_id=req.envelope_id, payload={"response_action": "clear"}
-                )
-            )
 
     def _get_user(self, client: SocketModeClient, slack_user_id: str) -> BotMyDeskUser:
         """Fetches Slack user info and creates/updates the user info on our side."""

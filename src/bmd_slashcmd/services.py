@@ -1,8 +1,8 @@
-from typing import Optional
 import logging
 
 from django.conf import settings
 from django.utils import timezone
+from slack_sdk.socket_mode import SocketModeClient
 
 from bmd_core.models import BotMyDeskUser
 import bmd_api_client.client
@@ -11,7 +11,9 @@ import bmd_api_client.client
 botmydesk_logger = logging.getLogger("botmydesk")
 
 
-def on_slash_command(botmydesk_user: BotMyDeskUser, payload: dict) -> dict:
+def on_slash_command(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, payload: dict
+):
     """Pass me your slash command payload to map."""
     command = payload["command"]
     botmydesk_logger.info(
@@ -25,10 +27,12 @@ def on_slash_command(botmydesk_user: BotMyDeskUser, payload: dict) -> dict:
     except KeyError:
         raise NotImplementedError(f"Slash command unknown or misconfigured: {command}")
 
-    return service_module(botmydesk_user, **payload)
+    service_module(client, botmydesk_user, **payload)
 
 
-def handle_slash_command_bmd(botmydesk_user: BotMyDeskUser, **payload) -> dict:
+def handle_slash_command_bmd(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
     """Called on generic bmd."""
     botmydesk_logger.debug(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): User triggered slash command"
@@ -39,7 +43,8 @@ def handle_slash_command_bmd(botmydesk_user: BotMyDeskUser, **payload) -> dict:
         botmydesk_logger.info(
             f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Unauthorized, requesting user auth"
         )
-        return {
+
+        view_data = {
             "type": "modal",
             "callback_id": "bmd-unauthorized-welcome",
             "title": {
@@ -93,21 +98,28 @@ def handle_slash_command_bmd(botmydesk_user: BotMyDeskUser, **payload) -> dict:
                 },
             ],
         }
+        # @see https://app.slack.com/block-kit-builder/
+        result = client.web_client.views_open(
+            trigger_id=payload["trigger_id"], view=view_data
+        )
+        result.validate()
+        return
 
     # Show status.
     botmydesk_logger.info(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): User already authorized"
     )
-    print(
-        botmydesk_user.access_token,
-        botmydesk_user.access_token_expires_at,
-        botmydesk_user.refresh_token,
+    profile = bmd_api_client.client.profile(botmydesk_user)
+    client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text=f"Already authorized as {profile['email']}",
     )
 
 
 def on_interactive_block_action(
-    botmydesk_user: BotMyDeskUser, action: dict, **payload
-) -> Optional[dict]:
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, action: dict, **payload
+):
     """Respond to user (inter)actions."""
     action_value = action["value"]
     botmydesk_logger.debug(
@@ -124,17 +136,17 @@ def on_interactive_block_action(
             f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive block action unknown or misconfigured: {action_value}"
         )
 
-    return service_module(botmydesk_user, **action)
+    service_module(client, botmydesk_user, **action)
 
 
 def handle_interactive_bmd_authorize_pt1_start(
-    botmydesk_user: BotMyDeskUser, **payload
-) -> Optional[dict]:
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
     botmydesk_logger.debug(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Rendering part 1 of authorization flow for user"
     )
 
-    return {
+    view_data = {
         "type": "modal",
         "callback_id": "bmd-modal-authorize-pt2",
         "title": {"type": "plain_text", "text": "Authorize BotMyDesk 1/2"},
@@ -172,20 +184,22 @@ def handle_interactive_bmd_authorize_pt1_start(
             },
         ],
     }
+    # @see https://api.slack.com/surfaces/modals/using#updating_apis
+    result = client.web_client.views_update(
+        view_id=payload["view"]["id"],
+        hash=payload["view"]["hash"],
+        view=view_data,
+    )
+    result.validate()
 
 
 def handle_interactive_bmd_authorize_pt2_start(
-    botmydesk_user: BotMyDeskUser, **payload
-) -> Optional[dict]:
-    botmydesk_logger.info(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Requesting BookMyDesk login code"
-    )
-    bmd_api_client.client.request_login_code(email=botmydesk_user.email)
-
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
     botmydesk_logger.debug(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Rendering part 2 of authorization flow for user"
     )
-    return {
+    view_data = {
         "type": "modal",
         "callback_id": "bmd-modal-authorize-pt2",
         "title": {"type": "plain_text", "text": "Authorize BotMyDesk 2/2"},
@@ -219,11 +233,24 @@ def handle_interactive_bmd_authorize_pt2_start(
         ],
         "submit": {"type": "plain_text", "text": "Verify login code"},
     }
+    # @see https://api.slack.com/surfaces/modals/using#updating_apis
+    result = client.web_client.views_update(
+        view_id=payload["view"]["id"],
+        hash=payload["view"]["hash"],
+        view=view_data,
+    )
+    result.validate()
+
+    # Request code later so the response above is quick.
+    botmydesk_logger.info(
+        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Requesting BookMyDesk login code"
+    )
+    bmd_api_client.client.request_login_code(email=botmydesk_user.email)
 
 
 def on_interactive_view_submission(
-    botmydesk_user: BotMyDeskUser, payload: dict
-) -> Optional[dict]:
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, payload: dict
+):
     """Respond to user (inter)actions."""
     view_callback_id = payload["view"]["callback_id"]
     botmydesk_logger.debug(
@@ -239,12 +266,12 @@ def on_interactive_view_submission(
             f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive view submission unknown or misconfigured: {view_callback_id}"
         )
 
-    return service_module(botmydesk_user, **payload)
+    service_module(client, botmydesk_user, **payload)
 
 
 def handle_interactive_bmd_authorize_pt2_submit(
-    botmydesk_user: BotMyDeskUser, **payload
-) -> Optional[dict]:
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
     botmydesk_logger.info(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Authorizing credentials entered for user"
     )
@@ -258,10 +285,16 @@ def handle_interactive_bmd_authorize_pt2_submit(
 
     botmydesk_user.update(
         access_token=json_response["access_token"],
-        access_token_expires_at=timezone.now() + timezone.timedelta(minutes=59),
+        access_token_expires_at=timezone.now()
+        + timezone.timedelta(minutes=5),  # Presume short TTL. Just refresh often.
         refresh_token=json_response["refresh_token"],
     )
     botmydesk_logger.info(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Successful authorization, updated token credentials"
     )
-    return
+
+    client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text=f"Thanks! You've authorize me. You can always revoke my access later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.",
+    )

@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  app:  # Runs by default on: http://localhost:8000
+  app:
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,25 +16,55 @@ services:
     env_file:
       - .env
     environment:
-      # TODO: Set DEV_EMAIL_ADDRESS if you dev on a different Slack workspace (and DJANGO_DEBUG = True). Omit otherwise.
+      # TODO: Set DEV_EMAIL_ADDRESS if you develop on a different Slack workspace (and DJANGO_DEBUG = True). Omit or keep empty otherwise.
       - DEV_EMAIL_ADDRESS=
       - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=development
       # https://docs.djangoproject.com/en/4.1/ref/settings/#allowed-hosts
       - DJANGO_ALLOWED_HOST=localhost
-      # https://docs.djangoproject.com/en/4.1/ref/databases/
+      # TODO: Choose your DB engine. See below for quick options. More engines are available but not recommended. See Django docs for details.
       - DJANGO_DATABASE_ENGINE=django.db.backends.mysql
-      - DJANGO_DATABASE_HOST=db
+      - DJANGO_DATABASE_HOST=mysql-db
       - DJANGO_DATABASE_PORT=3306
       - DJANGO_DATABASE_USER=devuser
       - DJANGO_DATABASE_PASSWORD=devpasswd
       - DJANGO_DATABASE_NAME=botmydesk
 
-  db:
-    image: mysql:8
-    restart: always
-    environment:
-     - MYSQL_DATABASE=botmydesk
-     - MYSQL_USER=devuser
-     - MYSQL_PASSWORD=devpasswd
-     - MYSQL_ROOT_PASSWORD=rootpasswd
+
+### Option 1 ###
+#  mysql-db:
+#    # Use with "app" environment:
+#    #    - DJANGO_DATABASE_ENGINE=django.db.backends.mysql
+#    #    - DJANGO_DATABASE_HOST=mysql-db
+#    #    - DJANGO_DATABASE_PORT=3306
+#    #    - DJANGO_DATABASE_USER=devuser
+#    #    - DJANGO_DATABASE_PASSWORD=devpasswd
+#    #    - DJANGO_DATABASE_NAME=botmydesk
+#    image: mysql:8
+#    restart: always
+#    volumes:
+#      - ./docker/mysql:/var/lib/mysql/
+#    environment:
+#     - MYSQL_DATABASE=botmydesk
+#     - MYSQL_USER=devuser
+#     - MYSQL_PASSWORD=devpasswd
+#     - MYSQL_ROOT_PASSWORD=rootpasswd
+
+
+### Option 2 ###
+#  postgres-db:
+#    # Use with "app" environment:
+#    #    - DJANGO_DATABASE_ENGINE=django.db.backends.postgresql
+#    #    - DJANGO_DATABASE_HOST=postgres-db
+#    #    - DJANGO_DATABASE_PORT=5432
+#    #    - DJANGO_DATABASE_USER=devuser
+#    #    - DJANGO_DATABASE_PASSWORD=devpasswd
+#    #    - DJANGO_DATABASE_NAME=botmydesk
+#    image: postgres:14
+#    restart: always
+#    volumes:
+#      - ./docker/postgres:/var/lib/postgresql/
+#    environment:
+#      - POSTGRES_DB=botmydesk
+#      - POSTGRES_USER=devuser
+#      - POSTGRES_PASSWORD=devpasswd

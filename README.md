@@ -81,3 +81,8 @@ cp docker-compose.override.yml.PROD.TEMPLATE docker-compose.override.yml
 # Either load your .env on your server or use real env vars. Either way see the env template for what you need.
 cp .env.TEMPLATE .env
 ```
+
+Make sure to run database migrations before running:
+```shell
+./manage.py migrate
+```

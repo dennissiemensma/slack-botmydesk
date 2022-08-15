@@ -7,9 +7,11 @@ ENV VIRTUAL_ENV=/opt/venv
 WORKDIR /code
 
 RUN apk add \
-    postgresql-dev \
     mariadb-dev \
     py3-mysqlclient \
+    python3-dev \
+    musl-dev \
+    postgresql-dev \
     build-base
 RUN python3 -m venv $VIRTUAL_ENV
 
@@ -25,11 +27,13 @@ RUN python3 -m pip install --upgrade pip && \
 
 FROM base-app AS dev-app
 RUN poetry install
+RUN rm /code/poetry.lock /code/pyproject.toml
 #ENTRYPOINT poetry run /code/manage.py runserver 0.0.0.0:8000
 #ENTRYPOINT poetry run /code/manage.py dev_socket_mode
 
 
 
 FROM base-app AS prod-app
+RUN rm /code/poetry.lock /code/pyproject.toml
 COPY src/ /code/
 ENTRYPOINT poetry run gunicorn --timeout 10 --workers 4 --max-requests 100 --bind 127.0.0.1:8080 botmydesk.wsgi

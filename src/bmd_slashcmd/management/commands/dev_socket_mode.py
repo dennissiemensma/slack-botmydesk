@@ -88,7 +88,7 @@ class Command(BaseCommand):
             client.web_client.chat_postEphemeral(
                 channel=user_id,
                 user=user_id,
-                text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: *{error}* 🤨 \n\n```{error_trace}```",
+                text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: 🤨 \n\n```{error_trace}```",
             )
 
     def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
@@ -116,7 +116,7 @@ class Command(BaseCommand):
                     client.web_client.chat_postEphemeral(
                         channel=user_id,
                         user=user_id,
-                        text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: *{error}* 🤨 \n\n```{error_trace}```",
+                        text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: 🤨 \n\n```{error_trace}```",
                     )
 
         # Respond to submits.
@@ -134,7 +134,7 @@ class Command(BaseCommand):
                 client.web_client.chat_postEphemeral(
                     channel=user_id,
                     user=user_id,
-                    text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: *{error}* 🤨 \n\n```{error_trace}```",
+                    text=f"🤷‍♀️ I'm not sure what to do, sorry! Please tell my creator: 🤨 \n\n```{error_trace}```",
                 )
 
     def _get_user(self, client: SocketModeClient, slack_user_id: str) -> BotMyDeskUser:

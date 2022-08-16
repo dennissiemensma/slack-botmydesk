@@ -35,3 +35,10 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
             self.access_token_expires_at is None
             or self.access_token_expires_at <= timezone.now()
         )
+
+    def clear_tokens(self):
+        self.update(
+            access_token=None,
+            access_token_expires_at=None,
+            refresh_token=None,
+        )

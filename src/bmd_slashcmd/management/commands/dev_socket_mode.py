@@ -94,13 +94,12 @@ class Command(BaseCommand):
     def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
         user_id = req.payload["user"]["id"]
         user = self._get_user(client, slack_user_id=user_id)
-        response_payload = None
 
         # Respond to view UX.
         if req.payload["type"] == "block_actions":
             for current in req.payload["actions"]:
                 try:
-                    response_payload = (
+                    (
                         bmd_slashcmd.services.on_interactive_block_action(
                             client, user, current, **req.payload
                         )
@@ -136,19 +135,19 @@ class Command(BaseCommand):
                 )
                 return
 
-        # Conditional response. E.g. for closing modal dialogs or form errors.
-        if response_payload is not None:
-            botmydesk_logger.debug(f"Sending response payload: {response_payload}")
-            client.send_socket_mode_response(
-                SocketModeResponse(
-                    envelope_id=req.envelope_id, payload=response_payload
+            # Conditional response. E.g. for closing modal dialogs or form errors.
+            if response_payload is not None:
+                botmydesk_logger.debug(f"Sending response payload: {response_payload}")
+                client.send_socket_mode_response(
+                    SocketModeResponse(
+                        envelope_id=req.envelope_id, payload=response_payload
+                    )
                 )
-            )
-        else:
-            # Just ACK
-            client.send_socket_mode_response(
-                SocketModeResponse(envelope_id=req.envelope_id)
-            )
+            else:
+                # Just ACK
+                client.send_socket_mode_response(
+                    SocketModeResponse(envelope_id=req.envelope_id)
+                )
 
     def _get_user(self, client: SocketModeClient, slack_user_id: str) -> BotMyDeskUser:
         """Fetches Slack user info and creates/updates the user info on our side."""

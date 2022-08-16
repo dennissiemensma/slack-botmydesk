@@ -76,13 +76,6 @@ def logout(botmydesk_user: BotMyDeskUser):
         )
         raise BookMyDeskException(response.content)
 
-    # Clear user.
-    botmydesk_user.update(
-        access_token=None,
-        access_token_expires_at=None,
-        refresh_token=None,
-    )
-
 
 def refresh_session(botmydesk_user: BotMyDeskUser):
     """Refresh session, updates user as well"""
@@ -105,11 +98,7 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
         bookmydesk_client_logger.error(
             f"FAILED to refresh session for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
-        botmydesk_user.update(
-            access_token=None,
-            access_token_expires_at=None,
-            refresh_token=None,
-        )
+        botmydesk_user.clear_tokens()
         bookmydesk_client_logger.error(
             f"Cleared session info for {botmydesk_user.email}, reauthorization required..."
         )

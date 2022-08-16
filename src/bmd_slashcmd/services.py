@@ -51,28 +51,29 @@ def handle_slash_command_bmd(
             "callback_id": "bmd-unauthorized-welcome",
             "title": {
                 "type": "plain_text",
-                "text": f"Greetings {botmydesk_user.name}!",
+                "text": f"Hi {botmydesk_user.name}",
             },
             "blocks": [
                 {
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "I'm an unofficial assistant bot for BookMyDesk. I will remind you to book or check-in by sending a Slack notification. Many more features may be added later!",
+                        "text": "My name is BotMyDesk, I'm an unofficial Slack bot for BookMyDesk.\n\nI can remind you to check-in at the office or at home. Making life a bit easier for you!",
+                    },
+                },
+                {"type": "divider"},
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Connecting BotMyDesk",
                     },
                 },
                 {
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"First, you will need to authorize me to access your BMD account (assuming it's *{botmydesk_user.email}*) to connect.",
-                    },
-                },
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Connect BotMyDesk",
+                        "text": f"First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.email}*.",
                     },
                 },
                 {
@@ -83,11 +84,26 @@ def handle_slash_command_bmd(
                             "style": "primary",
                             "text": {
                                 "type": "plain_text",
-                                "text": "Start",
+                                "text": "Connect",
                                 "emoji": True,
                             },
-                            "value": "authorize_pt1",
-                        },
+                            "confirm": {
+                                "title": {
+                                    "type": "plain_text",
+                                    "text": "Are you sure?",
+                                },
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": f"Request BookMyDesk login code for *{botmydesk_user.email}*?\n\n_You can enter it on the next screen._",
+                                },
+                                "confirm": {
+                                    "type": "plain_text",
+                                    "text": "Yes, send it",
+                                },
+                                "deny": {"type": "plain_text", "text": "No, hold on"},
+                            },
+                            "value": "send_bookmydesk_login_code",
+                        }
                     ],
                 },
                 {"type": "divider"},
@@ -95,7 +111,7 @@ def handle_slash_command_bmd(
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "❌ _BookMyDesk disconnected_",
+                        "text": f"_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._",
                     },
                 },
             ],
@@ -109,7 +125,7 @@ def handle_slash_command_bmd(
 
     # Check status.
     botmydesk_logger.info(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): User already authorized"
+        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): User authorized, checking session with BMD profile"
     )
     profile = bmd_api_client.client.profile(botmydesk_user)
 
@@ -118,14 +134,14 @@ def handle_slash_command_bmd(
         "callback_id": "bmd-unauthorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": f"Greetings {botmydesk_user.name}!",
+            "text": "BotMyDesk preferences",
         },
         "blocks": [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "I'm an unofficial assistant bot for BookMyDesk. I will remind you to book or check-in by sending a Slack notification. Many more features may be added later!",
+                    "text": f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?",
                 },
             },
             {
@@ -147,7 +163,7 @@ def handle_slash_command_bmd(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"✅ _BookMyDesk connected: *{profile['email']}*_",
+                    "text": f"_Connected: *{profile['email']}*_",
                 },
             },
             {
@@ -167,7 +183,10 @@ def handle_slash_command_bmd(
                                 "type": "mrkdwn",
                                 "text": "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n\n*Revoke my access to your account in BookMyDesk?*",
                             },
-                            "confirm": {"type": "plain_text", "text": "Yes"},
+                            "confirm": {
+                                "type": "plain_text",
+                                "text": "Yes, disconnect",
+                            },
                             "deny": {
                                 "type": "plain_text",
                                 "text": "Nevermind, keep connected",
@@ -197,8 +216,7 @@ def on_interactive_block_action(
 
     try:
         service_module = {
-            "authorize_pt1": handle_interactive_bmd_authorize_pt1_start,
-            "authorize_pt2": handle_interactive_bmd_authorize_pt2_start,
+            "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
             "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
         }[action_value]
     except KeyError:
@@ -206,90 +224,25 @@ def on_interactive_block_action(
             f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive block action unknown or misconfigured: {action_value}"
         )
 
-    return service_module(client, botmydesk_user, **payload)
+    service_module(client, botmydesk_user, **payload)
 
 
-def handle_interactive_bmd_authorize_pt1_start(
+def handle_interactive_send_bookmydesk_login_code(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     botmydesk_logger.debug(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Rendering part 1 of authorization flow for user"
+        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Rendering login code form"
     )
-
     view_data = {
         "type": "modal",
-        "callback_id": "bmd-modal-authorize-pt2",
-        "title": {"type": "plain_text", "text": "Connect BotMyDesk 1/2"},
+        "callback_id": "bmd-modal-authorize-login-code",
+        "title": {"type": "plain_text", "text": "Connecting BotMyDesk"},
         "blocks": [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"Click below to request a BookMyDesk login code on behalf of your Slack email address *{botmydesk_user.email}*.",
-                },
-            },
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Request login code",
-                            "emoji": True,
-                        },
-                        "confirm": {
-                            "title": {
-                                "type": "plain_text",
-                                "text": "Are you sure?",
-                            },
-                            "text": {
-                                "type": "mrkdwn",
-                                "text": f"Request BookMyDesk login code for *{botmydesk_user.email}*?",
-                            },
-                            "confirm": {"type": "plain_text", "text": "Yes"},
-                            "deny": {"type": "plain_text", "text": "No, hold on"},
-                        },
-                        "value": "authorize_pt2",
-                    }
-                ],
-            },
-            {"type": "divider"},
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._",
-                },
-            },
-        ],
-    }
-    # @see https://api.slack.com/surfaces/modals/using#updating_apis
-    result = client.web_client.views_update(
-        view_id=payload["view"]["id"],
-        hash=payload["view"]["hash"],
-        view=view_data,
-    )
-    result.validate()
-
-
-def handle_interactive_bmd_authorize_pt2_start(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    botmydesk_logger.debug(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Rendering part 2 of authorization flow for user"
-    )
-    view_data = {
-        "type": "modal",
-        "callback_id": "bmd-modal-authorize-pt2",
-        "title": {"type": "plain_text", "text": "Connect BotMyDesk 2/2"},
-        "blocks": [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Enter your login code received for *{botmydesk_user.email}* below.",
+                    "text": f"Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received.",
                 },
             },
             {
@@ -325,25 +278,51 @@ def handle_interactive_bmd_authorize_pt2_start(
 
     # Request code later so the response above is quick.
     botmydesk_logger.info(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Requesting BookMyDesk login code"
+        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Sending BookMyDesk login code"
     )
     bmd_api_client.client.request_login_code(email=botmydesk_user.email)
 
 
 def handle_interactive_bmd_revoke_botmydesk(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
-) -> Optional[dict]:
+):
     botmydesk_logger.debug(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Revoking bot access, ending BookMyDesk session"
     )
-    bmd_api_client.client.logout(botmydesk_user)
-    client.web_client.chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again. Bye! 👋",
-    )
 
-    return {"response_action": "clear"}
+    view_data = {
+        "type": "modal",
+        "callback_id": "bmd-disconnected",
+        "title": {
+            "type": "plain_text",
+            "text": "BotMyDesk disconnected",
+        },
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n\nBye! 👋",
+                },
+            },
+        ],
+    }
+    # @see https://api.slack.com/surfaces/modals/using#updating_apis
+    result = client.web_client.views_update(
+        view_id=payload["view"]["id"],
+        hash=payload["view"]["hash"],
+        view=view_data,
+    )
+    result.validate()
+
+    try:
+        # Logout in background.
+        bmd_api_client.client.logout(botmydesk_user)
+    except BookMyDeskException:
+        pass  # Whatever
+
+    # Clear session data.
+    botmydesk_user.clear_tokens()
 
 
 def on_interactive_view_submission(
@@ -357,7 +336,7 @@ def on_interactive_view_submission(
 
     try:
         service_module = {
-            "bmd-modal-authorize-pt2": handle_interactive_bmd_authorize_pt2_submit,
+            "bmd-modal-authorize-login-code": handle_interactive_bmd_authorize_login_code_submit,
         }[view_callback_id]
     except KeyError:
         raise NotImplementedError(
@@ -367,7 +346,7 @@ def on_interactive_view_submission(
     return service_module(client, botmydesk_user, **payload)
 
 
-def handle_interactive_bmd_authorize_pt2_submit(
+def handle_interactive_bmd_authorize_login_code_submit(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
 ) -> Optional[dict]:
     botmydesk_logger.info(
@@ -386,7 +365,7 @@ def handle_interactive_bmd_authorize_pt2_submit(
         return {
             "response_action": "errors",
             "errors": {
-                "otp_user_input_block": "Error validating your login code. You can try it another time or restart this flow to have a new code sent."
+                "otp_user_input_block": "Error validating your login code. You can try it another time or restart this flow to have a new code sent to you."
             },
         }
 

@@ -97,6 +97,11 @@ class Command(BaseCommand):
 
         # Respond to view UX.
         if req.payload["type"] == "block_actions":
+            # Ack first (Slack timeout @ 3s).
+            client.send_socket_mode_response(
+                SocketModeResponse(envelope_id=req.envelope_id)
+            )
+
             for current in req.payload["actions"]:
                 try:
                     (
@@ -118,6 +123,8 @@ class Command(BaseCommand):
 
         # Respond to submits.
         if req.payload["type"] == "view_submission":
+            # Do NOT ack yet. As we may or may not need to return a different payload.
+
             try:
                 response_payload = bmd_slashcmd.services.on_interactive_view_submission(
                     client, user, req.payload

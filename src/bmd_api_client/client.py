@@ -136,3 +136,34 @@ def profile(botmydesk_user: BotMyDeskUser) -> dict:
         raise BookMyDeskException(response.content)
 
     return response.json()
+
+
+def reservations(botmydesk_user: BotMyDeskUser, company_id: str) -> dict:
+    """Profile call about current user"""
+
+    if botmydesk_user.access_token_expired():
+        refresh_session(botmydesk_user)
+        botmydesk_user.refresh_from_db()
+
+    bookmydesk_client_logger.debug(f"Reservations for {botmydesk_user.email}")
+    response = requests.get(
+        url="{}/v3/reservations".format(settings.BOOKMYDESK_API_URL),
+        params={
+            "companyId": company_id,
+            "includeAnonymous": "true",
+            "from": timezone.now().date(),
+            "to": (timezone.now() + timezone.timedelta(days=7)).date(),
+        },
+        headers={
+            "User-Agent": settings.BOTMYDESK_USER_AGENT,
+            "Authorization": f"Bearer {botmydesk_user.access_token}",
+        },
+    )
+
+    if response.status_code != 200:
+        bookmydesk_client_logger.error(
+            f"FAILED to get me/profile for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+        )
+        raise BookMyDeskException(response.content)
+
+    return response.json()

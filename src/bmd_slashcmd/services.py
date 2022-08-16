@@ -1,8 +1,10 @@
+import datetime
 import logging
 from typing import Optional
 
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.humanize.templatetags import humanize
 from slack_sdk.socket_mode import SocketModeClient
 
 from bmd_api_client.exceptions import BookMyDeskException
@@ -131,7 +133,7 @@ def handle_slash_command_bmd(
 
     view_data = {
         "type": "modal",
-        "callback_id": "bmd-unauthorized-welcome",
+        "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
             "text": "BotMyDesk preferences",
@@ -148,6 +150,20 @@ def handle_slash_command_bmd(
                 "type": "header",
                 "text": {
                     "type": "plain_text",
+                    "text": "Reservations",
+                },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Loading... 🔄",
+                },
+            },
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
                     "text": "Settings",
                 },
             },
@@ -155,7 +171,7 @@ def handle_slash_command_bmd(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "TODO TODO TODO TODO TODO",  # @TODO
+                    "text": "Loading... 🔄",
                 },
             },
             {"type": "divider"},
@@ -199,10 +215,119 @@ def handle_slash_command_bmd(
         ],
     }
     # @see https://app.slack.com/block-kit-builder/
-    result = client.web_client.views_open(
+    initial_view_result = client.web_client.views_open(
         trigger_id=payload["trigger_id"], view=view_data
     )
-    result.validate()
+    initial_view_result.validate()
+
+    # Now perform slow calls. Fetch reservations.
+    company_id = profile["companies"][0]["id"]
+    company_name = profile["companies"][0]["name"]
+
+    reservations_result = bmd_api_client.client.reservations(botmydesk_user, company_id)
+    reservations = reservations_result["result"]["items"]
+
+    from pprint import pprint  # @TODO revert
+
+    pprint(reservations_result, indent=4)  # @TODO revert
+
+    view_data = {
+        "type": "modal",
+        "callback_id": "bmd-authorized-welcome",
+        "title": {
+            "type": "plain_text",
+            "text": "BotMyDesk preferences",
+        },
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?",
+                },
+            },
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": f"Upcoming reservation(s) for {company_name}",
+                },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "\n\n".join(  # TODO map to DTO
+                        [
+                            f"_{datetime.date.fromisoformat(x['date']).strftime('%A %d %B %Y')}_: *{x['from']} to {x['to']}*\n"
+                            f"At *{x['seat']['map']['name'] if x['seat'] else x['type']}* "
+                            f"_check-in before {humanize.naturaltime((timezone.datetime.fromisoformat(x['expiresAt']) - timezone.now())) if x['expiresAt'] else ''}_"
+                            for x in reservations
+                        ]
+                    ),
+                },
+            },
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Settings",
+                },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "TODO TODO TODO TODO TODO",  # TODO
+                },
+            },
+            {"type": "divider"},
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"_Connected: *{profile['email']}*_",
+                },
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "style": "danger",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Disconnect BotMyDesk",
+                            "emoji": True,
+                        },
+                        "confirm": {
+                            "title": {"type": "plain_text", "text": "Are you sure?"},
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n\n*Revoke my access to your account in BookMyDesk?*",
+                            },
+                            "confirm": {
+                                "type": "plain_text",
+                                "text": "Yes, disconnect",
+                            },
+                            "deny": {
+                                "type": "plain_text",
+                                "text": "Nevermind, keep connected",
+                            },
+                        },
+                        "value": "revoke_botmydesk",
+                    }
+                ],
+            },
+        ],
+    }
+    # @see https://api.slack.com/surfaces/modals/using#updating_apis
+    update_result = client.web_client.views_update(
+        view_id=initial_view_result["view"]["id"],
+        hash=initial_view_result["view"]["hash"],
+        view=view_data,
+    )
+    update_result.validate()
 
 
 def on_interactive_block_action(

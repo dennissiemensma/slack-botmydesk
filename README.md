@@ -22,9 +22,9 @@ Allow users to send Slash commands and messages from the messages tab
 
 - Go to _"Slash Commands"_, create a new command and make sure it has the following "slash command(s)":
 
-| Slash command  | Description                      | Parameters                           |
-|:---------------|----------------------------------|:-------------------------------------|
-| `/botmydesk`   | BookMyDesk assistent bot options | -                                    |
+| Slash command  | Description                               | Parameters                           |
+|:---------------|-------------------------------------------|:-------------------------------------|
+| `/botmydesk`   | Connect, manage preferences or disconnect | -                                    |
 
 _Note: You can choose any command name you'd like and override it as ``SLACK_SLASHCOMMAND_BMD`` env var._
 

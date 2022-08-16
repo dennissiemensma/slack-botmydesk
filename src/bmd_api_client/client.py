@@ -59,6 +59,31 @@ def token_login(username: str, otp: str) -> dict:
     return response.json()
 
 
+def logout(botmydesk_user: BotMyDeskUser):
+    bookmydesk_client_logger.debug(f"Terminate session for {botmydesk_user.email}")
+
+    response = requests.post(
+        url="{}/logout".format(settings.BOOKMYDESK_API_URL),
+        headers={
+            "User-Agent": settings.BOTMYDESK_USER_AGENT,
+            "Authorization": f"Bearer {botmydesk_user.access_token}",
+        },
+    )
+
+    if response.status_code != 200:
+        bookmydesk_client_logger.error(
+            f"FAILED to terminate session for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+        )
+        raise BookMyDeskException(response.content)
+
+    # Clear user.
+    botmydesk_user.update(
+        access_token=None,
+        access_token_expires_at=None,
+        refresh_token=None,
+    )
+
+
 def refresh_session(botmydesk_user: BotMyDeskUser):
     """Refresh session, updates user as well"""
     bookmydesk_client_logger.debug(f"Refresh session for {botmydesk_user.email}")
@@ -93,13 +118,19 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
     json_response = response.json()
     botmydesk_user.update(
         access_token=json_response["access_token"],
-        access_token_expires_at=timezone.now() + timezone.timedelta(minutes=5),
+        access_token_expires_at=timezone.now()
+        + timezone.timedelta(minutes=settings.BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES),
         refresh_token=json_response["refresh_token"],
     )
 
 
 def profile(botmydesk_user: BotMyDeskUser) -> dict:
     """Profile call about current user"""
+
+    if botmydesk_user.access_token_expired():
+        refresh_session(botmydesk_user)
+        botmydesk_user.refresh_from_db()
+
     bookmydesk_client_logger.debug(f"Me/profile for {botmydesk_user.email}")
     response = requests.get(
         url="{}/me".format(settings.BOOKMYDESK_API_URL),
@@ -110,10 +141,6 @@ def profile(botmydesk_user: BotMyDeskUser) -> dict:
     )
 
     if response.status_code != 200:
-        if response.status_code == 401:
-            # Last resort.
-            return refresh_session(botmydesk_user)
-
         bookmydesk_client_logger.error(
             f"FAILED to get me/profile for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )

@@ -19,6 +19,8 @@ services:
     environment:
       # TODO: Set DEV_EMAIL_ADDRESS if you develop on a different Slack workspace (and DJANGO_DEBUG = True). Omit or keep empty otherwise.
       - DEV_EMAIL_ADDRESS=
+      # Enable to refresh all the time. Only makes sense during session development.
+#      - DEV_BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES=0
       - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=development
       # https://docs.djangoproject.com/en/4.1/ref/settings/#allowed-hosts

@@ -184,6 +184,11 @@ BOTMYDESK_USER_AGENT = "BotMyDesk Slack Integration"
 SLACK_APP_TOKEN = config("SLACK_APP_TOKEN", cast=str)
 SLACK_BOT_TOKEN = config("SLACK_BOT_TOKEN", cast=str)
 
+BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES = config(
+    "DEV_BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES",
+    cast=int,
+    default=15,  # Low to make it refresh often
+)
 BOOKMYDESK_API_URL = config("BOOKMYDESK_API_URL", cast=str)
 BOOKMYDESK_CLIENT_ID = config("BOOKMYDESK_CLIENT_ID", cast=str)
 BOOKMYDESK_CLIENT_SECRET = config("BOOKMYDESK_CLIENT_SECRET", cast=str)

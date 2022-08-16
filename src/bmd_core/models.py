@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from bmd_core.mixins import ModelUpdateMixin
 
@@ -25,4 +26,12 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
     refresh_token = models.CharField(null=True, default=None, max_length=255)
 
     def authorized_bot(self) -> bool:
+        """Whether the bot is authorized for this user (has session)."""
         return self.refresh_token is not None
+
+    def access_token_expired(self) -> bool:
+        """Whether the access token needs to be refreshed."""
+        return (
+            self.access_token_expires_at is None
+            or self.access_token_expires_at <= timezone.now()
+        )

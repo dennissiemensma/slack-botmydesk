@@ -26,7 +26,7 @@ def request_login_code(email: str):
 
     if response.status_code != 204:
         bookmydesk_client_logger.error(
-            f"FAILED to request login code for {email} (HTTP {response.status_code}"
+            f"FAILED to request login code for {email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
@@ -52,7 +52,7 @@ def token_login(username: str, otp: str) -> dict:
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to token login for {username} (HTTP {response.status_code}"
+            f"FAILED to token login for {username} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
@@ -78,7 +78,15 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to refresh session for {botmydesk_user.email} (HTTP {response.status_code}"
+            f"FAILED to refresh session for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+        )
+        botmydesk_user.update(
+            access_token=None,
+            access_token_expires_at=None,
+            refresh_token=None,
+        )
+        bookmydesk_client_logger.error(
+            f"Cleared session info for {botmydesk_user.email}, reauthorization required..."
         )
         raise BookMyDeskException(response.content)
 
@@ -107,7 +115,7 @@ def profile(botmydesk_user: BotMyDeskUser) -> dict:
             return refresh_session(botmydesk_user)
 
         bookmydesk_client_logger.error(
-            f"FAILED to get me/profile for {botmydesk_user.email} (HTTP {response.status_code}"
+            f"FAILED to get me/profile for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 

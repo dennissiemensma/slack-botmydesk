@@ -136,7 +136,7 @@ def on_interactive_block_action(
             f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive block action unknown or misconfigured: {action_value}"
         )
 
-    service_module(client, botmydesk_user, **action)
+    service_module(client, botmydesk_user, **payload)
 
 
 def handle_interactive_bmd_authorize_pt1_start(

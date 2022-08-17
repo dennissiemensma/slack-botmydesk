@@ -26,7 +26,7 @@ def on_slash_command(
 
     try:
         service_module = {
-            settings.SLACK_SLASHCOMMAND_BMD: handle_slash_command_bmd,
+            settings.SLACK_SLASHCOMMAND_BMD: handle_slash_command,
         }[command]
     except KeyError:
         raise NotImplementedError(f"Slash command unknown or misconfigured: {command}")
@@ -34,15 +34,40 @@ def on_slash_command(
     service_module(client, botmydesk_user, **payload)
 
 
-def handle_slash_command_bmd(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+def handle_slash_command(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, text, **payload
 ):
-    """Called on generic bmd."""
+    """Called on generic slash command."""
     botmydesk_logger.debug(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): User triggered slash command"
+        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): User triggered slash command with text '{text}'"
     )
 
-    # Unauthorized.
+    text = text.strip()
+
+    # Check text, e.g. sub commands
+    if text:
+        try:
+            sub_command_module = {
+                settings.SLACK_SLASHCOMMAND_BMD_HELP: handle_slash_command_help,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1: handle_slash_command_mark_home,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2: handle_slash_command_mark_home,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1: handle_slash_command_mark_office,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2: handle_slash_command_mark_office,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_1: handle_slash_command_mark_externally,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2: handle_slash_command_mark_externally,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1: handle_slash_command_mark_cancelled,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2: handle_slash_command_mark_cancelled,
+                settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1: handle_slash_command_list_reservations,
+                settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2: handle_slash_command_list_reservations,
+            }[text.strip()]
+        except KeyError:
+            # Fallback on failed mapping.
+            sub_command_module = handle_slash_command_help
+
+        sub_command_module(client, botmydesk_user, **payload)
+        return
+
+    # Just the slash command was entered. Unauthorized.
     if not botmydesk_user.authorized_bot():
         botmydesk_logger.info(
             f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Unauthorized, requesting user auth"
@@ -157,7 +182,7 @@ def handle_slash_command_bmd(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "Loading... 🔄",
+                    "text": "Loading...",
                 },
             },
             {
@@ -171,7 +196,7 @@ def handle_slash_command_bmd(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "Loading... 🔄",
+                    "text": "Loading...",
                 },
             },
             {"type": "divider"},
@@ -250,22 +275,27 @@ def handle_slash_command_bmd(
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": f"Upcoming reservation(s) for {company_name}",
+                    "text": f"Upcoming reservation(s) at {company_name}",
                 },
             },
             {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "\n\n".join(  # TODO map to DTO
-                        [
-                            f"_{datetime.date.fromisoformat(x['date']).strftime('%A %d %B %Y')}_: *{x['from']} to {x['to']}*\n"
-                            f"At *{x['seat']['map']['name'] if x['seat'] else x['type']}* "
-                            f"_check-in before {humanize.naturaltime((timezone.datetime.fromisoformat(x['expiresAt']) - timezone.now())) if x['expiresAt'] else ''}_"
-                            for x in reservations
-                        ]
-                    ),
-                },
+                "type": "context",
+                "elements": [
+                    # x['seat'] is not None and ['type'] == 'normal': 🏢
+                    # x['seat'] is None and x['type'] == 'home': 🏡
+                    # x['seat']['map']['name'] == 'Extern': 🚋
+                    {
+                        "type": "mrkdwn",
+                        "text": "\n\n".join(  # TODO map to DTO
+                            [
+                                f"_{datetime.date.fromisoformat(x['date']).strftime('%A %d %B')}_: *{x['from']} to {x['to']}* "
+                                f"at *{x['seat']['map']['name'] if x['seat'] else x['type']}* "
+                                f"_check-in expires in {humanize.naturaltime((timezone.datetime.fromisoformat(x['expiresAt']) - timezone.now())) if x['expiresAt'] else ''}_"
+                                for x in reservations
+                            ]
+                        ),
+                    }
+                ],
             },
             {
                 "type": "header",
@@ -328,6 +358,158 @@ def handle_slash_command_bmd(
         view=view_data,
     )
     update_result.validate()
+
+
+def handle_slash_command_help(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
+    help_text = ""
+
+    if botmydesk_user.authorized_bot():
+        help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* \n\n"
+        help_text += (
+            "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n\n\n"
+        )
+        help_text += "\n> _You can use the following commands at any moment, without having to wait for my notification(s) first:_\n\n"
+        help_text += f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
+        help_text += "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n\n\n"
+        help_text += f"🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
+        help_text += "_Mark today as *working from the office*. Only checks you in if you already have a reservation._\n\n\n"
+        help_text += f"🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
+        help_text += "_Mark today as *working outside the office* (but not at home). Books an *'external' spot* for you (if you don't have one yet). Checks you in as well._\n\n\n"
+        help_text += f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
+        help_text += "_*Removes* any pending reservation you have for today or checks you out, if you were checked in already._\n\n\n"
+        help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
+        help_text += "_List any reservations you have soon (e.g. upcoming days)._\n\n\n"
+    else:
+        help_text += (
+            f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* \n _Connect BotMyDesk._\n\n\n"
+        )
+        help_text += f"_More commands are available after you've connected your account with *`{settings.SLACK_SLASHCOMMAND_BMD}`*_."
+
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Just type any of the following command(s):",
+            },
+        },
+        {
+            "type": "context",
+            "elements": [
+                {"type": "mrkdwn", "text": help_text},
+            ],
+        },
+    ]
+
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text="Help summary",
+        blocks=blocks,
+    )
+    result.validate()
+
+
+def handle_slash_command_mark_home(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
+    if not botmydesk_user.authorized_bot():
+        result = client.web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+        )
+        result.validate()
+        return
+
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text="Sorry, not yet implemented 🧑‍💻",
+    )
+    result.validate()
+
+
+def handle_slash_command_mark_office(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
+    if not botmydesk_user.authorized_bot():
+        result = client.web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+        )
+        result.validate()
+        return
+
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text="Sorry, not yet implemented 🧑‍💻",
+    )
+    result.validate()
+
+
+def handle_slash_command_mark_externally(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
+    if not botmydesk_user.authorized_bot():
+        result = client.web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+        )
+        result.validate()
+        return
+
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text="Sorry, not yet implemented 🧑‍💻",
+    )
+    result.validate()
+
+
+def handle_slash_command_mark_cancelled(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
+    if not botmydesk_user.authorized_bot():
+        result = client.web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+        )
+        result.validate()
+        return
+
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text="Sorry, not yet implemented 🧑‍💻",
+    )
+    result.validate()
+
+
+def handle_slash_command_list_reservations(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
+    if not botmydesk_user.authorized_bot():
+        result = client.web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+        )
+        result.validate()
+        return
+
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text="Sorry, not yet implemented 🧑‍💻",
+    )
+    result.validate()
 
 
 def on_interactive_block_action(
@@ -507,7 +689,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
     client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=f"Great! You've connected me to your BookMyDesk-account. 👏\n*To configure your preferences for BotMyDesk, run `{settings.SLACK_SLASHCOMMAND_BMD}` again.*\n\n_Also, you can revoke my access at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again and click the *Disconnect BotMyDesk* button on the bottom of the screen._",
+        text=f"Great! You've connected me to your BookMyDesk-account. 👏\n*To configure your preferences for BotMyDesk, run `{settings.SLACK_SLASHCOMMAND_BMD}` again.*\nYou can type `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}` for a full list of commands available.\n\n_Also, you can revoke my access at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again and click the *Disconnect BotMyDesk* button on the bottom of the screen._",
     )
 
     return {"response_action": "clear"}

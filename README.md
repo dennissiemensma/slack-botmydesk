@@ -24,7 +24,7 @@ Allow users to send Slash commands and messages from the messages tab
 
 | Slash command  | Description                               | Parameters                           |
 |:---------------|-------------------------------------------|:-------------------------------------|
-| `/botmydesk`   | Connect, manage preferences or disconnect | -                                    |
+| `/botmydesk`   | Access BotMyDesk commands and preferences | help                                 |
 
 _Note: You can choose any command name you'd like and override it as ``SLACK_SLASHCOMMAND_BMD`` env var._
 

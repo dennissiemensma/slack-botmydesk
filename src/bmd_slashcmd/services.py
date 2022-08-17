@@ -1,4 +1,3 @@
-import datetime
 import logging
 from typing import Optional
 
@@ -151,9 +150,6 @@ def handle_slash_command(
         return
 
     # Check status.
-    botmydesk_logger.info(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): User authorized, checking session with BMD profile"
-    )
     profile = bmd_api_client.client.profile(botmydesk_user)
 
     view_data = {
@@ -169,20 +165,6 @@ def handle_slash_command(
                 "text": {
                     "type": "mrkdwn",
                     "text": f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?",
-                },
-            },
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Reservations",
-                },
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "Loading...",
                 },
             },
             {
@@ -245,17 +227,7 @@ def handle_slash_command(
     )
     initial_view_result.validate()
 
-    # Now perform slow calls. Fetch reservations.
-    company_id = profile["companies"][0]["id"]
-    company_name = profile["companies"][0]["name"]
-
-    reservations_result = bmd_api_client.client.reservations(botmydesk_user, company_id)
-    reservations = reservations_result["result"]["items"]
-
-    from pprint import pprint  # @TODO revert
-
-    pprint(reservations_result, indent=4)  # @TODO revert
-
+    # Now perform slow calls. Fetch options now. @TODO implement
     view_data = {
         "type": "modal",
         "callback_id": "bmd-authorized-welcome",
@@ -270,32 +242,6 @@ def handle_slash_command(
                     "type": "mrkdwn",
                     "text": f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?",
                 },
-            },
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": f"Upcoming reservation(s) at {company_name}",
-                },
-            },
-            {
-                "type": "context",
-                "elements": [
-                    # x['seat'] is not None and ['type'] == 'normal': 🏢
-                    # x['seat'] is None and x['type'] == 'home': 🏡
-                    # x['seat']['map']['name'] == 'Extern': 🚋
-                    {
-                        "type": "mrkdwn",
-                        "text": "\n\n".join(  # TODO map to DTO
-                            [
-                                f"_{datetime.date.fromisoformat(x['date']).strftime('%A %d %B')}_: *{x['from']} to {x['to']}* "
-                                f"at *{x['seat']['map']['name'] if x['seat'] else x['type']}* "
-                                f"_check-in expires in {humanize.naturaltime((timezone.datetime.fromisoformat(x['expiresAt']) - timezone.now())) if x['expiresAt'] else ''}_"
-                                for x in reservations
-                            ]
-                        ),
-                    }
-                ],
             },
             {
                 "type": "header",
@@ -504,10 +450,70 @@ def handle_slash_command_list_reservations(
         result.validate()
         return
 
+    profile = bmd_api_client.client.profile(botmydesk_user)
+    company_id = profile["companies"][0]["id"]
+    company_name = profile["companies"][0]["name"]
+
+    reservations_result = bmd_api_client.client.reservations(botmydesk_user, company_id)
+    reservations = reservations_result["result"]["items"]
+
+    from pprint import pprint  # @TODO revert
+
+    pprint(reservations_result, indent=4)  # @TODO revert
+
+    reservations_text = ""
+
+    for current in reservations:
+        reservation_start = timezone.datetime.fromisoformat(current["dateStart"])
+        natural_time_until_start = humanize.naturaltime(reservation_start)
+
+        if current["status"] in ("checkedOut", "cancelled", "expired"):
+            reservations_text += f"\n\n~{reservation_start.strftime('%A %d %B')}: {current['from']} to {current['to']}~ ({current['status']})"
+            continue
+
+        # Skip weird ones.
+        if current["status"] != "reserved":
+            continue
+
+        if current["seat"] is not None and current["seat"]["map"]["name"] == "Extern":
+            emoji = "🚋"
+            location = current["seat"]["map"]["name"]
+        elif current["seat"] is not None and current["type"] == "normal":
+            emoji = "🏢"
+            location = current["seat"]["map"]["name"]
+        elif current["seat"] is None and current["type"] == "home":
+            emoji = "🏡"
+            location = "Home"
+        else:
+            emoji = "❓"
+            location = "❓"
+
+        reservations_text += f"\n\n{emoji} {reservation_start.strftime('%A %d %B')} at *{location}* from {current['from']} to {current['to']}\n_{natural_time_until_start}_"
+
+    blocks = [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": f"Upcoming reservation(s) at {company_name}",
+            },
+        },
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "mrkdwn",
+                    "text": reservations_text,
+                }
+            ],
+        },
+    ]
+
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text="Sorry, not yet implemented 🧑‍💻",
+        text="Reservation list",
+        blocks=blocks,
     )
     result.validate()
 

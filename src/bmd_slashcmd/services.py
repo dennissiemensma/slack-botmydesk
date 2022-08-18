@@ -107,9 +107,19 @@ def handle_slash_command_help(
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "Command(s) available:",
+                "text": " "
             },
+            "accessory": {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "emoji": True,
+                    "text": "BotMyDesk settings"
+                },
+                "value": "open_settings"
+            }
         },
+
         {
             "type": "context",
             "elements": [
@@ -223,7 +233,7 @@ def handle_slash_command_settings(
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": "BotMyDesk preferences",
+            "text": "BotMyDesk settings",
         },
         "blocks": [
             {
@@ -299,7 +309,7 @@ def handle_slash_command_settings(
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": "BotMyDesk preferences",
+            "text": "BotMyDesk settings",
         },
         "blocks": [
             {
@@ -546,6 +556,7 @@ def on_interactive_block_action(
         service_module = {
             "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
             "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
+            "open_settings": handle_slash_command_settings  # Alias
         }[action_value]
     except KeyError:
         raise NotImplementedError(
@@ -630,8 +641,17 @@ def handle_interactive_bmd_revoke_botmydesk(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n\nBye! 👋",
+                    "text": f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again or the button to the right.\n\nBye! 👋",
                 },
+                "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": "Settings"
+                    },
+                    "value": "open_settings"
+                }
             },
         ],
     }
@@ -707,10 +727,29 @@ def handle_interactive_bmd_authorize_login_code_submit(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Successful authorization, updated token credentials"
     )
 
+
     client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=f"Great! You've connected me to your BookMyDesk-account 👏\n\nI will now summarize the commands you can use, which is similar to typing *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`*",
+        text="BotMyDesk connected!",
+        blocks=[
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Great! You've connected me to your BookMyDesk-account 👏\n\nI will now summarize the commands you can use, which is similar to typing *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`*",
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": "BotMyDesk settings"
+                    },
+                    "value": "open_settings"
+                }
+            },
+        ]
     )
 
     # Just display the default help info.

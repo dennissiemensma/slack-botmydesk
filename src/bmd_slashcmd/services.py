@@ -690,7 +690,7 @@ def handle_interactive_bmd_revoke_botmydesk(
     except BookMyDeskException:
         pass  # Whatever
 
-    # Clear session data.
+    # Clear session data. For now, we're not deleting the user to keep their preferences.
     botmydesk_user.clear_tokens()
 
 

@@ -4,6 +4,7 @@ from typing import Optional
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.humanize.templatetags import humanize
+from django.utils.translation import gettext
 from slack_sdk.socket_mode import SocketModeClient
 
 from bmd_api_client.exceptions import BookMyDeskException
@@ -77,9 +78,7 @@ def handle_slash_command_help(
 
     if botmydesk_user.authorized_bot():
         help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n\n"
-        help_text += (
-            "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n\n\n"
-        )
+        help_text += "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n\n\n"
         help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
         help_text += "_List your upcoming reservations (e.g. coming days)._\n\n\n"
         help_text += "\n*You can use the following commands at any moment, without having to wait for my notification(s) first:*\n\n"
@@ -100,7 +99,7 @@ def handle_slash_command_help(
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": "BotMyDesk help",
+                "text": gettext("BotMyDesk help"),
             },
         },
         {
@@ -111,7 +110,7 @@ def handle_slash_command_help(
                 "text": {
                     "type": "plain_text",
                     "emoji": True,
-                    "text": "BotMyDesk settings",
+                    "text": gettext("BotMyDesk settings"),
                 },
                 "value": "open_settings",
             },
@@ -123,11 +122,13 @@ def handle_slash_command_help(
             ],
         },
     ]
+    import pprint
+    pprint.pprint(blocks, indent=4)
 
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text="BotMyDesk help",
+        text=gettext("BotMyDesk help"),
         blocks=blocks,
     )
     result.validate()

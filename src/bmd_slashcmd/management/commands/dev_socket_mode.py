@@ -7,6 +7,8 @@ from slack_sdk.socket_mode import SocketModeClient
 from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.socket_mode.request import SocketModeRequest
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.translation import gettext_lazy as _
+from django.utils import translation
 from django.utils.autoreload import run_with_reloader
 from django.conf import settings
 from decouple import config
@@ -88,7 +90,7 @@ class Command(BaseCommand):
             client.web_client.chat_postEphemeral(
                 channel=user_id,
                 user=user_id,
-                text=f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨",
+                text=_(f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"),
             )
 
     def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
@@ -118,7 +120,7 @@ class Command(BaseCommand):
                     client.web_client.chat_postEphemeral(
                         channel=user_id,
                         user=user_id,
-                        text=f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨",
+                        text=_(f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"),
                     )
 
         # Respond to submits.
@@ -138,7 +140,7 @@ class Command(BaseCommand):
                 client.web_client.chat_postEphemeral(
                     channel=user_id,
                     user=user_id,
-                    text=f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨",
+                    text=_(f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"),
                 )
                 return
 
@@ -158,7 +160,8 @@ class Command(BaseCommand):
 
     def _get_user(self, client: SocketModeClient, slack_user_id: str) -> BotMyDeskUser:
         """Fetches Slack user info and creates/updates the user info on our side."""
-        result = client.web_client.users_info(user=slack_user_id)
+        # @TODO update this once in a while. Use our internal DB first and add data expiry to it.
+        result = client.web_client.users_info(user=slack_user_id, include_locale=True)
         result.validate()
 
         # Dev only: Override email address when required for development.
@@ -173,6 +176,10 @@ class Command(BaseCommand):
             email_address = result.get("user")["profile"]["email"]
 
         first_name = result.get("user")["profile"]["first_name"]
+        locale = result.get("user")["locale"]
+
+        # Apply user locale.
+        translation.activate('nl')
 
         try:
             # Ensure every user is known internally.

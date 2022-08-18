@@ -48,7 +48,7 @@ You should now see a _"Bot User OAuth Token"_ there. Save it and set it (later) 
 ----
 
 ## Installation
-### (Local) Development
+### (Local) development
 Install poetry, e.g.:
 ```shell
 # Debian
@@ -70,6 +70,15 @@ Run this to bootstrap the app/bot:
 ```shell
 docker-compose up -d
 ```
+
+#### Translations
+- Currently supported: `en`, `nl`
+- Did you change strings? Generate PO file using all translation tags/strings in codebase.:
+```shell
+./manage.py makemessages --no-wrap --no-location --locale nl 
+```
+- The source translation (PO) file, e.g. [src/locales/nl/LC_MESSAGES/django.po](src/locales/nl/LC_MESSAGES/django.po), should be updated.
+- Translate any additions or changes with `Poedit` (or whatever program you'd like to use).
 
 
 ### Production/deploy

@@ -173,7 +173,7 @@ class Command(BaseCommand):
             email_address = result.get("user")["profile"]["email"]
 
         first_name = result.get("user")["profile"]["first_name"]
-        locale = result.get("user")["profile"]['locale']
+        locale = result.get("user")["profile"]["locale"]
 
         try:
             # Ensure every user is known internally.

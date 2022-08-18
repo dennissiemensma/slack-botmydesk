@@ -105,21 +105,17 @@ def handle_slash_command_help(
         },
         {
             "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": " "
-            },
+            "text": {"type": "mrkdwn", "text": " "},
             "accessory": {
                 "type": "button",
                 "text": {
                     "type": "plain_text",
                     "emoji": True,
-                    "text": "BotMyDesk settings"
+                    "text": "BotMyDesk settings",
                 },
-                "value": "open_settings"
-            }
+                "value": "open_settings",
+            },
         },
-
         {
             "type": "context",
             "elements": [
@@ -556,7 +552,7 @@ def on_interactive_block_action(
         service_module = {
             "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
             "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
-            "open_settings": handle_slash_command_settings  # Alias
+            "open_settings": handle_slash_command_settings,  # Alias
         }[action_value]
     except KeyError:
         raise NotImplementedError(
@@ -645,13 +641,9 @@ def handle_interactive_bmd_revoke_botmydesk(
                 },
                 "accessory": {
                     "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": "Settings"
-                    },
-                    "value": "open_settings"
-                }
+                    "text": {"type": "plain_text", "emoji": True, "text": "Settings"},
+                    "value": "open_settings",
+                },
             },
         ],
     }
@@ -727,7 +719,6 @@ def handle_interactive_bmd_authorize_login_code_submit(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Successful authorization, updated token credentials"
     )
 
-
     client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
@@ -744,12 +735,12 @@ def handle_interactive_bmd_authorize_login_code_submit(
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": "BotMyDesk settings"
+                        "text": "BotMyDesk settings",
                     },
-                    "value": "open_settings"
-                }
+                    "value": "open_settings",
+                },
             },
-        ]
+        ],
     )
 
     # Just display the default help info.

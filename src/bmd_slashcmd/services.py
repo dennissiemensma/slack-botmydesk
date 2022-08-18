@@ -48,6 +48,7 @@ def handle_slash_command(
         try:
             sub_command_module = {
                 settings.SLACK_SLASHCOMMAND_BMD_HELP: handle_slash_command_help,
+                settings.SLACK_SLASHCOMMAND_BMD_SETTINGS: handle_slash_command_settings,
                 settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1: handle_slash_command_mark_home,
                 settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2: handle_slash_command_mark_home,
                 settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1: handle_slash_command_mark_office,
@@ -60,11 +61,76 @@ def handle_slash_command(
                 settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2: handle_slash_command_list_reservations,
             }[text.strip()]
         except KeyError:
-            # Fallback on failed mapping.
-            sub_command_module = handle_slash_command_help
+            # Help when unknown sub.
+            handle_slash_command_help(client, botmydesk_user, **payload)
+        else:
+            sub_command_module(client, botmydesk_user, **payload)
+    else:
+        # Settings when no parameters given.
+        handle_slash_command_settings(client, botmydesk_user, **payload)
 
-        sub_command_module(client, botmydesk_user, **payload)
-        return
+
+def handle_slash_command_help(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **_
+):
+    help_text = ""
+
+    if botmydesk_user.authorized_bot():
+        help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n\n"
+        help_text += (
+            "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n\n\n"
+        )
+        help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
+        help_text += "_List your upcoming reservations (e.g. coming days)._\n\n\n"
+        help_text += "\n*You can use the following commands at any moment, without having to wait for my notification(s) first:*\n\n"
+        help_text += f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
+        help_text += "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n\n\n"
+        help_text += f"🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
+        help_text += "_Mark today as *working from the office*. Only checks you in if you already have a reservation._\n\n\n"
+        help_text += f"🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
+        help_text += "_Mark today as *working outside the office* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n\n\n"
+        help_text += f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
+        help_text += "_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n\n\n"
+    else:
+        help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n _Connect BotMyDesk._\n\n\n"
+        help_text += f"_More commands will be available after you've connected your account by typing *`{settings.SLACK_SLASHCOMMAND_BMD}`*_."
+
+    blocks = [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "BotMyDesk help",
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Command(s) available:",
+            },
+        },
+        {
+            "type": "context",
+            "elements": [
+                {"type": "mrkdwn", "text": help_text},
+            ],
+        },
+    ]
+
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text="BotMyDesk help",
+        blocks=blocks,
+    )
+    result.validate()
+
+
+def handle_slash_command_settings(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
+    """Modal settings."""
 
     # Just the slash command was entered. Unauthorized.
     if not botmydesk_user.authorized_bot():
@@ -306,45 +372,74 @@ def handle_slash_command(
     update_result.validate()
 
 
-def handle_slash_command_help(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+def handle_slash_command_list_reservations(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **_
 ):
-    help_text = ""
+    if not botmydesk_user.authorized_bot():
+        result = client.web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+        )
+        result.validate()
+        return
 
-    if botmydesk_user.authorized_bot():
-        help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* \n\n"
-        help_text += (
-            "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n\n\n"
-        )
-        help_text += "\n> _You can use the following commands at any moment, without having to wait for my notification(s) first:_\n\n"
-        help_text += f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
-        help_text += "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n\n\n"
-        help_text += f"🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
-        help_text += "_Mark today as *working from the office*. Only checks you in if you already have a reservation._\n\n\n"
-        help_text += f"🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
-        help_text += "_Mark today as *working outside the office* (but not at home). Books an *'external' spot* for you (if you don't have one yet). Checks you in as well._\n\n\n"
-        help_text += f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
-        help_text += "_*Removes* any pending reservation you have for today or checks you out, if you were checked in already._\n\n\n"
-        help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
-        help_text += "_List any reservations you have soon (e.g. upcoming days)._\n\n\n"
-    else:
-        help_text += (
-            f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* \n _Connect BotMyDesk._\n\n\n"
-        )
-        help_text += f"_More commands are available after you've connected your account with *`{settings.SLACK_SLASHCOMMAND_BMD}`*_."
+    profile = bmd_api_client.client.profile(botmydesk_user)
+    company_id = profile["companies"][0]["id"]
+    company_name = profile["companies"][0]["name"]
+
+    reservations_result = bmd_api_client.client.reservations(botmydesk_user, company_id)
+    reservations = reservations_result["result"]["items"]
+    reservations_text = ""
+
+    for current in reservations:
+        reservation_start = timezone.datetime.fromisoformat(current["dateStart"])
+        reservation_start_text = reservation_start.strftime("%A %d %B")
+        natural_time_until_start = humanize.naturaltime(reservation_start)
+        reservation_end = timezone.datetime.fromisoformat(current["dateEnd"])
+        natural_time_until_end = humanize.naturaltime(reservation_end)
+
+        if current["status"] in ("checkedIn", "checkedOut", "cancelled", "expired"):
+            reservations_text += f"\n\n\n✔️ ~{reservation_start_text}: {current['from']} to {current['to']}~ ({current['status']})\n_{natural_time_until_end}_"
+            continue
+
+        # Skip weird ones.
+        if current["status"] != "reserved":
+            continue
+
+        if current["seat"] is not None and current["seat"]["map"]["name"] == "Extern":
+            emoji = "🚋"
+            location = current["seat"]["map"]["name"]
+        elif current["seat"] is not None and current["type"] == "normal":
+            emoji = "🏢"
+            location = current["seat"]["map"]["name"]
+        elif current["seat"] is None and current["type"] == "home":
+            emoji = "🏡"
+            location = "Home"
+        else:
+            emoji = "❓"
+            location = "❓"
+
+        reservations_text += f"\n\n\n{emoji} {reservation_start_text} from {current['from']} to {current['to']}\n_{natural_time_until_start} at *{location}*_"
+
+    if not reservations:
+        reservations_text = "_No reservations found (or too far away)..._"
 
     blocks = [
         {
-            "type": "section",
+            "type": "header",
             "text": {
-                "type": "mrkdwn",
-                "text": "Just type any of the following command(s):",
+                "type": "plain_text",
+                "text": f"Your upcoming BookMyDesk reservation(s) at {company_name}",
             },
         },
         {
             "type": "context",
             "elements": [
-                {"type": "mrkdwn", "text": help_text},
+                {
+                    "type": "mrkdwn",
+                    "text": reservations_text,
+                }
             ],
         },
     ]
@@ -352,7 +447,7 @@ def handle_slash_command_help(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text="Help summary",
+        text=f"Your upcoming BookMyDesk reservations at {company_name}",
         blocks=blocks,
     )
     result.validate()
@@ -434,86 +529,6 @@ def handle_slash_command_mark_cancelled(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text="Sorry, not yet implemented 🧑‍💻",
-    )
-    result.validate()
-
-
-def handle_slash_command_list_reservations(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    if not botmydesk_user.authorized_bot():
-        result = client.web_client.chat_postEphemeral(
-            channel=botmydesk_user.slack_user_id,
-            user=botmydesk_user.slack_user_id,
-            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
-        )
-        result.validate()
-        return
-
-    profile = bmd_api_client.client.profile(botmydesk_user)
-    company_id = profile["companies"][0]["id"]
-    company_name = profile["companies"][0]["name"]
-
-    reservations_result = bmd_api_client.client.reservations(botmydesk_user, company_id)
-    reservations = reservations_result["result"]["items"]
-
-    from pprint import pprint  # @TODO revert
-
-    pprint(reservations_result, indent=4)  # @TODO revert
-
-    reservations_text = ""
-
-    for current in reservations:
-        reservation_start = timezone.datetime.fromisoformat(current["dateStart"])
-        natural_time_until_start = humanize.naturaltime(reservation_start)
-
-        if current["status"] in ("checkedOut", "cancelled", "expired"):
-            reservations_text += f"\n\n~{reservation_start.strftime('%A %d %B')}: {current['from']} to {current['to']}~ ({current['status']})"
-            continue
-
-        # Skip weird ones.
-        if current["status"] != "reserved":
-            continue
-
-        if current["seat"] is not None and current["seat"]["map"]["name"] == "Extern":
-            emoji = "🚋"
-            location = current["seat"]["map"]["name"]
-        elif current["seat"] is not None and current["type"] == "normal":
-            emoji = "🏢"
-            location = current["seat"]["map"]["name"]
-        elif current["seat"] is None and current["type"] == "home":
-            emoji = "🏡"
-            location = "Home"
-        else:
-            emoji = "❓"
-            location = "❓"
-
-        reservations_text += f"\n\n{emoji} {reservation_start.strftime('%A %d %B')} at *{location}* from {current['from']} to {current['to']}\n_{natural_time_until_start}_"
-
-    blocks = [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": f"Upcoming reservation(s) at {company_name}",
-            },
-        },
-        {
-            "type": "context",
-            "elements": [
-                {
-                    "type": "mrkdwn",
-                    "text": reservations_text,
-                }
-            ],
-        },
-    ]
-
-    result = client.web_client.chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text="Reservation list",
-        blocks=blocks,
     )
     result.validate()
 
@@ -695,7 +710,10 @@ def handle_interactive_bmd_authorize_login_code_submit(
     client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=f"Great! You've connected me to your BookMyDesk-account. 👏\n*To configure your preferences for BotMyDesk, run `{settings.SLACK_SLASHCOMMAND_BMD}` again.*\nYou can type `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}` for a full list of commands available.\n\n_Also, you can revoke my access at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again and click the *Disconnect BotMyDesk* button on the bottom of the screen._",
+        text="Great! You've connected me to your BookMyDesk-account. 👏",
     )
+
+    # Just display the default help info.
+    handle_slash_command_help(client, botmydesk_user)
 
     return {"response_action": "clear"}

@@ -79,6 +79,8 @@ def logout(botmydesk_user: BotMyDeskUser):
 
 def refresh_session(botmydesk_user: BotMyDeskUser):
     """Refresh session, updates user as well"""
+    botmydesk_user.refresh_from_db()
+
     bookmydesk_client_logger.debug(f"Refresh session for {botmydesk_user.email}")
     response = requests.post(
         url="{}/token".format(settings.BOOKMYDESK_API_URL),
@@ -115,7 +117,6 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
 
 def profile(botmydesk_user: BotMyDeskUser) -> dict:
     """Profile call about current user"""
-
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
@@ -140,7 +141,6 @@ def profile(botmydesk_user: BotMyDeskUser) -> dict:
 
 def reservations(botmydesk_user: BotMyDeskUser, company_id: str) -> dict:
     """Profile call about current user"""
-
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()

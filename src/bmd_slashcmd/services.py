@@ -78,7 +78,9 @@ def handle_slash_command_help(
 
     if botmydesk_user.authorized_bot():
         help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n\n"
-        help_text += "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n\n\n"
+        help_text += (
+            "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n\n\n"
+        )
         help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
         help_text += "_List your upcoming reservations (e.g. coming days)._\n\n\n"
         help_text += "\n*You can use the following commands at any moment, without having to wait for my notification(s) first:*\n\n"
@@ -123,6 +125,7 @@ def handle_slash_command_help(
         },
     ]
     import pprint
+
     pprint.pprint(blocks, indent=4)
 
     result = client.web_client.chat_postEphemeral(

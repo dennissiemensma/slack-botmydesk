@@ -90,7 +90,9 @@ class Command(BaseCommand):
             client.web_client.chat_postEphemeral(
                 channel=user_id,
                 user=user_id,
-                text=_(f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"),
+                text=_(
+                    f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"
+                ),
             )
 
     def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
@@ -120,7 +122,9 @@ class Command(BaseCommand):
                     client.web_client.chat_postEphemeral(
                         channel=user_id,
                         user=user_id,
-                        text=_(f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"),
+                        text=_(
+                            f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"
+                        ),
                     )
 
         # Respond to submits.
@@ -140,7 +144,9 @@ class Command(BaseCommand):
                 client.web_client.chat_postEphemeral(
                     channel=user_id,
                     user=user_id,
-                    text=_(f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"),
+                    text=_(
+                        f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"
+                    ),
                 )
                 return
 
@@ -177,7 +183,6 @@ class Command(BaseCommand):
 
         first_name = result.get("user")["profile"]["first_name"]
         locale = result.get("user")["locale"]
-
 
         try:
             # Ensure every user is known internally.

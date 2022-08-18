@@ -158,7 +158,7 @@ class Command(BaseCommand):
 
     def _get_user(self, client: SocketModeClient, slack_user_id: str) -> BotMyDeskUser:
         """Fetches Slack user info and creates/updates the user info on our side."""
-        result = client.web_client.users_info(user=slack_user_id, include_locale=True)
+        result = client.web_client.users_info(user=slack_user_id)
         result.validate()
 
         # Dev only: Override email address when required for development.
@@ -173,7 +173,6 @@ class Command(BaseCommand):
             email_address = result.get("user")["profile"]["email"]
 
         first_name = result.get("user")["profile"]["first_name"]
-        locale = result.get("user")["profile"]["locale"]
 
         try:
             # Ensure every user is known internally.
@@ -181,14 +180,12 @@ class Command(BaseCommand):
         except BotMyDeskUser.DoesNotExist:
             user = BotMyDeskUser.objects.create(
                 slack_user_id=slack_user_id,
-                locale=locale,
                 email=email_address,
                 name=first_name,
             )
         else:
             # Update these, if it ever changes.
             user.update(
-                locale=locale,
                 email=email_address,
                 name=first_name,
             )

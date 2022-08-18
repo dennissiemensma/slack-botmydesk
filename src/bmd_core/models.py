@@ -17,7 +17,6 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
         unique=True,
         max_length=255,
     )
-    locale = models.CharField(max_length=16)
     email = models.EmailField(max_length=255)
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now=True)

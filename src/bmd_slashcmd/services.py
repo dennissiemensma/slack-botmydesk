@@ -710,7 +710,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
     client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text="Great! You've connected me to your BookMyDesk-account. 👏",
+        text=f"Great! You've connected me to your BookMyDesk-account 👏\n\nI will now summarize the commands you can use, which is similar to typing *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`*",
     )
 
     # Just display the default help info.

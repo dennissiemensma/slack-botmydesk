@@ -178,8 +178,6 @@ class Command(BaseCommand):
         first_name = result.get("user")["profile"]["first_name"]
         locale = result.get("user")["locale"]
 
-        # Apply user locale.
-        translation.activate('nl')
 
         try:
             # Ensure every user is known internally.
@@ -187,14 +185,19 @@ class Command(BaseCommand):
         except BotMyDeskUser.DoesNotExist:
             user = BotMyDeskUser.objects.create(
                 slack_user_id=slack_user_id,
+                locale=locale,
                 email=email_address,
                 name=first_name,
             )
         else:
             # Update these, if it ever changes.
             user.update(
+                locale=locale,
                 email=email_address,
                 name=first_name,
             )
+
+        # Apply user locale.
+        translation.activate(locale)
 
         return user

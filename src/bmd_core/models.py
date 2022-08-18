@@ -21,6 +21,7 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
     email = models.EmailField(max_length=255)
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now=True)
+    next_profile_update = models.DateTimeField(auto_now=True)
     access_token = models.CharField(null=True, default=None, max_length=255)
     # The actual expiry is unknown, but assume one hour.
     access_token_expires_at = models.DateTimeField(null=True, default=None)
@@ -36,6 +37,10 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
             self.access_token_expires_at is None
             or self.access_token_expires_at <= timezone.now()
         )
+
+    def profile_data_expired(self) -> bool:
+        """Whether the profile data needs to be refreshed."""
+        return self.next_profile_update <= timezone.now()
 
     def clear_tokens(self):
         self.update(

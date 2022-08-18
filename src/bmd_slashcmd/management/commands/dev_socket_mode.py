@@ -8,13 +8,11 @@ from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.socket_mode.request import SocketModeRequest
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import gettext_lazy as _
-from django.utils import translation
 from django.utils.autoreload import run_with_reloader
 from django.conf import settings
-from decouple import config
 
 import bmd_slashcmd.services
-from bmd_core.models import BotMyDeskUser
+import bmd_core.services
 
 
 console_commands_logger = logging.getLogger("console_commands")
@@ -72,7 +70,9 @@ class Command(BaseCommand):
 
     def _handle_slash_commands(self, client: SocketModeClient, req: SocketModeRequest):
         user_id = req.payload["user_id"]
-        user = self._get_user(client, slack_user_id=user_id)
+        botmydesk_user = bmd_core.services.get_botmydesk_user(
+            client, slack_user_id=user_id
+        )
 
         # Ack first (Slack timeout @ 3s).
         client.send_socket_mode_response(
@@ -80,7 +80,7 @@ class Command(BaseCommand):
         )
 
         try:
-            bmd_slashcmd.services.on_slash_command(client, user, req.payload)
+            bmd_slashcmd.services.on_slash_command(client, botmydesk_user, req.payload)
         except Exception as error:
             console_commands_logger.error(
                 f"Slash command error: {error} ({error.__class__})"
@@ -97,7 +97,9 @@ class Command(BaseCommand):
 
     def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
         user_id = req.payload["user"]["id"]
-        user = self._get_user(client, slack_user_id=user_id)
+        botmydesk_user = bmd_core.services.get_botmydesk_user(
+            client, slack_user_id=user_id
+        )
 
         # Respond to view UX.
         if req.payload["type"] == "block_actions":
@@ -110,7 +112,7 @@ class Command(BaseCommand):
                 try:
                     (
                         bmd_slashcmd.services.on_interactive_block_action(
-                            client, user, current, **req.payload
+                            client, botmydesk_user, current, **req.payload
                         )
                     )
                 except Exception as error:
@@ -133,7 +135,7 @@ class Command(BaseCommand):
 
             try:
                 response_payload = bmd_slashcmd.services.on_interactive_view_submission(
-                    client, user, req.payload
+                    client, botmydesk_user, req.payload
                 )
             except Exception as error:
                 console_commands_logger.error(
@@ -163,46 +165,3 @@ class Command(BaseCommand):
                 client.send_socket_mode_response(
                     SocketModeResponse(envelope_id=req.envelope_id)
                 )
-
-    def _get_user(self, client: SocketModeClient, slack_user_id: str) -> BotMyDeskUser:
-        """Fetches Slack user info and creates/updates the user info on our side."""
-        # @TODO update this once in a while. Use our internal DB first and add data expiry to it.
-        result = client.web_client.users_info(user=slack_user_id, include_locale=True)
-        result.validate()
-
-        # Dev only: Override email address when required for development.
-        DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default="")
-
-        if settings.DEBUG and DEV_EMAIL_ADDRESS:
-            email_address = DEV_EMAIL_ADDRESS
-            console_commands_logger.debug(
-                f"DEV_EMAIL_ADDRESS: Overriding email address with: {email_address}"
-            )
-        else:
-            email_address = result.get("user")["profile"]["email"]
-
-        first_name = result.get("user")["profile"]["first_name"]
-        locale = result.get("user")["locale"]
-
-        try:
-            # Ensure every user is known internally.
-            user = BotMyDeskUser.objects.by_slack_id(slack_user_id=slack_user_id)
-        except BotMyDeskUser.DoesNotExist:
-            user = BotMyDeskUser.objects.create(
-                slack_user_id=slack_user_id,
-                locale=locale,
-                email=email_address,
-                name=first_name,
-            )
-        else:
-            # Update these, if it ever changes.
-            user.update(
-                locale=locale,
-                email=email_address,
-                name=first_name,
-            )
-
-        # Apply user locale.
-        translation.activate(locale)
-
-        return user

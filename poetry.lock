@@ -122,31 +122,6 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
-name = "coreapi"
-version = "2.3.3"
-description = "Python client library for Core API."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-coreschema = "*"
-itypes = "*"
-requests = "*"
-uritemplate = "*"
-
-[[package]]
-name = "coreschema"
-version = "0.0.4"
-description = "Core Schema."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-jinja2 = "*"
-
-[[package]]
 name = "coverage"
 version = "6.4.4"
 description = "Code coverage measurement for Python"
@@ -334,36 +309,6 @@ description = "iniconfig: brain-dead simple config-ini parsing"
 category = "dev"
 optional = false
 python-versions = "*"
-
-[[package]]
-name = "itypes"
-version = "1.2.0"
-description = "Simple immutable types for python."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
-name = "jinja2"
-version = "3.1.2"
-description = "A very fast and expressive template engine."
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-MarkupSafe = ">=2.0"
-
-[package.extras]
-i18n = ["Babel (>=2.7)"]
-
-[[package]]
-name = "markupsafe"
-version = "2.1.1"
-description = "Safely add untrusted strings to HTML/XML markup."
-category = "main"
-optional = false
-python-versions = ">=3.7"
 
 [[package]]
 name = "mccabe"
@@ -753,14 +698,6 @@ optional = false
 python-versions = ">=2"
 
 [[package]]
-name = "uritemplate"
-version = "4.1.1"
-description = "Implementation of RFC 6570 URI Templates"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[[package]]
 name = "urllib3"
 version = "1.26.11"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -776,7 +713,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "0cd31220cecfb8824be9e3a7839b56b47c02c90e4d7fca288f0eac2085c70681"
+content-hash = "e082b341a335430489a7577a96b25314b43e1941f92e50be3fce10b58018359c"
 
 [metadata.files]
 asgiref = []
@@ -789,8 +726,6 @@ certifi = []
 charset-normalizer = []
 click = []
 colorama = []
-coreapi = []
-coreschema = []
 coverage = []
 django = []
 django-debug-toolbar = []
@@ -806,9 +741,6 @@ gitpython = []
 gunicorn = []
 idna = []
 iniconfig = []
-itypes = []
-jinja2 = []
-markupsafe = []
 mccabe = []
 mypy = []
 mypy-extensions = []
@@ -846,5 +778,4 @@ types-six = []
 types-urllib3 = []
 typing-extensions = []
 tzdata = []
-uritemplate = []
 urllib3 = []

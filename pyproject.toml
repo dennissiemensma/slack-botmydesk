@@ -12,7 +12,6 @@ authors = ["Dennis Siemensma"]
 [tool.poetry.dependencies]
 python = "^3.8"
 
-coreapi = "^2.3"
 django = "^4.0"
 django-debug-toolbar = "^3.6"
 gunicorn = "^20.1"

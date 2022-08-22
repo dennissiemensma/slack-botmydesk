@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-22 19:36+0000\n"
-"PO-Revision-Date: 2022-08-22 22:20+0200\n"
+"POT-Creation-Date: 2022-08-22 21:00+0000\n"
+"PO-Revision-Date: 2022-08-22 23:04+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -226,14 +226,12 @@ msgid ""
 "\n"
 "\n"
 "\n"
-"✔️ ~{reservation_start_text}: {current['from']} to {current['to']}~ ({current['status']})\n"
-"_{natural_time_until_end}_"
+"~{emoji} {reservation_start_text}: {current['from']} to {current['to']}~ ({current['status']})"
 msgstr ""
 "\n"
 "\n"
 "\n"
-"✔️ ~{reservation_start_text}: {current['from']} tot {current['to']}~ ({current['status']})\n"
-"_{natural_time_until_end}_"
+"✔️ ~{reservation_start_text}: {current['from']} tot {current['to']}~ ({current['status']})"
 
 msgid "Home"
 msgstr "Thuis"
@@ -254,10 +252,50 @@ msgstr ""
 msgid "_No reservations found (or too far away)..._"
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
 
-#, python-brace-format
-msgid "Your upcoming BookMyDesk reservation(s) at {company_name}"
-msgstr "Je komende boeking(en) in BookMyDesk bij {company_name}"
+msgid "Your upcoming BookMyDesk reservation(s)"
+msgstr "Je komende boeking(en) in BookMyDesk"
+
+msgid "Your upcoming BookMyDesk reservations"
+msgstr "Je komende boekingen in BookMyDesk"
+
+msgid "Sorry, not yet implemented 🧑‍💻"
+msgstr "Sorry, nog niet werkend 🧑‍💻"
 
 #, python-brace-format
-msgid "Your upcoming BookMyDesk reservations at {company_name}"
-msgstr "Je komende boekingen in BookMyDesk bij {company_name}"
+msgid "Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received."
+msgstr "Controleer je mailbox voor *{botmydesk_user.email}*. Vul de BookMyDesk logincode in die je hebt ontvangen."
+
+msgid "Login code"
+msgstr "Logincode"
+
+msgid "Verify login code"
+msgstr "Verifieer logincode"
+
+msgid "BotMyDesk disconnected"
+msgstr "BotMyDesk ontkoppeld"
+
+#, python-brace-format
+msgid ""
+"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again or the button to the right.\n"
+"\n"
+"Bye! 👋"
+msgstr ""
+"Ik ben nu ontkoppeld van je BookMyDesk-account. Je kunt me later weer koppelen door `{settings.SLACK_SLASHCOMMAND_BMD}` opnieuw uit te voeren, of te klikken op de knop aan de rechterzijde.\n"
+"\n"
+"Doei! 👋"
+
+msgid "Error validating your login code. You can try it another time or restart this flow to have a new code sent to you."
+msgstr "Fout bij het valideren van je logincode. Je kunt het nogmaals proberen of deze flow opnieuw doorlopen om een nieuwe code te ontvangen."
+
+msgid "BotMyDesk connected!"
+msgstr "BotMyDesk gekoppeld!"
+
+#, python-brace-format
+msgid ""
+"Great! You've connected me to your BookMyDesk-account 👏\n"
+"\n"
+"I will now summarize the commands you can use, which is similar to typing *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`*"
+msgstr ""
+"Yes! Je hebt me gekoppeld aan je BookMyDesk-account 👏\n"
+"\n"
+"Ik geef nu een opsomming van alle commando's die je kunt gebruiken, vergelijkbaar wanneer je *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`* typt"

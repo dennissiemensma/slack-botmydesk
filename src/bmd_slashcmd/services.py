@@ -535,7 +535,7 @@ def handle_slash_command_mark_home(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text="Sorry, not yet implemented 🧑‍💻",
+        text=gettext("Sorry, not yet implemented 🧑‍💻"),
     )
     result.validate()
 
@@ -547,7 +547,9 @@ def handle_slash_command_mark_office(
         result = client.web_client.chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
-            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+            text=gettext(
+                f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
+            ),
         )
         result.validate()
         return
@@ -555,7 +557,7 @@ def handle_slash_command_mark_office(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text="Sorry, not yet implemented 🧑‍💻",
+        text=gettext("Sorry, not yet implemented 🧑‍💻"),
     )
     result.validate()
 
@@ -567,7 +569,9 @@ def handle_slash_command_mark_externally(
         result = client.web_client.chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
-            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+            text=gettext(
+                f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
+            ),
         )
         result.validate()
         return
@@ -575,7 +579,7 @@ def handle_slash_command_mark_externally(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text="Sorry, not yet implemented 🧑‍💻",
+        text=gettext("Sorry, not yet implemented 🧑‍💻"),
     )
     result.validate()
 
@@ -587,7 +591,9 @@ def handle_slash_command_mark_cancelled(
         result = client.web_client.chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
-            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+            text=gettext(
+                f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
+            ),
         )
         result.validate()
         return
@@ -595,7 +601,7 @@ def handle_slash_command_mark_cancelled(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text="Sorry, not yet implemented 🧑‍💻",
+        text=gettext("Sorry, not yet implemented 🧑‍💻"),
     )
     result.validate()
 
@@ -632,13 +638,15 @@ def handle_interactive_send_bookmydesk_login_code(
     view_data = {
         "type": "modal",
         "callback_id": "bmd-modal-authorize-login-code",
-        "title": {"type": "plain_text", "text": "Connecting BotMyDesk"},
+        "title": {"type": "plain_text", "text": gettext("Connecting BotMyDesk")},
         "blocks": [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received.",
+                    "text": gettext(
+                        f"Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received."
+                    ),
                 },
             },
             {
@@ -646,7 +654,7 @@ def handle_interactive_send_bookmydesk_login_code(
                 "block_id": "otp_user_input_block",
                 "label": {
                     "type": "plain_text",
-                    "text": "Login code",
+                    "text": gettext("Login code"),
                 },
                 "element": {
                     "action_id": "otp_user_input",
@@ -661,7 +669,7 @@ def handle_interactive_send_bookmydesk_login_code(
                 },
             },
         ],
-        "submit": {"type": "plain_text", "text": "Verify login code"},
+        "submit": {"type": "plain_text", "text": gettext("Verify login code")},
     }
 
     # @see https://api.slack.com/surfaces/modals/using#updating_apis
@@ -691,18 +699,24 @@ def handle_interactive_bmd_revoke_botmydesk(
         "callback_id": "bmd-disconnected",
         "title": {
             "type": "plain_text",
-            "text": "BotMyDesk disconnected",
+            "text": gettext("BotMyDesk disconnected"),
         },
         "blocks": [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again or the button to the right.\n\nBye! 👋",
+                    "text": gettext(
+                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again or the button to the right.\n\nBye! 👋"
+                    ),
                 },
                 "accessory": {
                     "type": "button",
-                    "text": {"type": "plain_text", "emoji": True, "text": "Settings"},
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": gettext("Settings"),
+                    },
                     "value": "open_settings",
                 },
             },
@@ -766,7 +780,9 @@ def handle_interactive_bmd_authorize_login_code_submit(
         return {
             "response_action": "errors",
             "errors": {
-                "otp_user_input_block": "Error validating your login code. You can try it another time or restart this flow to have a new code sent to you."
+                "otp_user_input_block": gettext(
+                    "Error validating your login code. You can try it another time or restart this flow to have a new code sent to you."
+                )
             },
         }
 
@@ -783,20 +799,22 @@ def handle_interactive_bmd_authorize_login_code_submit(
     client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text="BotMyDesk connected!",
+        text=gettext("BotMyDesk connected!"),
         blocks=[
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"Great! You've connected me to your BookMyDesk-account 👏\n\nI will now summarize the commands you can use, which is similar to typing *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`*",
+                    "text": gettext(
+                        f"Great! You've connected me to your BookMyDesk-account 👏\n\nI will now summarize the commands you can use, which is similar to typing *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`*"
+                    ),
                 },
                 "accessory": {
                     "type": "button",
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": "BotMyDesk settings",
+                        "text": gettext("BotMyDesk settings"),
                     },
                     "value": "open_settings",
                 },

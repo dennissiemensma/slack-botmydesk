@@ -178,14 +178,14 @@ def handle_slash_command_settings(
             "callback_id": "bmd-unauthorized-welcome",
             "title": {
                 "type": "plain_text",
-                "text": f"Hi {botmydesk_user.name}",
+                "text": gettext(f"Hi {botmydesk_user.name}"),
             },
             "blocks": [
                 {
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "My name is BotMyDesk, I'm an unofficial Slack bot for BookMyDesk.\n\nI can remind you to check-in at the office or at home. Making life a bit easier for you!",
+                        "text": gettext("My name is BotMyDesk, I'm an unofficial Slack bot for BookMyDesk.\n\nI can remind you to check-in at the office or at home. Making life a bit easier for you!"),
                     },
                 },
                 {"type": "divider"},
@@ -193,14 +193,14 @@ def handle_slash_command_settings(
                     "type": "header",
                     "text": {
                         "type": "plain_text",
-                        "text": "Connecting BotMyDesk",
+                        "text": gettext("Connecting BotMyDesk"),
                     },
                 },
                 {
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.email}*.",
+                        "text": gettext(f"First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.email}*."),
                     },
                 },
                 {
@@ -211,23 +211,23 @@ def handle_slash_command_settings(
                             "style": "primary",
                             "text": {
                                 "type": "plain_text",
-                                "text": "Connect",
+                                "text": gettext("Connect"),
                                 "emoji": True,
                             },
                             "confirm": {
                                 "title": {
                                     "type": "plain_text",
-                                    "text": "Are you sure?",
+                                    "text": gettext("Are you sure?"),
                                 },
                                 "text": {
                                     "type": "mrkdwn",
-                                    "text": f"Request BookMyDesk login code for *{botmydesk_user.email}*?\n\n_You can enter it on the next screen._",
+                                    "text": gettext(f"Request BookMyDesk login code for *{botmydesk_user.email}*?\n\n_You can enter it on the next screen._"),
                                 },
                                 "confirm": {
                                     "type": "plain_text",
-                                    "text": "Yes, send it",
+                                    "text": gettext("Yes, send it"),
                                 },
-                                "deny": {"type": "plain_text", "text": "No, hold on"},
+                                "deny": {"type": "plain_text", "text": gettext("No, hold on")},
                             },
                             "value": "send_bookmydesk_login_code",
                         }
@@ -238,7 +238,7 @@ def handle_slash_command_settings(
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._",
+                        "text": gettext(f"_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._"),
                     },
                 },
             ],
@@ -258,28 +258,28 @@ def handle_slash_command_settings(
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": "BotMyDesk settings",
+            "text": gettext("BotMyDesk settings"),
         },
         "blocks": [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?",
+                    "text": gettext(f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?"),
                 },
             },
             {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": "Settings",
+                    "text": gettext("Settings"),
                 },
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "Loading...",
+                    "text": gettext("Loading..."),
                 },
             },
             {"type": "divider"},
@@ -287,7 +287,7 @@ def handle_slash_command_settings(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"_Connected: *{profile['email']}*_",
+                    "text": gettext(f"_Connected: *{profile['email']}*_"),
                 },
             },
             {
@@ -298,22 +298,22 @@ def handle_slash_command_settings(
                         "style": "danger",
                         "text": {
                             "type": "plain_text",
-                            "text": "Disconnect BotMyDesk",
+                            "text": gettext("Disconnect BotMyDesk"),
                             "emoji": True,
                         },
                         "confirm": {
-                            "title": {"type": "plain_text", "text": "Are you sure?"},
+                            "title": {"type": "plain_text", "text": gettext("Are you sure?")},
                             "text": {
                                 "type": "mrkdwn",
-                                "text": "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n\n*Revoke my access to your account in BookMyDesk?*",
+                                "text": gettext("This will log me out of your BookMyDesk-account and I won't bother you anymore.\n\n*Revoke my access to your account in BookMyDesk?*"),
                             },
                             "confirm": {
                                 "type": "plain_text",
-                                "text": "Yes, disconnect",
+                                "text": gettext("Yes, disconnect"),
                             },
                             "deny": {
                                 "type": "plain_text",
-                                "text": "Nevermind, keep connected",
+                                "text": gettext("Nevermind, keep connected"),
                             },
                         },
                         "value": "revoke_botmydesk",
@@ -334,21 +334,21 @@ def handle_slash_command_settings(
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": "BotMyDesk settings",
+            "text": gettext("BotMyDesk settings"),
         },
         "blocks": [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?",
+                    "text": gettext(f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?"),
                 },
             },
             {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": "Settings",
+                    "text": gettext("Settings"),
                 },
             },
             {
@@ -363,7 +363,7 @@ def handle_slash_command_settings(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"_Connected: *{profile['email']}*_",
+                    "text": gettext(f"_Connected: *{profile['email']}*_"),
                 },
             },
             {
@@ -374,22 +374,22 @@ def handle_slash_command_settings(
                         "style": "danger",
                         "text": {
                             "type": "plain_text",
-                            "text": "Disconnect BotMyDesk",
+                            "text": gettext("Disconnect BotMyDesk"),
                             "emoji": True,
                         },
                         "confirm": {
-                            "title": {"type": "plain_text", "text": "Are you sure?"},
+                            "title": {"type": "plain_text", "text": gettext("Are you sure?")},
                             "text": {
                                 "type": "mrkdwn",
-                                "text": "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n\n*Revoke my access to your account in BookMyDesk?*",
+                                "text": gettext("This will log me out of your BookMyDesk-account and I won't bother you anymore.\n\n*Revoke my access to your account in BookMyDesk?*"),
                             },
                             "confirm": {
                                 "type": "plain_text",
-                                "text": "Yes, disconnect",
+                                "text": gettext("Yes, disconnect"),
                             },
                             "deny": {
                                 "type": "plain_text",
-                                "text": "Nevermind, keep connected",
+                                "text": gettext("Nevermind, keep connected"),
                             },
                         },
                         "value": "revoke_botmydesk",
@@ -414,7 +414,7 @@ def handle_slash_command_list_reservations(
         result = client.web_client.chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
-            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+            text=gettext(f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"),
         )
         result.validate()
         return
@@ -435,7 +435,7 @@ def handle_slash_command_list_reservations(
         natural_time_until_end = humanize.naturaltime(reservation_end)
 
         if current["status"] in ("checkedIn", "checkedOut", "cancelled", "expired"):
-            reservations_text += f"\n\n\n✔️ ~{reservation_start_text}: {current['from']} to {current['to']}~ ({current['status']})\n_{natural_time_until_end}_"
+            reservations_text += gettext(f"\n\n\n✔️ ~{reservation_start_text}: {current['from']} to {current['to']}~ ({current['status']})\n_{natural_time_until_end}_")
             continue
 
         # Skip weird ones.
@@ -450,22 +450,22 @@ def handle_slash_command_list_reservations(
             location = current["seat"]["map"]["name"]
         elif current["seat"] is None and current["type"] == "home":
             emoji = "🏡"
-            location = "Home"
+            location = gettext("Home")
         else:
             emoji = "❓"
             location = "❓"
 
-        reservations_text += f"\n\n\n{emoji} {reservation_start_text} from {current['from']} to {current['to']}\n_{natural_time_until_start} at *{location}*_"
+        reservations_text += gettext(f"\n\n\n{emoji} {reservation_start_text} from {current['from']} to {current['to']}\n_{natural_time_until_start} at *{location}*_")
 
     if not reservations:
-        reservations_text = "_No reservations found (or too far away)..._"
+        reservations_text = gettext("_No reservations found (or too far away)..._")
 
     blocks = [
         {
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": f"Your upcoming BookMyDesk reservation(s) at {company_name}",
+                "text": gettext(f"Your upcoming BookMyDesk reservation(s) at {company_name}"),
             },
         },
         {
@@ -482,7 +482,7 @@ def handle_slash_command_list_reservations(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=f"Your upcoming BookMyDesk reservations at {company_name}",
+        text=gettext(f"Your upcoming BookMyDesk reservations at {company_name}"),
         blocks=blocks,
     )
     result.validate()
@@ -495,7 +495,7 @@ def handle_slash_command_mark_home(
         result = client.web_client.chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
-            text=f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`",
+            text=gettext(f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"),
         )
         result.validate()
         return

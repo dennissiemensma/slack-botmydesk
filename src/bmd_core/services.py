@@ -21,8 +21,11 @@ def get_botmydesk_user(client: SocketModeClient, slack_user_id: str) -> BotMyDes
 
     # Profile sync on each request is quite expensive, so once in a while suffices. Or when the user is unknown.
     if botmydesk_user is not None and botmydesk_user.profile_data_expired():
+        # Dev only: Override locale or use user's preference.
+        locale = config("DEV_LOCALE", cast=str, default=botmydesk_user.locale)
+
         # Apply user locale.
-        translation.activate(botmydesk_user.locale)
+        translation.activate(locale)
 
         return botmydesk_user
 
@@ -67,6 +70,8 @@ def get_botmydesk_user(client: SocketModeClient, slack_user_id: str) -> BotMyDes
             next_profile_update=next_profile_update,
         )
 
-    translation.activate(botmydesk_user.locale)
+    # Dev only: Override locale or use user's preference.
+    locale = config("DEV_LOCALE", cast=str, default=botmydesk_user.locale)
+    translation.activate(locale)
 
     return botmydesk_user

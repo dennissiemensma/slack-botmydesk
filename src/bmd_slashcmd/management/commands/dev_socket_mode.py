@@ -7,7 +7,7 @@ from slack_sdk.socket_mode import SocketModeClient
 from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.socket_mode.request import SocketModeRequest
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext
 from django.utils.autoreload import run_with_reloader
 from django.conf import settings
 
@@ -90,7 +90,7 @@ class Command(BaseCommand):
             client.web_client.chat_postEphemeral(
                 channel=user_id,
                 user=user_id,
-                text=_(
+                text=gettext(
                     f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"
                 ),
             )
@@ -124,7 +124,7 @@ class Command(BaseCommand):
                     client.web_client.chat_postEphemeral(
                         channel=user_id,
                         user=user_id,
-                        text=_(
+                        text=gettext(
                             f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"
                         ),
                     )
@@ -146,7 +146,7 @@ class Command(BaseCommand):
                 client.web_client.chat_postEphemeral(
                     channel=user_id,
                     user=user_id,
-                    text=_(
+                    text=gettext(
                         f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"
                     ),
                 )

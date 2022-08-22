@@ -458,12 +458,15 @@ def handle_slash_command_list_reservations(
         reservation_start = timezone.datetime.fromisoformat(current["dateStart"])
         reservation_start_text = reservation_start.strftime("%A %d %B")
         natural_time_until_start = humanize.naturaltime(reservation_start)
-        reservation_end = timezone.datetime.fromisoformat(current["dateEnd"])
-        natural_time_until_end = humanize.naturaltime(reservation_end)
 
         if current["status"] in ("checkedIn", "checkedOut", "cancelled", "expired"):
+            if current["status"] in ("cancelled", "expired"):
+                emoji = "❌ "
+            else:
+                emoji = "✔️"
+
             reservations_text += gettext(
-                f"\n\n\n✔️ ~{reservation_start_text}: {current['from']} to {current['to']}~ ({current['status']})\n_{natural_time_until_end}_"
+                f"\n\n\n~{emoji} {reservation_start_text}: {current['from']} to {current['to']}~ ({current['status']})"
             )
             continue
 

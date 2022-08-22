@@ -139,21 +139,29 @@ def profile(botmydesk_user: BotMyDeskUser) -> dict:
     return response.json()
 
 
-def reservations(botmydesk_user: BotMyDeskUser, company_id: str) -> dict:
-    """Profile call about current user"""
+def reservations(botmydesk_user: BotMyDeskUser, **override_parameters) -> dict:
+    """Fetch reservations. Any parameters given will overrule any defaults below."""
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
 
+    # For now, always use the first company found.
+    profile_result = profile(botmydesk_user=botmydesk_user)
+    company_id = profile_result["companies"][0]["id"]
+
+    today = timezone.localtime(timezone.now())
     bookmydesk_client_logger.debug(f"Reservations for {botmydesk_user.email}")
+    parameters = {
+        "companyId": company_id,
+        "includeAnonymous": "true",
+        "from": today.date(),
+        "to": (today + timezone.timedelta(days=7)).date(),
+    }
+    parameters.update(override_parameters)
+
     response = requests.get(
         url="{}/v3/reservations".format(settings.BOOKMYDESK_API_URL),
-        params={
-            "companyId": company_id,
-            "includeAnonymous": "true",
-            "from": timezone.now().date(),
-            "to": (timezone.now() + timezone.timedelta(days=7)).date(),
-        },
+        params=parameters,
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
             "Authorization": f"Bearer {botmydesk_user.access_token}",
@@ -162,7 +170,7 @@ def reservations(botmydesk_user: BotMyDeskUser, company_id: str) -> dict:
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to get me/profile for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to get reservations for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 

@@ -446,11 +446,7 @@ def handle_slash_command_list_reservations(
         result.validate()
         return
 
-    profile = bmd_api_client.client.profile(botmydesk_user)
-    company_id = profile["companies"][0]["id"]
-    company_name = profile["companies"][0]["name"]
-
-    reservations_result = bmd_api_client.client.reservations(botmydesk_user, company_id)
+    reservations_result = bmd_api_client.client.reservations(botmydesk_user)
     reservations = reservations_result["result"]["items"]
     reservations_text = ""
 
@@ -499,9 +495,7 @@ def handle_slash_command_list_reservations(
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": gettext(
-                    f"Your upcoming BookMyDesk reservation(s) at {company_name}"
-                ),
+                "text": gettext(f"Your upcoming BookMyDesk reservation(s)"),
             },
         },
         {
@@ -518,7 +512,7 @@ def handle_slash_command_list_reservations(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=gettext(f"Your upcoming BookMyDesk reservations at {company_name}"),
+        text=gettext(f"Your upcoming BookMyDesk reservations"),
         blocks=blocks,
     )
     result.validate()

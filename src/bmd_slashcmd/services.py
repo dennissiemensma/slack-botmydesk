@@ -495,7 +495,7 @@ def handle_slash_command_list_reservations(
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": gettext(f"Your upcoming BookMyDesk reservation(s)"),
+                "text": gettext("Your upcoming BookMyDesk reservation(s)"),
             },
         },
         {
@@ -512,7 +512,7 @@ def handle_slash_command_list_reservations(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=gettext(f"Your upcoming BookMyDesk reservations"),
+        text=gettext("Your upcoming BookMyDesk reservations"),
         blocks=blocks,
     )
     result.validate()

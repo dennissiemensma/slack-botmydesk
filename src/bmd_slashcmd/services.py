@@ -50,6 +50,7 @@ def handle_slash_command(
             sub_command_module = {
                 settings.SLACK_SLASHCOMMAND_BMD_HELP: handle_slash_command_help,
                 settings.SLACK_SLASHCOMMAND_BMD_SETTINGS: handle_slash_command_settings,
+                settings.SLACK_SLASHCOMMAND_BMD_STATUS: handle_slash_command_status,
                 settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1: handle_slash_command_mark_home,
                 settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2: handle_slash_command_mark_home,
                 settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1: handle_slash_command_mark_office,
@@ -66,8 +67,13 @@ def handle_slash_command(
             handle_slash_command_help(client, botmydesk_user, **payload)
         else:
             sub_command_module(client, botmydesk_user, **payload)
+
+        return
+
+    # Status or settings when no parameters given.
+    if botmydesk_user.authorized_bot():
+        handle_slash_command_status(client, botmydesk_user, **payload)
     else:
-        # Settings when no parameters given.
         handle_slash_command_settings(client, botmydesk_user, **payload)
 
 
@@ -78,10 +84,10 @@ def handle_slash_command_help(
 
     if botmydesk_user.authorized_bot():
         help_text += gettext(
-            f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n\n"
+            f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_STATUS}`*\n"
         )
         help_text += gettext(
-            "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n\n\n"
+            "_Show your BookMyDesk status today. Allows you to choose what to book for you today. Similar to notifications sent by BotMyDesk._\n\n\n"
         )
         help_text += gettext(
             f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
@@ -102,13 +108,13 @@ def handle_slash_command_help(
             f"🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
         )
         help_text += gettext(
-            "_Mark today as *working from the office*. Only checks you in if you already have a reservation._\n\n\n"
+            "_Mark today as *working from the office*. Only works if you already have a reservation. I will check you in though._\n\n\n"
         )
         help_text += gettext(
             f"🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
         )
         help_text += gettext(
-            "_Mark today as *working outside the office* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n\n\n"
+            "_Mark today as *working externally* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n\n\n"
         )
         help_text += gettext(
             f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
@@ -117,9 +123,6 @@ def handle_slash_command_help(
             "_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n\n\n"
         )
     else:
-        help_text += gettext(
-            f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n _Connect BotMyDesk._\n\n\n"
-        )
         help_text += gettext(
             f"_More commands will be available after you've connected your account by typing *`{settings.SLACK_SLASHCOMMAND_BMD}`*_."
         )
@@ -134,7 +137,12 @@ def handle_slash_command_help(
         },
         {
             "type": "section",
-            "text": {"type": "mrkdwn", "text": " "},
+            "text": {
+                "type": "mrkdwn",
+                "text": gettext(
+                    "_Click the button to the right for preferences or (dis)connecting BotMyDesk._\n\n\n"
+                ),
+            },
             "accessory": {
                 "type": "button",
                 "text": {
@@ -300,7 +308,7 @@ def handle_slash_command_settings(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext(f"_Connected: *{profile['email']}*_"),
+                    "text": gettext(f"_Connected to: *{profile['email']}*_"),
                 },
             },
             {
@@ -383,7 +391,7 @@ def handle_slash_command_settings(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext(f"_Connected: *{profile['email']}*_"),
+                    "text": gettext(f"_Connected to: *{profile['email']}*_"),
                 },
             },
             {
@@ -451,7 +459,14 @@ def handle_slash_command_list_reservations(
     if not botmydesk_user.authorized_bot():
         return _unauthorized_reply_shortcut(client, botmydesk_user)
 
-    reservations_result = bmd_api_client.client.reservations(botmydesk_user)
+    start = timezone.localtime(timezone.now())
+    reservations_result = bmd_api_client.client.reservations(
+        botmydesk_user,
+        **{
+            "from": start,
+            "to": (start + timezone.timedelta(days=7)).date(),
+        },
+    )
     reservations = reservations_result["result"]["items"]
     reservations_text = ""
 
@@ -521,6 +536,129 @@ def handle_slash_command_list_reservations(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=gettext("Your upcoming BookMyDesk reservations"),
+        blocks=blocks,
+    )
+    result.validate()
+
+
+def handle_slash_command_status(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
+    """Manually trigger it. Useful for development."""
+    if not botmydesk_user.authorized_bot():
+        return _unauthorized_reply_shortcut(client, botmydesk_user)
+
+    # reservations_today_result = bmd_api_client.client.reservations(botmydesk_user)
+    # reservations_today = reservations_today_result["result"]["items"]
+    # TODO: Current status
+
+    blocks = [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": gettext("Your presence today with BookMyDesk"),
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": gettext(
+                    "🏡 *Working from home*\n\n_I will book a home spot for you, if you don't have one yet._"
+                ),
+            },
+            "accessory": {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "emoji": True,
+                    "text": gettext("🏡 Choose"),
+                },
+                "value": "mark_working_from_home_today",
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": gettext(
+                    "🏢 *Working at the office*\n\n_Only works if you already have a reservation. I will check you in though._"
+                ),
+            },
+            "accessory": {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "emoji": True,
+                    "text": gettext("🏢 Choose"),
+                },
+                "value": "mark_working_at_the_office_today",
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": gettext(
+                    "🚋 *Working externally* _(and not home)_\n\n_I will book an 'external' spot for you, if you don't have one yet. And check you in._"
+                ),
+            },
+            "accessory": {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "emoji": True,
+                    "text": gettext("🚋 Choose"),
+                },
+                "value": "mark_working_externally_today",
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": gettext(
+                    "❌ *Not working*\n\n_I will cancel your reservations for today. If you are already checked in I will check you out as well._"
+                ),
+            },
+            "accessory": {
+                "style": "danger",
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "emoji": True,
+                    "text": gettext("❌ Choose"),
+                },
+                "confirm": {
+                    "title": {
+                        "type": "plain_text",
+                        "text": gettext("Are you sure?"),
+                    },
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": gettext(
+                            "Cancel my reservation(s) and/or check me out."
+                        ),
+                    },
+                    "confirm": {
+                        "type": "plain_text",
+                        "text": gettext("Yes"),
+                    },
+                    "deny": {
+                        "type": "plain_text",
+                        "text": gettext("No"),
+                    },
+                },
+                "value": "mark_not_working_today",
+            },
+        },
+    ]
+
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text=gettext("Your presence today with BookMyDesk"),
         blocks=blocks,
     )
     result.validate()

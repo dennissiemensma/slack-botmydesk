@@ -140,7 +140,7 @@ def profile(botmydesk_user: BotMyDeskUser) -> dict:
 
 
 def reservations(botmydesk_user: BotMyDeskUser, **override_parameters) -> dict:
-    """Fetch reservations. Any parameters given will overrule any defaults below."""
+    """Fetch reservations (for today by default). Any parameters given will overrule any defaults below."""
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
@@ -155,7 +155,7 @@ def reservations(botmydesk_user: BotMyDeskUser, **override_parameters) -> dict:
         "companyId": company_id,
         "includeAnonymous": "true",
         "from": today.date(),
-        "to": (today + timezone.timedelta(days=7)).date(),
+        "to": today.date(),
     }
     parameters.update(override_parameters)
 

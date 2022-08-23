@@ -774,6 +774,9 @@ def handle_interactive_send_bookmydesk_login_code(
                     "action_id": "otp_user_input",
                     "focus_on_load": True,
                     "type": "plain_text_input",
+                    "dispatch_action_config": {
+                        "trigger_actions_on": ["on_enter_pressed"]
+                    },
                     "placeholder": {
                         "type": "plain_text",
                         "text": "123456",

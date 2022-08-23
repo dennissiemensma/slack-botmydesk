@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-23 18:32+0000\n"
-"PO-Revision-Date: 2022-08-23 19:37+0200\n"
+"POT-Creation-Date: 2022-08-23 20:59+0000\n"
+"PO-Revision-Date: 2022-08-23 23:02+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -17,17 +17,25 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.3\n"
 
+msgid "Unexpected error"
+msgstr "Onverwachte fout"
+
+msgid "I'm not sure what to do, sorry! 🤷‍♀"
+msgstr "Ik weet niet wat ik moet doen, sorry! 🤷‍♀"
+
 #, python-brace-format
 msgid ""
-"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n"
+"_Please tell my creator that the following failed_:\n"
 "\n"
-"```{error_trace}```\n"
-" 🤨"
+"```{error}```"
 msgstr ""
-"Ik weet niet wat te doen, sorry! 🤷‍♀️Vertel mijn maker het volgende:\n"
+"_Vertel mijn maker dat het volgende faalde_:\n"
 "\n"
-"```{error_trace}```\n"
-" 🤨"
+"```{error}```"
+
+#, python-brace-format
+msgid "_Report to <{settings.BOTMYDESK_SLACK_ID_ON_ERROR}>_ 🤨"
+msgstr "_Rapporteer aan <{settings.BOTMYDESK_SLACK_ID_ON_ERROR}>_ 🤨"
 
 #, fuzzy, python-brace-format
 #| msgid ""
@@ -234,6 +242,9 @@ msgstr "Laat maar, blijf gekoppeld"
 msgid "✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
 msgstr "✋ Sorry, je zult me eerst moeten koppelen. Zie `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
 
+msgid "Your upcoming BookMyDesk reservations"
+msgstr "Je komende boekingen in BookMyDesk"
+
 msgid ""
 "\n"
 "\n"
@@ -266,14 +277,8 @@ msgstr ""
 msgid "_No reservations found (or too far away)..._"
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
 
-msgid "Your upcoming BookMyDesk reservation(s)"
-msgstr "Je komende boeking(en) in BookMyDesk"
-
-msgid "Your upcoming BookMyDesk reservations"
-msgstr "Je komende boekingen in BookMyDesk"
-
 msgid "Your presence today with BookMyDesk"
-msgstr ""
+msgstr "Je aanwezigheid vandaag in BookMyDesk"
 
 #, fuzzy
 #| msgid ""
@@ -290,7 +295,7 @@ msgstr ""
 "\n"
 
 msgid "🏡 Choose"
-msgstr ""
+msgstr "🏡 Selecteer"
 
 #, fuzzy
 #| msgid ""
@@ -307,7 +312,7 @@ msgstr ""
 "\n"
 
 msgid "🏢 Choose"
-msgstr ""
+msgstr "🏢 Selecteer"
 
 #, fuzzy
 #| msgid ""
@@ -324,25 +329,28 @@ msgstr ""
 "\n"
 
 msgid "🚋 Choose"
-msgstr ""
+msgstr "🚋 Selecteer"
 
 msgid ""
 "❌ *Not working*\n"
 "\n"
-"_I will cancel your reservations for today. If you are already checked in I will check you out as well._"
+"_I will cancel your reservations for today. If you were already checked in, I'll check you out as well._"
 msgstr ""
+"❌ *Niet aan het werk*\n"
+"\n"
+"_Ik annuleer je reserveringen voor vandaag. Als je al ingecheckt was, check ik je uit._"
 
 msgid "❌ Choose"
-msgstr ""
+msgstr "❌ Selecteer"
 
 msgid "Cancel my reservation(s) and/or check me out."
-msgstr ""
+msgstr "Annuleer al mijn reserveringen en/of check me uit."
 
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 msgid "No"
-msgstr ""
+msgstr "Nee"
 
 msgid "Sorry, not yet implemented 🧑‍💻"
 msgstr "Sorry, nog niet werkend 🧑‍💻"
@@ -386,7 +394,9 @@ msgstr ""
 "\n"
 "Ik geef nu een opsomming van alle commando's die je kunt gebruiken, vergelijkbaar wanneer je *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`* typt"
 
-#, python-brace-format
+#~ msgid "Your upcoming BookMyDesk reservation(s)"
+#~ msgstr "Je komende boeking(en) in BookMyDesk"
+
 #~ msgid ""
 #~ "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
 #~ " _Connect BotMyDesk._\n"

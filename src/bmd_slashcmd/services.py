@@ -432,25 +432,33 @@ def handle_slash_command_settings(
     update_result.validate()
 
 
+def _unauthorized_reply_shortcut(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser
+):
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text=gettext(
+            f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
+        ),
+    )
+    result.validate()
+
+
 def handle_slash_command_list_reservations(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **_
 ):
     if not botmydesk_user.authorized_bot():
-        result = client.web_client.chat_postEphemeral(
-            channel=botmydesk_user.slack_user_id,
-            user=botmydesk_user.slack_user_id,
-            text=gettext(
-                f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-            ),
-        )
-        result.validate()
-        return
+        return _unauthorized_reply_shortcut(client, botmydesk_user)
 
     reservations_result = bmd_api_client.client.reservations(botmydesk_user)
     reservations = reservations_result["result"]["items"]
     reservations_text = ""
 
     for current in reservations:
+        from pprint import pprint
+
+        pprint(current, indent=4)
         reservation_start = timezone.datetime.fromisoformat(current["dateStart"])
         reservation_start_text = reservation_start.strftime("%A %d %B")
         natural_time_until_start = humanize.naturaltime(reservation_start)
@@ -462,7 +470,7 @@ def handle_slash_command_list_reservations(
                 emoji = "✔️"
 
             reservations_text += gettext(
-                f"\n\n\n~{emoji} {reservation_start_text}: {current['from']} to {current['to']}~ ({current['status']})"
+                f"\n\n\n~{emoji} {reservation_start_text}: {current['from']} to {current['to']}~\n_{current['status']}_"
             )
             continue
 
@@ -522,15 +530,7 @@ def handle_slash_command_mark_home(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     if not botmydesk_user.authorized_bot():
-        result = client.web_client.chat_postEphemeral(
-            channel=botmydesk_user.slack_user_id,
-            user=botmydesk_user.slack_user_id,
-            text=gettext(
-                f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-            ),
-        )
-        result.validate()
-        return
+        return _unauthorized_reply_shortcut(client, botmydesk_user)
 
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
@@ -544,15 +544,7 @@ def handle_slash_command_mark_office(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     if not botmydesk_user.authorized_bot():
-        result = client.web_client.chat_postEphemeral(
-            channel=botmydesk_user.slack_user_id,
-            user=botmydesk_user.slack_user_id,
-            text=gettext(
-                f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-            ),
-        )
-        result.validate()
-        return
+        return _unauthorized_reply_shortcut(client, botmydesk_user)
 
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
@@ -566,15 +558,7 @@ def handle_slash_command_mark_externally(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     if not botmydesk_user.authorized_bot():
-        result = client.web_client.chat_postEphemeral(
-            channel=botmydesk_user.slack_user_id,
-            user=botmydesk_user.slack_user_id,
-            text=gettext(
-                f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-            ),
-        )
-        result.validate()
-        return
+        return _unauthorized_reply_shortcut(client, botmydesk_user)
 
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
@@ -588,15 +572,7 @@ def handle_slash_command_mark_cancelled(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     if not botmydesk_user.authorized_bot():
-        result = client.web_client.chat_postEphemeral(
-            channel=botmydesk_user.slack_user_id,
-            user=botmydesk_user.slack_user_id,
-            text=gettext(
-                f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-            ),
-        )
-        result.validate()
-        return
+        return _unauthorized_reply_shortcut(client, botmydesk_user)
 
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,

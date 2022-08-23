@@ -82,18 +82,8 @@ class Command(BaseCommand):
         try:
             bmd_slashcmd.services.on_slash_command(client, botmydesk_user, req.payload)
         except Exception as error:
-            console_commands_logger.error(
-                f"Slash command error: {error} ({error.__class__})"
-            )
-
-            error_trace = "\n".join(traceback.format_exc().splitlines())
-            client.web_client.chat_postEphemeral(
-                channel=user_id,
-                user=user_id,
-                text=gettext(
-                    f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"
-                ),
-            )
+            self._on_error(client, user_id, error)
+            return
 
     def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
         user_id = req.payload["user"]["id"]
@@ -116,18 +106,8 @@ class Command(BaseCommand):
                         )
                     )
                 except Exception as error:
-                    console_commands_logger.error(
-                        f"Interactive action error: {error} ({error.__class__})"
-                    )
-
-                    error_trace = "\n".join(traceback.format_exc().splitlines())
-                    client.web_client.chat_postEphemeral(
-                        channel=user_id,
-                        user=user_id,
-                        text=gettext(
-                            f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"
-                        ),
-                    )
+                    self._on_error(client, user_id, error)
+                    return
 
         # Respond to submits.
         if req.payload["type"] == "view_submission":
@@ -138,18 +118,7 @@ class Command(BaseCommand):
                     client, botmydesk_user, req.payload
                 )
             except Exception as error:
-                console_commands_logger.error(
-                    f"Interactive submission error: {error} ({error.__class__})"
-                )
-
-                error_trace = "\n".join(traceback.format_exc().splitlines())
-                client.web_client.chat_postEphemeral(
-                    channel=user_id,
-                    user=user_id,
-                    text=gettext(
-                        f"I'm not sure what to do, sorry! 🤷‍♀️Please tell my creator the following failed:\n\n```{error_trace}```\n 🤨"
-                    ),
-                )
+                self._on_error(client, user_id, error)
                 return
 
             # Conditional response. E.g. for closing modal dialogs or form errors.
@@ -165,3 +134,48 @@ class Command(BaseCommand):
                 client.send_socket_mode_response(
                     SocketModeResponse(envelope_id=req.envelope_id)
                 )
+
+    def _on_error(self, client: SocketModeClient, slack_user_id: str, error: Exception):
+        error_trace = "\n".join(traceback.format_exc().splitlines())
+        console_commands_logger.error(
+            f"{slack_user_id}: Unexpected error: {error} ({error.__class__})\n{error_trace}"
+        )
+
+        title = gettext("Unexpected error")
+        client.web_client.chat_postEphemeral(
+            channel=slack_user_id,
+            user=slack_user_id,
+            text=title,
+            blocks=[
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": title,
+                    },
+                },
+                {
+                    "type": "context",
+                    "elements": [
+                        {
+                            "type": "mrkdwn",
+                            "text": gettext("I'm not sure what to do, sorry! 🤷‍♀"),
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": gettext(
+                                f"_Please tell my creator that the following failed_:\n\n```{error}```"
+                            ),
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": gettext(
+                                f"_Report to <{settings.BOTMYDESK_SLACK_ID_ON_ERROR}>_ 🤨"
+                                if settings.BOTMYDESK_SLACK_ID_ON_ERROR
+                                else " "
+                            ),
+                        },
+                    ],
+                },
+            ],
+        )

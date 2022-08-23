@@ -1,6 +1,7 @@
 version: "3.7"
 services:
   app:
+    container_name: slack-botmydesk_app
     build:
       context: .
       dockerfile: Dockerfile

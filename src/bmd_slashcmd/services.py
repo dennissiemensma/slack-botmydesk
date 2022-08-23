@@ -459,6 +459,8 @@ def handle_slash_command_list_reservations(
     if not botmydesk_user.authorized_bot():
         return _unauthorized_reply_shortcut(client, botmydesk_user)
 
+    title = gettext("Your upcoming BookMyDesk reservations")
+
     start = timezone.localtime(timezone.now())
     reservations_result = bmd_api_client.client.reservations(
         botmydesk_user,
@@ -518,7 +520,7 @@ def handle_slash_command_list_reservations(
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": gettext("Your upcoming BookMyDesk reservation(s)"),
+                "text": title,
             },
         },
         {
@@ -535,7 +537,7 @@ def handle_slash_command_list_reservations(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=gettext("Your upcoming BookMyDesk reservations"),
+        text=title,
         blocks=blocks,
     )
     result.validate()
@@ -552,12 +554,14 @@ def handle_slash_command_status(
     # reservations_today = reservations_today_result["result"]["items"]
     # TODO: Current status
 
+    title = gettext("Your presence today with BookMyDesk")
+
     blocks = [
         {
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": gettext("Your presence today with BookMyDesk"),
+                "text": title,
             },
         },
         {
@@ -619,7 +623,7 @@ def handle_slash_command_status(
             "text": {
                 "type": "mrkdwn",
                 "text": gettext(
-                    "❌ *Not working*\n\n_I will cancel your reservations for today. If you are already checked in I will check you out as well._"
+                    "❌ *Not working*\n\n_I will cancel your reservations for today. If you were already checked in, I'll check you out as well._"
                 ),
             },
             "accessory": {
@@ -658,7 +662,7 @@ def handle_slash_command_status(
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=gettext("Your presence today with BookMyDesk"),
+        text=title,
         blocks=blocks,
     )
     result.validate()
@@ -913,11 +917,19 @@ def handle_interactive_bmd_authorize_login_code_submit(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Successful authorization, updated token credentials"
     )
 
+    title = gettext("BotMyDesk connected!")
     client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=gettext("BotMyDesk connected!"),
+        text=title,
         blocks=[
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": title,
+                },
+            },
             {
                 "type": "section",
                 "text": {

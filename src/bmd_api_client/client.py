@@ -1,9 +1,11 @@
 import logging
+from pprint import pformat
 
 from django.conf import settings
 from django.utils import timezone
 import requests
 
+from bmd_api_client.dto import BookMyDeskProfile
 from bmd_api_client.exceptions import BookMyDeskException
 from bmd_core.models import BotMyDeskUser
 
@@ -15,7 +17,7 @@ def request_login_code(email: str):
     """Requests and sends a login code to the designated email address."""
     bookmydesk_client_logger.debug(f"Requesting login code for {email}")
     response = requests.post(
-        url="{}/request-login".format(settings.BOOKMYDESK_API_URL),
+        url=f"{settings.BOOKMYDESK_API_URL}/request-login",
         json={
             "email": email,
         },
@@ -23,6 +25,7 @@ def request_login_code(email: str):
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
         },
     )
+    bookmydesk_client_logger.info("(%s) Request sent: %s", email, response.request.url)
 
     if response.status_code != 204:
         bookmydesk_client_logger.error(
@@ -33,9 +36,8 @@ def request_login_code(email: str):
 
 def token_login(username: str, otp: str) -> dict:
     """Login with OTP and fetch access/refresh tokens."""
-    bookmydesk_client_logger.debug(f"Token login for {username} with {otp}")
     response = requests.post(
-        url="{}/token".format(settings.BOOKMYDESK_API_URL),
+        url=f"{settings.BOOKMYDESK_API_URL}/token",
         data={
             "grant_type": "password",
             "client_id": settings.BOOKMYDESK_CLIENT_ID,
@@ -49,6 +51,9 @@ def token_login(username: str, otp: str) -> dict:
             "Content-Type": "application/x-www-form-urlencoded",
         },
     )
+    bookmydesk_client_logger.info(
+        "(%s) Request sent: %s", username, response.request.url
+    )
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
@@ -60,14 +65,15 @@ def token_login(username: str, otp: str) -> dict:
 
 
 def logout(botmydesk_user: BotMyDeskUser):
-    bookmydesk_client_logger.debug(f"Terminate session for {botmydesk_user.email}")
-
     response = requests.post(
-        url="{}/logout".format(settings.BOOKMYDESK_API_URL),
+        url=f"{settings.BOOKMYDESK_API_URL}/logout",
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
             "Authorization": f"Bearer {botmydesk_user.access_token}",
         },
+    )
+    bookmydesk_client_logger.info(
+        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
     )
 
     if response.status_code != 200:
@@ -81,9 +87,8 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
     """Refresh session, updates user as well"""
     botmydesk_user.refresh_from_db()
 
-    bookmydesk_client_logger.debug(f"Refresh session for {botmydesk_user.email}")
     response = requests.post(
-        url="{}/token".format(settings.BOOKMYDESK_API_URL),
+        url=f"{settings.BOOKMYDESK_API_URL}/token",
         data={
             "grant_type": "refresh_token",
             "client_id": settings.BOOKMYDESK_CLIENT_ID,
@@ -95,11 +100,15 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
             "Content-Type": "application/x-www-form-urlencoded",
         },
     )
+    bookmydesk_client_logger.info(
+        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+    )
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
             f"FAILED to refresh session for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
+
         botmydesk_user.clear_tokens()
         bookmydesk_client_logger.error(
             f"Cleared session info for {botmydesk_user.email}, reauthorization required..."
@@ -115,19 +124,24 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
     )
 
 
-def profile(botmydesk_user: BotMyDeskUser) -> dict:
+def me_v3(botmydesk_user: BotMyDeskUser) -> BookMyDeskProfile:
     """Profile call about current user"""
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
 
-    bookmydesk_client_logger.debug(f"Me/profile for {botmydesk_user.email}")
     response = requests.get(
-        url="{}/me".format(settings.BOOKMYDESK_API_URL),
+        url=f"{settings.BOOKMYDESK_API_URL}/v3/me",
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
             "Authorization": f"Bearer {botmydesk_user.access_token}",
         },
+    )
+    bookmydesk_client_logger.info(
+        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+    )
+    bookmydesk_client_logger.debug(
+        "(%s) Response:\n%s", botmydesk_user.email, pformat(response.json(), indent=4)
     )
 
     if response.status_code != 200:
@@ -136,36 +150,43 @@ def profile(botmydesk_user: BotMyDeskUser) -> dict:
         )
         raise BookMyDeskException(response.content)
 
-    return response.json()
+    return BookMyDeskProfile(profile_v3_result=response.json())
 
 
-def reservations(botmydesk_user: BotMyDeskUser, **override_parameters) -> dict:
+def list_reservations_v3(botmydesk_user: BotMyDeskUser, **override_parameters) -> dict:
     """Fetch reservations (for today by default). Any parameters given will overrule any defaults below."""
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
 
     # For now, always use the first company found.
-    profile_result = profile(botmydesk_user=botmydesk_user)
-    company_id = profile_result["companies"][0]["id"]
+    profile = me_v3(botmydesk_user=botmydesk_user)
 
     today = timezone.localtime(timezone.now())
-    bookmydesk_client_logger.debug(f"Reservations for {botmydesk_user.email}")
     parameters = {
-        "companyId": company_id,
+        "companyId": profile.company_id,
         "includeAnonymous": "true",
         "from": today.date(),
-        "to": today.date(),
+        "to": (
+            today + timezone.timedelta(days=1)
+        ).date(),  # Yes, kinda sucks and ambiguous
+        "take": 30,  # Limit, default 10
     }
     parameters.update(override_parameters)
 
     response = requests.get(
-        url="{}/v3/reservations".format(settings.BOOKMYDESK_API_URL),
+        url=f"{settings.BOOKMYDESK_API_URL}/v3/reservations",
         params=parameters,
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
             "Authorization": f"Bearer {botmydesk_user.access_token}",
         },
+    )
+    bookmydesk_client_logger.info(
+        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+    )
+    bookmydesk_client_logger.debug(
+        "(%s) Response:\n%s", botmydesk_user.email, pformat(response.json(), indent=2)
     )
 
     if response.status_code != 200:
@@ -175,3 +196,57 @@ def reservations(botmydesk_user: BotMyDeskUser, **override_parameters) -> dict:
         raise BookMyDeskException(response.content)
 
     return response.json()
+
+
+def reservation_checkout(botmydesk_user: BotMyDeskUser, reservation_id: str):
+    """Check out of a reservation (manually)."""
+    if botmydesk_user.access_token_expired():
+        refresh_session(botmydesk_user)
+        botmydesk_user.refresh_from_db()
+
+    response = requests.post(
+        url=f"{settings.BOOKMYDESK_API_URL}/reservation/{reservation_id}/checkout",
+        data={
+            "type": "manual",
+        },
+        headers={
+            "User-Agent": settings.BOTMYDESK_USER_AGENT,
+            "Authorization": f"Bearer {botmydesk_user.access_token}",
+        },
+    )
+    bookmydesk_client_logger.info(
+        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+    )
+
+    if response.status_code != 204:
+        bookmydesk_client_logger.error(
+            f"FAILED to checkout from reservation for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+        )
+        raise BookMyDeskException(response.content)
+
+
+def delete_reservation_v3(botmydesk_user: BotMyDeskUser, reservation_id: str):
+    """Delete a reservation."""
+    if botmydesk_user.access_token_expired():
+        refresh_session(botmydesk_user)
+        botmydesk_user.refresh_from_db()
+
+    response = requests.delete(
+        url=f"{settings.BOOKMYDESK_API_URL}/v3/reservation",
+        params={
+            "reservationId": reservation_id,
+        },
+        headers={
+            "User-Agent": settings.BOTMYDESK_USER_AGENT,
+            "Authorization": f"Bearer {botmydesk_user.access_token}",
+        },
+    )
+    bookmydesk_client_logger.info(
+        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+    )
+
+    if response.status_code != 204:
+        bookmydesk_client_logger.error(
+            f"FAILED to delete reservation for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+        )
+        raise BookMyDeskException(response.content)

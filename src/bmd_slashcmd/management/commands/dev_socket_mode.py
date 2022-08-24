@@ -164,11 +164,12 @@ class Command(BaseCommand):
                         {
                             "type": "mrkdwn",
                             "text": gettext(
-                                f"_Please tell my creator that the following failed_:\n\n```{error}```"
+                                f"_Please tell my creator that the following failed_:\n\n```{error_trace}```"
                             ),
                         },
                         {
                             "type": "mrkdwn",
+                            # @see https://api.slack.com/reference/surfaces/formatting#linking-urls
                             "text": gettext(
                                 f"_Report to <{settings.BOTMYDESK_SLACK_ID_ON_ERROR}>_ 🤨"
                                 if settings.BOTMYDESK_SLACK_ID_ON_ERROR

@@ -3,13 +3,13 @@ from typing import Optional
 
 from django.conf import settings
 from django.utils import timezone
-from django.contrib.humanize.templatetags import humanize
 from django.utils.translation import gettext
 from slack_sdk.socket_mode import SocketModeClient
 
 from bmd_api_client.exceptions import BookMyDeskException
 from bmd_core.models import BotMyDeskUser
 import bmd_api_client.client
+import bmd_core.services
 
 
 botmydesk_logger = logging.getLogger("botmydesk")
@@ -51,16 +51,16 @@ def handle_slash_command(
                 settings.SLACK_SLASHCOMMAND_BMD_HELP: handle_slash_command_help,
                 settings.SLACK_SLASHCOMMAND_BMD_SETTINGS: handle_slash_command_settings,
                 settings.SLACK_SLASHCOMMAND_BMD_STATUS: handle_slash_command_status,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1: handle_slash_command_mark_home,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2: handle_slash_command_mark_home,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1: handle_slash_command_mark_office,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2: handle_slash_command_mark_office,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_1: handle_slash_command_mark_externally,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2: handle_slash_command_mark_externally,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1: handle_slash_command_mark_cancelled,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2: handle_slash_command_mark_cancelled,
-                settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1: handle_slash_command_list_reservations,
-                settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2: handle_slash_command_list_reservations,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1: bmd_core.services.handle_user_working_home_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2: bmd_core.services.handle_user_working_home_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1: bmd_core.services.handle_user_working_in_office_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2: bmd_core.services.handle_user_working_in_office_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_1: bmd_core.services.handle_user_working_externally_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2: bmd_core.services.handle_user_working_externally_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1: bmd_core.services.handle_user_not_working_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2: bmd_core.services.handle_user_not_working_today,
+                settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1: bmd_core.services.handle_slash_command_list_reservations,
+                settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2: bmd_core.services.handle_slash_command_list_reservations,
             }[text.strip()]
         except KeyError:
             # Help when unknown sub.
@@ -96,7 +96,7 @@ def handle_slash_command_help(
             "_List your upcoming reservations (e.g. coming days)._\n\n\n"
         )
         help_text += gettext(
-            "\n*You can use the following commands at any moment, without having to wait for my notification(s) first:*\n\n"
+            "\nYou can use the following commands at any moment, without having to wait for my notification(s) first.*\n\n"
         )
         help_text += gettext(
             f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
@@ -120,7 +120,7 @@ def handle_slash_command_help(
             f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
         )
         help_text += gettext(
-            "_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n\n\n"
+            "_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n ⚠️ _Care, will be applied instantly without confirmation._\n\n\n"
         )
     else:
         help_text += gettext(
@@ -270,7 +270,7 @@ def handle_slash_command_settings(
         return
 
     # Check status.
-    profile = bmd_api_client.client.profile(botmydesk_user)
+    profile = bmd_api_client.client.me_v3(botmydesk_user)
 
     view_data = {
         "type": "modal",
@@ -285,7 +285,7 @@ def handle_slash_command_settings(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?"
+                        f"Hi *{profile.first_name} {profile.infix} {profile.last_name}*, how can I help you?"
                     ),
                 },
             },
@@ -308,7 +308,7 @@ def handle_slash_command_settings(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext(f"_Connected to: *{profile['email']}*_"),
+                    "text": gettext(f"_Connected to: *{profile.email}*_"),
                 },
             },
             {
@@ -368,7 +368,7 @@ def handle_slash_command_settings(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        f"Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?"
+                        f"Hi *{profile.first_name} {profile.infix} {profile.last_name}*, how can I help you?"
                     ),
                 },
             },
@@ -391,7 +391,7 @@ def handle_slash_command_settings(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext(f"_Connected to: *{profile['email']}*_"),
+                    "text": gettext(f"_Connected to: *{profile.email}*_"),
                 },
             },
             {
@@ -440,115 +440,12 @@ def handle_slash_command_settings(
     update_result.validate()
 
 
-def _unauthorized_reply_shortcut(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser
-):
-    result = client.web_client.chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=gettext(
-            f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-        ),
-    )
-    result.validate()
-
-
-def handle_slash_command_list_reservations(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **_
-):
-    if not botmydesk_user.authorized_bot():
-        return _unauthorized_reply_shortcut(client, botmydesk_user)
-
-    title = gettext("Your upcoming BookMyDesk reservations")
-
-    start = timezone.localtime(timezone.now())
-    reservations_result = bmd_api_client.client.reservations(
-        botmydesk_user,
-        **{
-            "from": start,
-            "to": (start + timezone.timedelta(days=7)).date(),
-        },
-    )
-    reservations = reservations_result["result"]["items"]
-    reservations_text = ""
-
-    for current in reservations:
-        from pprint import pprint
-
-        pprint(current, indent=4)
-        reservation_start = timezone.datetime.fromisoformat(current["dateStart"])
-        reservation_start_text = reservation_start.strftime("%A %d %B")
-        natural_time_until_start = humanize.naturaltime(reservation_start)
-
-        if current["status"] in ("checkedIn", "checkedOut", "cancelled", "expired"):
-            if current["status"] in ("cancelled", "expired"):
-                emoji = "❌ "
-            else:
-                emoji = "✔️"
-
-            reservations_text += gettext(
-                f"\n\n\n~{emoji} {reservation_start_text}: {current['from']} to {current['to']}~\n_{current['status']}_"
-            )
-            continue
-
-        # Skip weird ones.
-        if current["status"] != "reserved":
-            continue
-
-        if current["seat"] is not None and current["seat"]["map"]["name"] == "Extern":
-            emoji = "🚋"
-            location = current["seat"]["map"]["name"]
-        elif current["seat"] is not None and current["type"] == "normal":
-            emoji = "🏢"
-            location = current["seat"]["map"]["name"]
-        elif current["seat"] is None and current["type"] == "home":
-            emoji = "🏡"
-            location = gettext("Home")
-        else:
-            emoji = "❓"
-            location = "❓"
-
-        reservations_text += gettext(
-            f"\n\n\n{emoji} {reservation_start_text} from {current['from']} to {current['to']}\n_{natural_time_until_start} at *{location}*_"
-        )
-
-    if not reservations:
-        reservations_text = gettext("_No reservations found (or too far away)..._")
-
-    blocks = [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": title,
-            },
-        },
-        {
-            "type": "context",
-            "elements": [
-                {
-                    "type": "mrkdwn",
-                    "text": reservations_text,
-                }
-            ],
-        },
-    ]
-
-    result = client.web_client.chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=title,
-        blocks=blocks,
-    )
-    result.validate()
-
-
 def handle_slash_command_status(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     """Manually trigger it. Useful for development."""
     if not botmydesk_user.authorized_bot():
-        return _unauthorized_reply_shortcut(client, botmydesk_user)
+        return bmd_core.services.unauthorized_reply_shortcut(client, botmydesk_user)
 
     # reservations_today_result = bmd_api_client.client.reservations(botmydesk_user)
     # reservations_today = reservations_today_result["result"]["items"]
@@ -668,66 +565,10 @@ def handle_slash_command_status(
     result.validate()
 
 
-def handle_slash_command_mark_home(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    if not botmydesk_user.authorized_bot():
-        return _unauthorized_reply_shortcut(client, botmydesk_user)
-
-    result = client.web_client.chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=gettext("Sorry, not yet implemented 🧑‍💻"),
-    )
-    result.validate()
-
-
-def handle_slash_command_mark_office(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    if not botmydesk_user.authorized_bot():
-        return _unauthorized_reply_shortcut(client, botmydesk_user)
-
-    result = client.web_client.chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=gettext("Sorry, not yet implemented 🧑‍💻"),
-    )
-    result.validate()
-
-
-def handle_slash_command_mark_externally(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    if not botmydesk_user.authorized_bot():
-        return _unauthorized_reply_shortcut(client, botmydesk_user)
-
-    result = client.web_client.chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=gettext("Sorry, not yet implemented 🧑‍💻"),
-    )
-    result.validate()
-
-
-def handle_slash_command_mark_cancelled(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    if not botmydesk_user.authorized_bot():
-        return _unauthorized_reply_shortcut(client, botmydesk_user)
-
-    result = client.web_client.chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=gettext("Sorry, not yet implemented 🧑‍💻"),
-    )
-    result.validate()
-
-
 def on_interactive_block_action(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, action: dict, **payload
 ):
-    """Respond to user (inter)actions."""
+    """Respond to user (inter)actions. Some are follow-ups, some are aliases."""
     action_value = action["value"]
     botmydesk_logger.debug(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Incoming interactive block action '{action_value}'"
@@ -738,6 +579,10 @@ def on_interactive_block_action(
             "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
             "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
             "open_settings": handle_slash_command_settings,  # Alias
+            "mark_working_from_home_today": bmd_core.services.handle_user_working_home_today,
+            "mark_working_at_the_office_today": bmd_core.services.handle_user_working_in_office_today,
+            "mark_working_externally_today": bmd_core.services.handle_user_working_externally_today,
+            "mark_not_working_today": bmd_core.services.handle_user_not_working_today,
         }[action_value]
     except KeyError:
         raise NotImplementedError(

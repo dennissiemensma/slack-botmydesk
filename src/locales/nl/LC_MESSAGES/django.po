@@ -206,8 +206,8 @@ msgstr "Nee, wacht even"
 msgid "_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._"
 msgstr "_Je kunt me later op elk moment ontkoppelen door weer `{settings.SLACK_SLASHCOMMAND_BMD}` te typen._"
 
-msgid "Hi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, how can I help you?"
-msgstr "Hoi *{profile['first_name']} {profile['infix']} {profile['last_name']}*, hoe kan ik je helpen?"
+msgid "Hi *{profile['firstName']} {profile['infix']} {profile['lastName']}*, how can I help you?"
+msgstr "Hoi *{profile['firstName']} {profile['infix']} {profile['lastName']}*, hoe kan ik je helpen?"
 
 msgid "Settings"
 msgstr "Instellingen"

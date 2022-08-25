@@ -465,9 +465,7 @@ def handle_slash_command_status(
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": gettext(
-                    "🏡 *Working from home*\n\n_I will book a home spot for you, if you don't have one yet._"
-                ),
+                "text": gettext("🏡 *Working from home*"),
             },
             "accessory": {
                 "type": "button",
@@ -476,6 +474,26 @@ def handle_slash_command_status(
                     "emoji": True,
                     "text": gettext("🏡 Choose"),
                 },
+                "confirm": {
+                    "title": {
+                        "type": "plain_text",
+                        "text": gettext("Are you sure?"),
+                    },
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": gettext(
+                            "I will book a home spot for you, if you don't have one yet.\n\nContinue?"
+                        ),
+                    },
+                    "confirm": {
+                        "type": "plain_text",
+                        "text": gettext("Yes"),
+                    },
+                    "deny": {
+                        "type": "plain_text",
+                        "text": gettext("No"),
+                    },
+                },
                 "value": "mark_working_from_home_today",
             },
         },
@@ -483,9 +501,7 @@ def handle_slash_command_status(
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": gettext(
-                    "🏢 *Working at the office*\n\n_Only works if you already have a reservation. I will check you in though._"
-                ),
+                "text": gettext("🏢 *Working at the office*"),
             },
             "accessory": {
                 "type": "button",
@@ -494,6 +510,26 @@ def handle_slash_command_status(
                     "emoji": True,
                     "text": gettext("🏢 Choose"),
                 },
+                "confirm": {
+                    "title": {
+                        "type": "plain_text",
+                        "text": gettext("Are you sure?"),
+                    },
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": gettext(
+                            "Only works if you already have a reservation. I will check you in though.\n\nContinue?"
+                        ),
+                    },
+                    "confirm": {
+                        "type": "plain_text",
+                        "text": gettext("Yes"),
+                    },
+                    "deny": {
+                        "type": "plain_text",
+                        "text": gettext("No"),
+                    },
+                },
                 "value": "mark_working_at_the_office_today",
             },
         },
@@ -501,9 +537,7 @@ def handle_slash_command_status(
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": gettext(
-                    "🚋 *Working externally* _(and not home)_\n\n_I will book an 'external' spot for you, if you don't have one yet. And check you in._"
-                ),
+                "text": gettext("🚋 *Working externally*"),
             },
             "accessory": {
                 "type": "button",
@@ -512,6 +546,26 @@ def handle_slash_command_status(
                     "emoji": True,
                     "text": gettext("🚋 Choose"),
                 },
+                "confirm": {
+                    "title": {
+                        "type": "plain_text",
+                        "text": gettext("Are you sure?"),
+                    },
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": gettext(
+                            "I will book an 'external' spot for you (if you don't have one yet), since you're not in the office nor at home. And check you in also.\n\nContinue?"
+                        ),
+                    },
+                    "confirm": {
+                        "type": "plain_text",
+                        "text": gettext("Yes"),
+                    },
+                    "deny": {
+                        "type": "plain_text",
+                        "text": gettext("No"),
+                    },
+                },
                 "value": "mark_working_externally_today",
             },
         },
@@ -519,9 +573,7 @@ def handle_slash_command_status(
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": gettext(
-                    "❌ *Not working*\n\n_I will cancel your reservations for today. If you were already checked in, I'll check you out as well._"
-                ),
+                "text": gettext("❌ *Not working*\n\n"),
             },
             "accessory": {
                 "style": "danger",
@@ -539,7 +591,7 @@ def handle_slash_command_status(
                     "text": {
                         "type": "mrkdwn",
                         "text": gettext(
-                            "Cancel my reservation(s) and/or check me out."
+                            "I will cancel your reservations for today. If you were already checked in, I'll check you out as well.\n\nContinue?"
                         ),
                     },
                     "confirm": {
@@ -782,15 +834,6 @@ def handle_interactive_bmd_authorize_login_code_submit(
                     "text": gettext(
                         f"Great! You've connected me to your BookMyDesk-account 👏\n\nI will now summarize the commands you can use, which is similar to typing *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`*"
                     ),
-                },
-                "accessory": {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": gettext("BotMyDesk settings"),
-                    },
-                    "value": "open_settings",
                 },
             },
         ],

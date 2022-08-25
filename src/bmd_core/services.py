@@ -283,12 +283,12 @@ def handle_user_not_working_today(
             current_status = current["status"]
             current_from = (
                 current["checkedInTime"]
-                if current["checkedInTime"]
+                if "checkedInTime" in current
                 else current["from"]
             )
             current_to = (
                 current["checkedOutTime"]
-                if current["checkedOutTime"]
+                if "checkedOutTime" in current
                 else current["to"]
             )
             current_reservation_text = gettext(

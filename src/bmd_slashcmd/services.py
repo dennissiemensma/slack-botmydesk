@@ -284,67 +284,8 @@ def handle_slash_command_settings(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext(
-                        f"Hi *{profile.first_name} {profile.infix} {profile.last_name}*, how can I help you?"
-                    ),
-                },
-            },
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": gettext("Settings"),
-                },
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
                     "text": gettext("Loading..."),
                 },
-            },
-            {"type": "divider"},
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": gettext(f"_Connected to: *{profile.email}*_"),
-                },
-            },
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "style": "danger",
-                        "text": {
-                            "type": "plain_text",
-                            "text": gettext("Disconnect BotMyDesk"),
-                            "emoji": True,
-                        },
-                        "confirm": {
-                            "title": {
-                                "type": "plain_text",
-                                "text": gettext("Are you sure?"),
-                            },
-                            "text": {
-                                "type": "mrkdwn",
-                                "text": gettext(
-                                    "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n\n*Revoke my access to your account in BookMyDesk?*"
-                                ),
-                            },
-                            "confirm": {
-                                "type": "plain_text",
-                                "text": gettext("Yes, disconnect"),
-                            },
-                            "deny": {
-                                "type": "plain_text",
-                                "text": gettext("Nevermind, keep connected"),
-                            },
-                        },
-                        "value": "revoke_botmydesk",
-                    }
-                ],
             },
         ],
     }
@@ -368,7 +309,7 @@ def handle_slash_command_settings(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        f"Hi *{profile.first_name} {profile.infix} {profile.last_name}*, how can I help you?"
+                        f"_Connected to: *{profile.first_name} {profile.infix} {profile.last_name}* ({profile.email})_"
                     ),
                 },
             },
@@ -376,24 +317,74 @@ def handle_slash_command_settings(
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": gettext("Settings"),
+                    "text": gettext("Preferences"),
                 },
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "TODO TODO TODO TODO TODO",  # TODO
+                    "text": gettext(
+                        "Select *which working day(s)* to receive daily notification on:"
+                    ),
+                },
+                "accessory": {
+                    "type": "checkboxes",
+                    "options": [
+                        {
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": gettext("Mondays"),
+                            },  # TODO - fetch from DB
+                            "value": "notify_me_on_mondays",
+                        },
+                        {
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": gettext("Tuesdays"),
+                            },  # TODO - fetch from DB
+                            "value": "notify_me_on_tuesdays",
+                        },
+                        {
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": gettext("Wednesdays"),
+                            },  # TODO - fetch from DB
+                            "value": "notify_me_on_wednesdays",
+                        },
+                        {
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": gettext("Thursdays"),
+                            },  # TODO - fetch from DB
+                            "value": "notify_me_on_thursdays",
+                        },
+                        {
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": gettext("Fridays"),
+                            },  # TODO - fetch from DB
+                            "value": "notify_me_on_fridays",
+                        },
+                    ],
+                    "action_id": "daily_notification_days",
+                },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": gettext(
+                        "Select *what time* to receive daily notification on:"
+                    ),
+                },
+                "accessory": {
+                    "type": "timepicker",
+                    "initial_time": "09:00",  # TODO - fetch from DB
+                    "action_id": "daily_notification_time",
                 },
             },
             {"type": "divider"},
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": gettext(f"_Connected to: *{profile.email}*_"),
-                },
-            },
             {
                 "type": "actions",
                 "elements": [
@@ -725,7 +716,7 @@ def handle_interactive_bmd_revoke_botmydesk(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again or the button to the right.\n\nBye! 👋"
+                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}` again or the button to the right.\n\nBye! 👋"
                     ),
                 },
                 "accessory": {
@@ -733,7 +724,7 @@ def handle_interactive_bmd_revoke_botmydesk(
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": gettext("Settings"),
+                        "text": gettext("BotMyDesk settings"),
                     },
                     "value": "open_settings",
                 },

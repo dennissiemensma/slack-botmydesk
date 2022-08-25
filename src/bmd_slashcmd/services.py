@@ -325,7 +325,7 @@ def handle_slash_command_settings(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        "Select *which working day(s)* to receive daily notification on:"
+                        "Select *which working day(s)* to receive daily notifications on:"
                     ),
                 },
                 "accessory": {

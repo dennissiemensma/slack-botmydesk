@@ -50,7 +50,7 @@ def handle_slash_command(
             sub_command_module = {
                 settings.SLACK_SLASHCOMMAND_BMD_HELP: handle_slash_command_help,
                 settings.SLACK_SLASHCOMMAND_BMD_SETTINGS: handle_slash_command_settings,
-                settings.SLACK_SLASHCOMMAND_BMD_STATUS: handle_slash_command_status,
+                settings.SLACK_SLASHCOMMAND_BMD_STATUS: bmd_core.services.handle_slash_command_status,
                 settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1: bmd_core.services.handle_user_working_home_today,
                 settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2: bmd_core.services.handle_user_working_home_today,
                 settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1: bmd_core.services.handle_user_working_in_office_today,
@@ -72,7 +72,7 @@ def handle_slash_command(
 
     # Status or settings when no parameters given.
     if botmydesk_user.authorized_bot():
-        handle_slash_command_status(client, botmydesk_user, **payload)
+        bmd_core.services.handle_slash_command_status(client, botmydesk_user, **payload)
     else:
         handle_slash_command_settings(client, botmydesk_user, **payload)
 
@@ -429,183 +429,6 @@ def handle_slash_command_settings(
         view=view_data,
     )
     update_result.validate()
-
-
-def handle_slash_command_status(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    """Manually trigger it. Useful for development."""
-    if not botmydesk_user.authorized_bot():
-        return bmd_core.services.unauthorized_reply_shortcut(client, botmydesk_user)
-
-    # reservations_today_result = bmd_api_client.client.reservations(botmydesk_user)
-    # reservations_today = reservations_today_result["result"]["items"]
-    # TODO: Current status
-
-    title = gettext("Your presence today with BookMyDesk")
-
-    blocks = [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": title,
-            },
-        },
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": gettext("🏡 *Working from home*"),
-            },
-            "accessory": {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "emoji": True,
-                    "text": gettext("🏡 Choose"),
-                },
-                "confirm": {
-                    "title": {
-                        "type": "plain_text",
-                        "text": gettext("Are you sure?"),
-                    },
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": gettext(
-                            "I will book a home spot for you, if you don't have one yet.\n\nContinue?"
-                        ),
-                    },
-                    "confirm": {
-                        "type": "plain_text",
-                        "text": gettext("Yes"),
-                    },
-                    "deny": {
-                        "type": "plain_text",
-                        "text": gettext("No"),
-                    },
-                },
-                "value": "mark_working_from_home_today",
-            },
-        },
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": gettext("🏢 *Working at the office*"),
-            },
-            "accessory": {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "emoji": True,
-                    "text": gettext("🏢 Choose"),
-                },
-                "confirm": {
-                    "title": {
-                        "type": "plain_text",
-                        "text": gettext("Are you sure?"),
-                    },
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": gettext(
-                            "Only works if you already have a reservation. I will check you in though.\n\nContinue?"
-                        ),
-                    },
-                    "confirm": {
-                        "type": "plain_text",
-                        "text": gettext("Yes"),
-                    },
-                    "deny": {
-                        "type": "plain_text",
-                        "text": gettext("No"),
-                    },
-                },
-                "value": "mark_working_at_the_office_today",
-            },
-        },
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": gettext("🚋 *Working externally*"),
-            },
-            "accessory": {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "emoji": True,
-                    "text": gettext("🚋 Choose"),
-                },
-                "confirm": {
-                    "title": {
-                        "type": "plain_text",
-                        "text": gettext("Are you sure?"),
-                    },
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": gettext(
-                            "I will book an 'external' spot for you (if you don't have one yet), since you're not in the office nor at home. And check you in also.\n\nContinue?"
-                        ),
-                    },
-                    "confirm": {
-                        "type": "plain_text",
-                        "text": gettext("Yes"),
-                    },
-                    "deny": {
-                        "type": "plain_text",
-                        "text": gettext("No"),
-                    },
-                },
-                "value": "mark_working_externally_today",
-            },
-        },
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": gettext("❌ *Not working*\n\n"),
-            },
-            "accessory": {
-                "style": "danger",
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "emoji": True,
-                    "text": gettext("❌ Choose"),
-                },
-                "confirm": {
-                    "title": {
-                        "type": "plain_text",
-                        "text": gettext("Are you sure?"),
-                    },
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": gettext(
-                            "I will cancel your reservations for today. If you were already checked in, I'll check you out as well.\n\nContinue?"
-                        ),
-                    },
-                    "confirm": {
-                        "type": "plain_text",
-                        "text": gettext("Yes"),
-                    },
-                    "deny": {
-                        "type": "plain_text",
-                        "text": gettext("No"),
-                    },
-                },
-                "value": "mark_not_working_today",
-            },
-        },
-    ]
-
-    result = client.web_client.chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=title,
-        blocks=blocks,
-    )
-    result.validate()
 
 
 def on_interactive_block_action(

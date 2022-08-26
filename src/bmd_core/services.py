@@ -136,7 +136,7 @@ def handle_slash_command_list_reservations(
                     emoji = "✔️"
 
                 reservations_text += gettext(
-                    f"\n\n\n~{emoji} {reservation_start_text}: {current_from} to {current_to}~\n_{current_status}_"
+                    f"\n\n\n{emoji} {reservation_start_text}: {current_from} to {current_to}\n_{current_status}_"
                 )
                 continue
 
@@ -183,6 +183,195 @@ def handle_slash_command_list_reservations(
                     "type": "mrkdwn",
                     "text": reservations_text,
                 }
+            ],
+        },
+    ]
+
+    result = client.web_client.chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text=title,
+        blocks=blocks,
+    )
+    result.validate()
+
+
+def handle_slash_command_status(
+    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+):
+    """Manually trigger it. Useful for development."""
+    if not botmydesk_user.authorized_bot():
+        return unauthorized_reply_shortcut(client, botmydesk_user)
+
+    reservations_today_result = bmd_api_client.client.list_reservations_v3(
+        botmydesk_user
+    )
+    has_home_reservation = False
+    has_office_reservation = False
+    has_external_reservation = False
+
+    # Very shallow assertions.
+    for current in reservations_today_result["result"]["items"]:
+        if current["type"] == "visitor":
+            continue
+
+        if current["seat"] is not None and current["seat"]["map"]["name"] == "Extern":
+            has_external_reservation = True
+        elif current["seat"] is not None and current["type"] == "normal":
+            has_office_reservation = True
+        elif current["seat"] is None and current["type"] == "home":
+            has_home_reservation = True
+
+    today = timezone.localtime(timezone.now()).date().strftime("%A %d %B")
+    title = gettext(f"BookMyDesk {today}")
+    reservation_text = ""
+
+    if has_home_reservation:
+        reservation_text = gettext("🏡 You have a *home reservation* for today")
+    elif has_office_reservation:
+        reservation_text = gettext("🏢 You have an *office reservation* for today")
+    elif has_external_reservation:
+        reservation_text = gettext(
+            "🚋 You have an *external reservation* outside home/office for today"
+        )
+    else:
+        reservation_text = gettext("❌ You have *no reservation* yet for today")
+
+    blocks = [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": title,
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": gettext(f"_{reservation_text}. What do you want to do?_"),
+            },
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": gettext("🏡 Home"),
+                    },
+                    "confirm": {
+                        "title": {
+                            "type": "plain_text",
+                            "text": gettext("Are you sure?"),
+                        },
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": gettext(
+                                "🏡 You're working from home today.\n\nI will book a home spot for you, if you don't have one yet."
+                            ),
+                        },
+                        "confirm": {
+                            "type": "plain_text",
+                            "text": gettext("Yes, continue"),
+                        },
+                        "deny": {
+                            "type": "plain_text",
+                            "text": gettext("No, wait"),
+                        },
+                    },
+                    "value": "mark_working_from_home_today",
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": gettext("🏢 Office"),
+                    },
+                    "confirm": {
+                        "title": {
+                            "type": "plain_text",
+                            "text": gettext("Are you sure?"),
+                        },
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": gettext(
+                                "🏢 You're working at the office today.\n\nThis only works if you already have a reservation.\nI will check you in if you are not already, no matter what time your reservation is."
+                            ),
+                        },
+                        "confirm": {
+                            "type": "plain_text",
+                            "text": gettext("Yes, continue"),
+                        },
+                        "deny": {
+                            "type": "plain_text",
+                            "text": gettext("No, wait"),
+                        },
+                    },
+                    "value": "mark_working_at_the_office_today",
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": gettext("🚋 Externally"),
+                    },
+                    "confirm": {
+                        "title": {
+                            "type": "plain_text",
+                            "text": gettext("Are you sure?"),
+                        },
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": gettext(
+                                "🚋 You're working externally.\n\nI will book an 'external' spot for you, if you don't have one yet, and check you in as well."
+                            ),
+                        },
+                        "confirm": {
+                            "type": "plain_text",
+                            "text": gettext("Yes, continue"),
+                        },
+                        "deny": {
+                            "type": "plain_text",
+                            "text": gettext("No, wait"),
+                        },
+                    },
+                    "value": "mark_working_externally_today",
+                },
+                {
+                    "type": "button",
+                    "style": "danger",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": gettext("❌ Not working"),
+                    },
+                    "confirm": {
+                        "title": {
+                            "type": "plain_text",
+                            "text": gettext("Are you sure?"),
+                        },
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": gettext(
+                                "❌ You're not working today or you're already done.\n\nI will cancel your reservations for today.\nAlso, if you were already checked in, I'll check you out now.\n\nContinue?"
+                            ),
+                        },
+                        "confirm": {
+                            "type": "plain_text",
+                            "text": gettext("Yes, continue"),
+                        },
+                        "deny": {
+                            "type": "plain_text",
+                            "text": gettext("No, wait"),
+                        },
+                    },
+                    "value": "mark_not_working_today",
+                },
             ],
         },
     ]

@@ -206,7 +206,7 @@ def reservation_checkout(botmydesk_user: BotMyDeskUser, reservation_id: str):
 
     response = requests.post(
         url=f"{settings.BOOKMYDESK_API_URL}/reservation/{reservation_id}/checkout",
-        data={
+        json={
             "type": "manual",
         },
         headers={

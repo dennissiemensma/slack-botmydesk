@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-25 21:04+0000\n"
+"POT-Creation-Date: 2022-08-30 20:55+0000\n"
 "PO-Revision-Date: 2022-08-23 23:02+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
@@ -38,7 +38,7 @@ msgid ""
 "\n"
 "\n"
 "\n"
-"~{emoji} {reservation_start_text}: {current_from} to {current_to}~\n"
+"{emoji} {reservation_start_text}: {current_from} to {current_to}\n"
 "_{current_status}_"
 msgstr ""
 "\n"
@@ -70,8 +70,162 @@ msgstr ""
 "{emoji} {reservation_start_text} van {current['from']} tot {current['to']}\n"
 "_{natural_time_until_start} op *{location}*_"
 
+msgid "BookMyDesk notification"
+msgstr ""
+
+#, python-brace-format
+msgid "🏡 You have a *home reservation* for today ({reservation_start} - {reservation_end})"
+msgstr ""
+
+#, python-brace-format
+msgid "🏢 You have an *office reservation* for today ({reservation_start} - {reservation_end})"
+msgstr ""
+
+#, python-brace-format
+msgid "🚋 You have an *external reservation* outside home/office for today ({reservation_start} - {reservation_end})"
+msgstr ""
+
+#, fuzzy
+#| msgid "_No reservations found (or too far away)..._"
+msgid "❌ You have *no reservation* yet for today"
+msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
+
+msgid " (+{reservation_count-1} other)"
+msgstr ""
+
+msgid " and you are *checked in*"
+msgstr ""
+
+msgid " and you are *checked out*"
+msgstr ""
+
+msgid "BotMyDesk preferences"
+msgstr "BotMyDesk-voorkeuren"
+
+#, python-brace-format
+msgid "_{reservation_text}. Where are you today?_"
+msgstr ""
+
+msgid "🏡 At home"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr "Weet je het zeker?"
+
+#, fuzzy
+#| msgid ""
+#| "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n"
+#| "\n"
+#| "\n"
+msgid ""
+"🏡 You're working from home today.\n"
+"\n"
+"I will book a home spot for you, if you don't have one yet."
+msgstr ""
+"_Markeer vandaag als *thuiswerken*. Boekt een thuisplek voor je, mocht je dat nog niet gedaan hebben. Geen check-in vereist._\n"
+"\n"
+"\n"
+
+#, fuzzy
+#| msgid "Yes, disconnect"
+msgid "Yes, continue"
+msgstr "Ja, ontkoppel"
+
+msgid "No, wait"
+msgstr ""
+
+msgid "🏢 At the office"
+msgstr ""
+
+#, fuzzy
+#| msgid ""
+#| "_Mark today as *working from the office*. Only checks you in if you already have a reservation._\n"
+#| "\n"
+#| "\n"
+msgid ""
+"🏢 You're working at the office today.\n"
+"\n"
+"This only works if you already have a reservation.\n"
+"I will check you in if you are not already, no matter what time your reservation is."
+msgstr ""
+"_Markeert vandaag als *werkend op kantoor*. Checkt je alleen in als je al een reservering hebt._\n"
+"\n"
+"\n"
+
+msgid "🚋 Externally"
+msgstr ""
+
+#, fuzzy
+#| msgid ""
+#| "_Mark today as *working outside the office* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n"
+#| "\n"
+#| "\n"
+msgid ""
+"🚋 You're working externally.\n"
+"\n"
+"I will book an 'external' spot for you, if you don't have one yet, and check you in as well."
+msgstr ""
+"_Markeert vandaag als *werkend buiten kantoor* (maar niet thuis). Boekt een 'externe plek' voor je, mocht je dit nog niet gedaan hebben. Checkt je tevens in._\n"
+"\n"
+"\n"
+
+msgid "❌ Not working"
+msgstr ""
+
+#, fuzzy
+#| msgid ""
+#| "❌ *Not working*\n"
+#| "\n"
+#| "_I will cancel your reservations for today. If you were already checked in, I'll check you out as well._"
+msgid ""
+"❌ You're not working today or you're already done.\n"
+"\n"
+"I will cancel your pending reservations for today (if any).\n"
+"Also, if you were already checked in, I'll check you out now."
+msgstr ""
+"❌ *Niet aan het werk*\n"
+"\n"
+"_Ik annuleer je reserveringen voor vandaag. Als je al ingecheckt was, check ik je uit._"
+
 msgid "Sorry, not yet implemented 🧑‍💻"
 msgstr "Sorry, nog niet werkend 🧑‍💻"
+
+#, fuzzy
+#| msgid "_No reservations found (or too far away)..._"
+msgid "⚠️ No office reservation found for today"
+msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
+
+msgid "✔️ _I left it as-is, since you're already *checked in.*_"
+msgstr ""
+
+msgid "⚠️ _I did nothing, as you seem to be *checked out* already?_"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"⚠️ *Failed to check you in*\n"
+" ```{error}```"
+msgstr ""
+
+#, python-brace-format
+msgid "✅ _I checked you in at {location}_"
+msgstr ""
+
+msgid "⚠️ _Unexpected status, **I ignored your request to make sure not breaking anything**!_"
+msgstr ""
+
+#, fuzzy, python-brace-format
+#| msgid "Your upcoming BookMyDesk reservations"
+msgid "BookMyDesk updated for {today_text}"
+msgstr "Je komende boekingen in BookMyDesk"
+
+#, python-brace-format
+msgid ""
+"🏢 _You requested me to check you in for the office today._\n"
+"\n"
+"\n"
+"{report_text}"
+msgstr ""
 
 #, fuzzy
 #| msgid "_No reservations found (or too far away)..._"
@@ -124,13 +278,8 @@ msgid ""
 "\t\t ⚠️ _Unexpected status, **left untouched**!_"
 msgstr ""
 
-#, fuzzy
-#| msgid "Your upcoming BookMyDesk reservations"
-msgid "Your BookMyDesk reservations update today"
-msgstr "Je komende boekingen in BookMyDesk"
-
 #, python-brace-format
-msgid "_You requested me to clear your reservations today._ {report_text}"
+msgid "❌ _You requested me to clear your reservations today._ {report_text}"
 msgstr ""
 
 #, python-brace-format
@@ -196,7 +345,7 @@ msgstr ""
 #| "\n"
 msgid ""
 "\n"
-"You can use the following commands at any moment, without having to wait for my notification(s) first.*\n"
+"You can use the following commands at any moment, without having to wait for my notification(s) first.\n"
 "\n"
 msgstr ""
 "\n"
@@ -278,23 +427,6 @@ msgstr "_More commando's zijn beschikbaar zodra je je account koppelt door *`{se
 msgid "BotMyDesk help"
 msgstr "BotMyDesk hulp"
 
-#, fuzzy
-#| msgid ""
-#| "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n"
-#| "\n"
-#| "\n"
-msgid ""
-"_Click the button to the right for preferences or (dis)connecting BotMyDesk._\n"
-"\n"
-"\n"
-msgstr ""
-"_Stel je (dagelijkse) *voorkeuren voor herinneringen* in. Ontkoppel BotMyDesk._\n"
-"\n"
-"\n"
-
-msgid "BotMyDesk preferences"
-msgstr "BotMyDesk-voorkeuren"
-
 #, python-brace-format
 msgid "Hi {botmydesk_user.name}"
 msgstr "Hoi {botmydesk_user.name}"
@@ -317,9 +449,6 @@ msgstr "Om te beginnen zul je me toegang moeten geven tot je BookMyDesk-account,
 
 msgid "Connect"
 msgstr "Koppel"
-
-msgid "Are you sure?"
-msgstr "Weet je het zeker?"
 
 #, python-brace-format
 msgid ""
@@ -344,15 +473,10 @@ msgstr "_Je kunt me later op elk moment ontkoppelen door weer `{settings.SLACK_S
 msgid "Loading..."
 msgstr "Bezig met laden..."
 
-#, fuzzy, python-brace-format
-#| msgid "Hi *{profile['firstName']} {profile['infix']} {profile['lastName']}*, how can I help you?"
-msgid "_Connected to: *{profile.first_name} {profile.infix} {profile.last_name}* ({profile.email})_"
-msgstr "Hoi *{profile['firstName']} {profile['infix']} {profile['lastName']}*, hoe kan ik je helpen?"
-
 msgid "Preferences"
 msgstr ""
 
-msgid "Select *which working day(s)* to receive daily notifications on:"
+msgid "Select *which working day(s)* to receive daily reminder on:"
 msgstr ""
 
 msgid "Mondays"
@@ -370,7 +494,17 @@ msgstr ""
 msgid "Fridays"
 msgstr ""
 
-msgid "Select *what time* to receive daily notification on:"
+msgid "Select *which time* to be reminded at:"
+msgstr ""
+
+#, python-brace-format
+msgid "_Connected to BookMyDesk account of *{full_name}*_"
+msgstr ""
+
+msgid "Show help info in chat"
+msgstr ""
+
+msgid "Test notification in chat"
 msgstr ""
 
 msgid "Disconnect BotMyDesk"
@@ -391,97 +525,6 @@ msgstr "Ja, ontkoppel"
 msgid "Nevermind, keep connected"
 msgstr "Laat maar, blijf gekoppeld"
 
-msgid "Your presence today with BookMyDesk"
-msgstr "Je aanwezigheid vandaag in BookMyDesk"
-
-msgid "🏡 *Working from home*"
-msgstr ""
-
-msgid "🏡 Choose"
-msgstr "🏡 Selecteer"
-
-#, fuzzy
-#| msgid ""
-#| "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n"
-#| "\n"
-#| "\n"
-msgid ""
-"I will book a home spot for you, if you don't have one yet.\n"
-"\n"
-"Continue?"
-msgstr ""
-"_Markeer vandaag als *thuiswerken*. Boekt een thuisplek voor je, mocht je dat nog niet gedaan hebben. Geen check-in vereist._\n"
-"\n"
-"\n"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nee"
-
-msgid "🏢 *Working at the office*"
-msgstr ""
-
-msgid "🏢 Choose"
-msgstr "🏢 Selecteer"
-
-#, fuzzy
-#| msgid ""
-#| "_Mark today as *working from the office*. Only checks you in if you already have a reservation._\n"
-#| "\n"
-#| "\n"
-msgid ""
-"Only works if you already have a reservation. I will check you in though.\n"
-"\n"
-"Continue?"
-msgstr ""
-"_Markeert vandaag als *werkend op kantoor*. Checkt je alleen in als je al een reservering hebt._\n"
-"\n"
-"\n"
-
-msgid "🚋 *Working externally*"
-msgstr ""
-
-msgid "🚋 Choose"
-msgstr "🚋 Selecteer"
-
-#, fuzzy
-#| msgid ""
-#| "_Mark today as *working outside the office* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n"
-#| "\n"
-#| "\n"
-msgid ""
-"I will book an 'external' spot for you (if you don't have one yet), since you're not in the office nor at home. And check you in also.\n"
-"\n"
-"Continue?"
-msgstr ""
-"_Markeert vandaag als *werkend buiten kantoor* (maar niet thuis). Boekt een 'externe plek' voor je, mocht je dit nog niet gedaan hebben. Checkt je tevens in._\n"
-"\n"
-"\n"
-
-msgid ""
-"❌ *Not working*\n"
-"\n"
-msgstr ""
-
-msgid "❌ Choose"
-msgstr "❌ Selecteer"
-
-#, fuzzy
-#| msgid ""
-#| "❌ *Not working*\n"
-#| "\n"
-#| "_I will cancel your reservations for today. If you were already checked in, I'll check you out as well._"
-msgid ""
-"I will cancel your reservations for today. If you were already checked in, I'll check you out as well.\n"
-"\n"
-"Continue?"
-msgstr ""
-"❌ *Niet aan het werk*\n"
-"\n"
-"_Ik annuleer je reserveringen voor vandaag. Als je al ingecheckt was, check ik je uit._"
-
 #, python-brace-format
 msgid "Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received."
 msgstr "Controleer je mailbox voor *{botmydesk_user.email}*. Vul de BookMyDesk logincode in die je hebt ontvangen."
@@ -501,7 +544,7 @@ msgstr "BotMyDesk ontkoppeld"
 #| "\n"
 #| "Bye! 👋"
 msgid ""
-"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}` again or the button to the right.\n"
+"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}` again.\n"
 "\n"
 "Bye! 👋"
 msgstr ""
@@ -524,6 +567,88 @@ msgstr ""
 "Yes! Je hebt me gekoppeld aan je BookMyDesk-account 👏\n"
 "\n"
 "Ik geef nu een opsomming van alle commando's die je kunt gebruiken, vergelijkbaar wanneer je *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`* typt"
+
+#, fuzzy
+#~| msgid ""
+#~| "_Set your (daily) *reminder preferences*. Disconnect BotMyDesk._\n"
+#~| "\n"
+#~| "\n"
+#~ msgid ""
+#~ "_Click the button to the right for preferences or (dis)connecting BotMyDesk._\n"
+#~ "\n"
+#~ "\n"
+#~ msgstr ""
+#~ "_Stel je (dagelijkse) *voorkeuren voor herinneringen* in. Ontkoppel BotMyDesk._\n"
+#~ "\n"
+#~ "\n"
+
+#, fuzzy, python-brace-format
+#~| msgid "Hi *{profile['firstName']} {profile['infix']} {profile['lastName']}*, how can I help you?"
+#~ msgid "_Connected to: *{profile.first_name} {profile.infix} {profile.last_name}* ({profile.email})_"
+#~ msgstr "Hoi *{profile['firstName']} {profile['infix']} {profile['lastName']}*, hoe kan ik je helpen?"
+
+#~ msgid "Your presence today with BookMyDesk"
+#~ msgstr "Je aanwezigheid vandaag in BookMyDesk"
+
+#~ msgid "🏡 Choose"
+#~ msgstr "🏡 Selecteer"
+
+#, fuzzy
+#~| msgid ""
+#~| "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n"
+#~| "\n"
+#~| "\n"
+#~ msgid ""
+#~ "I will book a home spot for you, if you don't have one yet.\n"
+#~ "\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "_Markeer vandaag als *thuiswerken*. Boekt een thuisplek voor je, mocht je dat nog niet gedaan hebben. Geen check-in vereist._\n"
+#~ "\n"
+#~ "\n"
+
+#~ msgid "Yes"
+#~ msgstr "Ja"
+
+#~ msgid "No"
+#~ msgstr "Nee"
+
+#~ msgid "🏢 Choose"
+#~ msgstr "🏢 Selecteer"
+
+#, fuzzy
+#~| msgid ""
+#~| "_Mark today as *working from the office*. Only checks you in if you already have a reservation._\n"
+#~| "\n"
+#~| "\n"
+#~ msgid ""
+#~ "Only works if you already have a reservation. I will check you in though.\n"
+#~ "\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "_Markeert vandaag als *werkend op kantoor*. Checkt je alleen in als je al een reservering hebt._\n"
+#~ "\n"
+#~ "\n"
+
+#~ msgid "🚋 Choose"
+#~ msgstr "🚋 Selecteer"
+
+#, fuzzy
+#~| msgid ""
+#~| "_Mark today as *working outside the office* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n"
+#~| "\n"
+#~| "\n"
+#~ msgid ""
+#~ "I will book an 'external' spot for you (if you don't have one yet), since you're not in the office nor at home. And check you in also.\n"
+#~ "\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "_Markeert vandaag als *werkend buiten kantoor* (maar niet thuis). Boekt een 'externe plek' voor je, mocht je dit nog niet gedaan hebben. Checkt je tevens in._\n"
+#~ "\n"
+#~ "\n"
+
+#~ msgid "❌ Choose"
+#~ msgstr "❌ Selecteer"
 
 #~ msgid "Settings"
 #~ msgstr "Instellingen"

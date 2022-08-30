@@ -231,7 +231,7 @@ def handle_slash_command_status(
         elif current["seat"] is None and current["type"] == "home":
             has_home_reservation = True
 
-    title = gettext("BookMyDesk notification")
+    title = gettext("BotMyDesk notification")
 
     if has_home_reservation:
         reservation_text = gettext(

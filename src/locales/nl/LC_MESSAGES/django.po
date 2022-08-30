@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-30 20:55+0000\n"
+"POT-Creation-Date: 2022-08-30 20:56+0000\n"
 "PO-Revision-Date: 2022-08-23 23:02+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
@@ -70,8 +70,10 @@ msgstr ""
 "{emoji} {reservation_start_text} van {current['from']} tot {current['to']}\n"
 "_{natural_time_until_start} op *{location}*_"
 
-msgid "BookMyDesk notification"
-msgstr ""
+#, fuzzy
+#| msgid "BotMyDesk disconnected"
+msgid "BotMyDesk notification"
+msgstr "BotMyDesk ontkoppeld"
 
 #, python-brace-format
 msgid "🏡 You have a *home reservation* for today ({reservation_start} - {reservation_end})"

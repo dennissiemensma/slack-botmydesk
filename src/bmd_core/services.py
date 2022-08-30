@@ -1,4 +1,5 @@
 import logging
+import pprint
 
 from slack_sdk.socket_mode import SocketModeClient
 from django.utils import timezone, translation
@@ -199,43 +200,63 @@ def handle_slash_command_list_reservations(
 def handle_slash_command_status(
     client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
 ):
-    """Manually trigger it. Useful for development."""
     if not botmydesk_user.authorized_bot():
         return unauthorized_reply_shortcut(client, botmydesk_user)
 
     reservations_today_result = bmd_api_client.client.list_reservations_v3(
         botmydesk_user
     )
-    has_home_reservation = False
-    has_office_reservation = False
-    has_external_reservation = False
+    reservation_count = 0  # Omits ignored ones below
+    has_home_reservation = has_office_reservation = has_external_reservation = False
+    checked_in = checked_out = False
+    reservation_start = reservation_end = None
 
     # Very shallow assertions.
     for current in reservations_today_result["result"]["items"]:
         if current["type"] == "visitor":
             continue
 
+        reservation_count += 1
+        reservation_start = current["from"]
+        reservation_end = current["to"]
+
         if current["seat"] is not None and current["seat"]["map"]["name"] == "Extern":
             has_external_reservation = True
+            checked_in = current["status"] == "checkedIn"
+            checked_out = current["status"] == "checkedOut"
         elif current["seat"] is not None and current["type"] == "normal":
             has_office_reservation = True
+            checked_in = current["status"] == "checkedIn"
+            checked_out = current["status"] == "checkedOut"
         elif current["seat"] is None and current["type"] == "home":
             has_home_reservation = True
 
-    today = timezone.localtime(timezone.now()).date().strftime("%A %d %B")
-    title = gettext(f"BookMyDesk {today}")
-    reservation_text = ""
+    title = gettext("BookMyDesk")
 
     if has_home_reservation:
-        reservation_text = gettext("🏡 You have a *home reservation* for today")
+        reservation_text = gettext(
+            f"🏡 You have a *home reservation* for today ({reservation_start} - {reservation_end})"
+        )
     elif has_office_reservation:
-        reservation_text = gettext("🏢 You have an *office reservation* for today")
+        reservation_text = gettext(
+            f"🏢 You have an *office reservation* for today ({reservation_start} - {reservation_end})"
+        )
     elif has_external_reservation:
         reservation_text = gettext(
-            "🚋 You have an *external reservation* outside home/office for today"
+            f"🚋 You have an *external reservation* outside home/office for today ({reservation_start} - {reservation_end})"
         )
     else:
         reservation_text = gettext("❌ You have *no reservation* yet for today")
+
+    # Edge-cases, for those wanting to see the world burn.
+    if reservation_count > 1:
+        reservation_text += gettext(f" (+{reservation_count-1} other)")
+
+    # This is some assumption, may break in future if statuses change.
+    if checked_in:
+        reservation_text += gettext(" and you are *checked in*")
+    elif checked_out:
+        reservation_text += gettext(" and you are *checked out*")
 
     blocks = [
         {
@@ -249,7 +270,16 @@ def handle_slash_command_status(
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": gettext(f"_{reservation_text}. What do you want to do?_"),
+                "text": gettext(f"_{reservation_text}. Where are you today?_"),
+            },
+            "accessory": {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "emoji": True,
+                    "text": gettext("BotMyDesk settings"),
+                },
+                "value": "open_settings",
             },
         },
         {
@@ -257,10 +287,11 @@ def handle_slash_command_status(
             "elements": [
                 {
                     "type": "button",
+                    # "style": "primary" if has_home_reservation else "default",
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": gettext("🏡 Home"),
+                        "text": gettext("🏡 At home"),
                     },
                     "confirm": {
                         "title": {
@@ -286,10 +317,11 @@ def handle_slash_command_status(
                 },
                 {
                     "type": "button",
+                    # "style": "primary" if has_office_reservation else "default",
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": gettext("🏢 Office"),
+                        "text": gettext("🏢 At the office"),
                     },
                     "confirm": {
                         "title": {
@@ -315,6 +347,7 @@ def handle_slash_command_status(
                 },
                 {
                     "type": "button",
+                    # "style": "primary" if has_external_reservation else "default",
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
@@ -376,6 +409,7 @@ def handle_slash_command_status(
         },
     ]
 
+    pprint.pprint(blocks, indent=2)
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
@@ -405,10 +439,92 @@ def handle_user_working_in_office_today(
     if not botmydesk_user.authorized_bot():
         return unauthorized_reply_shortcut(client, botmydesk_user)
 
+    try:
+        reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
+    except BookMyDeskException as error:
+        result = client.web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=gettext(
+                f"Sorry, an error occurred while requesting your reservations: ```{error}```"
+            ),
+        )
+        result.validate()
+        return
+
+    # Worst-case
+    report_text = gettext("⚠️ No office reservation found for today")
+
+    if reservations_result["result"]["items"]:
+        for current in reservations_result["result"]["items"]:
+            # Ignore everything we're not interested in. E.g. visitors or home reservations.
+            if current["seat"] is None or current["type"] != "normal":
+                continue
+
+            location = current["seat"]["map"]["name"]
+            current_reservation_id = current["id"]
+            current_status = current["status"]
+
+            # The logic below just assumes a single reservation. We may or may not want to have it compatible
+            # with multiple items in the future (which is way more code than it currently already is).
+
+            if current_status == "checkedIn":
+                report_text = gettext(
+                    "✔️ _I left it as-is, since you're already *checked in.*_"
+                )
+                break
+
+            if current_status == "checkedOut":
+                report_text = gettext(
+                    "⚠️ _I did nothing, as you seem to be *checked out* already?_"
+                )
+                break
+
+            if current_status == "reserved":
+                try:
+                    bmd_api_client.client.reservation_check_in_out(
+                        botmydesk_user, current_reservation_id, check_in=True
+                    )
+                except BookMyDeskException as error:
+                    report_text = gettext(
+                        f"⚠️ *Failed to check you in*\n ```{error}```"
+                    )
+                else:
+                    report_text = gettext(f"✅ _I checked you in at {location}_")
+                break
+
+            # Fail-safe for future statuses.
+            report_text = gettext(
+                "⚠️ _Unexpected status, **I ignored your request to make sure not breaking anything**!_"
+            )
+            break
+
+    today_text = timezone.localtime(timezone.now()).strftime("%A %d %B")
+    title = gettext(f"BookMyDesk updated for {today_text}")
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=gettext("Sorry, not yet implemented 🧑‍💻"),
+        text=title,
+        blocks=[
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": title,
+                },
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": gettext(
+                            f"🏢 _You requested me to check you in for the office today._\n\n\n{report_text}"
+                        ),
+                    },
+                ],
+            },
+        ],
     )
     result.validate()
 
@@ -496,8 +612,8 @@ def handle_user_not_working_today(
             # Just check out
             elif current_status in ("checkedIn",):
                 try:
-                    bmd_api_client.client.reservation_checkout(
-                        botmydesk_user, current_reservation_id
+                    bmd_api_client.client.reservation_check_in_out(
+                        botmydesk_user, current_reservation_id, check_in=False
                     )
                 except BookMyDeskException as error:
                     report_text += gettext(
@@ -528,7 +644,7 @@ def handle_user_not_working_today(
                 )
 
     today_text = timezone.localtime(timezone.now()).strftime("%A %d %B")
-    title = gettext(f"BookMyDesk reservations for {today_text}")
+    title = gettext(f"BookMyDesk updated for {today_text}")
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,

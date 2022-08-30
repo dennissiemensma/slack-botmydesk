@@ -97,7 +97,7 @@ def handle_slash_command_help(
             "_List your upcoming reservations (e.g. coming days)._\n\n\n"
         )
         help_text += gettext(
-            "\nYou can use the following commands at any moment, without having to wait for my notification(s) first.*\n\n"
+            "\nYou can use the following commands at any moment, without having to wait for my notification(s) first.\n\n"
         )
         help_text += gettext(
             f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
@@ -137,20 +137,18 @@ def handle_slash_command_help(
             },
         },
         {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": " ",
-            },
-            "accessory": {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "emoji": True,
-                    "text": gettext("BotMyDesk settings"),
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": gettext("BotMyDesk preferences"),
+                    },
+                    "value": "open_settings",
                 },
-                "value": "open_settings",
-            },
+            ],
         },
         {
             "type": "context",
@@ -276,7 +274,7 @@ def handle_slash_command_settings(
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": gettext("BotMyDesk settings"),
+            "text": gettext("BotMyDesk preferences"),
         },
         "blocks": [
             {
@@ -302,7 +300,7 @@ def handle_slash_command_settings(
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": gettext("BotMyDesk settings"),
+            "text": gettext("BotMyDesk preferences"),
         },
         "blocks": [
             {
@@ -389,6 +387,24 @@ def handle_slash_command_settings(
                 "elements": [
                     {
                         "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "emoji": True,
+                            "text": gettext("Show help info in chat"),
+                        },
+                        "value": "open_help",
+                    },
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "emoji": True,
+                            "text": gettext("Test notification in chat"),
+                        },
+                        "value": "send_status_notification",
+                    },
+                    {
+                        "type": "button",
                         "style": "danger",
                         "text": {
                             "type": "plain_text",
@@ -416,7 +432,7 @@ def handle_slash_command_settings(
                             },
                         },
                         "value": "revoke_botmydesk",
-                    }
+                    },
                 ],
             },
         ],
@@ -444,6 +460,8 @@ def on_interactive_block_action(
             "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
             "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
             "open_settings": handle_slash_command_settings,  # Alias
+            "open_help": handle_slash_command_help,  # Alias
+            "send_status_notification": bmd_core.services.handle_slash_command_status,  # Alias
             "mark_working_from_home_today": bmd_core.services.handle_user_working_home_today,
             "mark_working_at_the_office_today": bmd_core.services.handle_user_working_in_office_today,
             "mark_working_externally_today": bmd_core.services.handle_user_working_externally_today,

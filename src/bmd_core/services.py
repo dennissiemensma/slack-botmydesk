@@ -231,7 +231,7 @@ def handle_slash_command_status(
         elif current["seat"] is None and current["type"] == "home":
             has_home_reservation = True
 
-    title = gettext("BookMyDesk")
+    title = gettext("BookMyDesk notification")
 
     if has_home_reservation:
         reservation_text = gettext(
@@ -267,19 +267,24 @@ def handle_slash_command_status(
             },
         },
         {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": gettext("BotMyDesk preferences"),
+                    },
+                    "value": "open_settings",
+                },
+            ],
+        },
+        {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
                 "text": gettext(f"_{reservation_text}. Where are you today?_"),
-            },
-            "accessory": {
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "emoji": True,
-                    "text": gettext("BotMyDesk settings"),
-                },
-                "value": "open_settings",
             },
         },
         {
@@ -287,7 +292,6 @@ def handle_slash_command_status(
             "elements": [
                 {
                     "type": "button",
-                    # "style": "primary" if has_home_reservation else "default",
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
@@ -317,7 +321,6 @@ def handle_slash_command_status(
                 },
                 {
                     "type": "button",
-                    # "style": "primary" if has_office_reservation else "default",
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
@@ -347,7 +350,6 @@ def handle_slash_command_status(
                 },
                 {
                     "type": "button",
-                    # "style": "primary" if has_external_reservation else "default",
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
@@ -391,7 +393,7 @@ def handle_slash_command_status(
                         "text": {
                             "type": "mrkdwn",
                             "text": gettext(
-                                "❌ You're not working today or you're already done.\n\nI will cancel your reservations for today.\nAlso, if you were already checked in, I'll check you out now.\n\nContinue?"
+                                "❌ You're not working today or you're already done.\n\nI will cancel your pending reservations for today (if any).\nAlso, if you were already checked in, I'll check you out now."
                             ),
                         },
                         "confirm": {
@@ -409,7 +411,6 @@ def handle_slash_command_status(
         },
     ]
 
-    pprint.pprint(blocks, indent=2)
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,

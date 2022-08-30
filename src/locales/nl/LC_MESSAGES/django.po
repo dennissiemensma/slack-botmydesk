@@ -292,8 +292,8 @@ msgstr ""
 "\n"
 "\n"
 
-msgid "BotMyDesk settings"
-msgstr "BotMyDesk-instellingen"
+msgid "BotMyDesk preferences"
+msgstr "BotMyDesk-voorkeuren"
 
 #, python-brace-format
 msgid "Hi {botmydesk_user.name}"

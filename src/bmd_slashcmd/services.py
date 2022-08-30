@@ -294,6 +294,8 @@ def handle_slash_command_settings(
         trigger_id=payload["trigger_id"], view=view_data
     )
     initial_view_result.validate()
+    full_name = f"{profile.first_name} {profile.infix} {profile.last_name}"
+    full_name = re.sub(' +', ' ', full_name)
 
     # Now perform slow calls. Fetch options now. @TODO implement
     view_data = {
@@ -304,15 +306,6 @@ def handle_slash_command_settings(
             "text": gettext("BotMyDesk settings"),
         },
         "blocks": [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": gettext(
-                        f"_Connected to: *{profile.first_name} {profile.infix} {profile.last_name}* ({profile.email})_"
-                    ),
-                },
-            },
             {
                 "type": "header",
                 "text": {
@@ -325,7 +318,7 @@ def handle_slash_command_settings(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        "Select *which working day(s)* to receive daily notifications on:"
+                        "Select *which working day(s)* to receive daily reminder on:"
                     ),
                 },
                 "accessory": {
@@ -375,7 +368,7 @@ def handle_slash_command_settings(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        "Select *what time* to receive daily notification on:"
+                        "Select *which time* to be reminded at:"
                     ),
                 },
                 "accessory": {
@@ -385,6 +378,15 @@ def handle_slash_command_settings(
                 },
             },
             {"type": "divider"},
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": gettext(
+                        f"_Connected to BookMyDesk account of *{full_name}*_"
+                    ),
+                },
+            },
             {
                 "type": "actions",
                 "elements": [

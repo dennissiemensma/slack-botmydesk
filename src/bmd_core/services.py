@@ -527,7 +527,8 @@ def handle_user_not_working_today(
                     f"{current_reservation_text}\n\t\t ⚠️ _Unexpected status, **left untouched**!_"
                 )
 
-    title = gettext("Your BookMyDesk reservations update today")
+    today_text = timezone.localtime(timezone.now()).strftime("%A %d %B")
+    title = gettext(f"BookMyDesk reservations for {today_text}")
     result = client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
@@ -546,7 +547,7 @@ def handle_user_not_working_today(
                     {
                         "type": "mrkdwn",
                         "text": gettext(
-                            f"_You requested me to clear your reservations today._ {report_text}"
+                            f"❌ _You requested me to clear your reservations today._ {report_text}"
                         ),
                     },
                 ],

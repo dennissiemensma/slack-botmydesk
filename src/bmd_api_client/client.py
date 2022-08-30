@@ -78,7 +78,7 @@ def logout(botmydesk_user: BotMyDeskUser):
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to terminate session for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to terminate session of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
@@ -106,12 +106,12 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to refresh session for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to refresh session of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
 
         botmydesk_user.clear_tokens()
         bookmydesk_client_logger.error(
-            f"Cleared session info for {botmydesk_user.email}, reauthorization required..."
+            f"Cleared session info of {botmydesk_user.email}, reauthorization required..."
         )
         raise BookMyDeskException(response.content)
 
@@ -146,7 +146,7 @@ def me_v3(botmydesk_user: BotMyDeskUser) -> BookMyDeskProfile:
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to get me/profile for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to get me/profile of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
@@ -191,21 +191,24 @@ def list_reservations_v3(botmydesk_user: BotMyDeskUser, **override_parameters) -
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to get reservations for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to get reservations of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
     return response.json()
 
 
-def reservation_checkout(botmydesk_user: BotMyDeskUser, reservation_id: str):
-    """Check out of a reservation (manually)."""
+def reservation_check_in_out(
+    botmydesk_user: BotMyDeskUser, reservation_id: str, check_in: bool
+):
+    """Check in or out of a reservation."""
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
 
+    check_in_or_out = "checkout" if check_in else "checkin"
     response = requests.post(
-        url=f"{settings.BOOKMYDESK_API_URL}/reservation/{reservation_id}/checkout",
+        url=f"{settings.BOOKMYDESK_API_URL}/reservation/{reservation_id}/{check_in_or_out}",
         json={
             "type": "manual",
         },
@@ -220,7 +223,7 @@ def reservation_checkout(botmydesk_user: BotMyDeskUser, reservation_id: str):
 
     if response.status_code != 204:
         bookmydesk_client_logger.error(
-            f"FAILED to checkout from reservation for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to {check_in_or_out} from reservation of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
@@ -247,6 +250,6 @@ def delete_reservation_v3(botmydesk_user: BotMyDeskUser, reservation_id: str):
 
     if response.status_code != 204:
         bookmydesk_client_logger.error(
-            f"FAILED to delete reservation for {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to delete reservation of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)

@@ -539,17 +539,8 @@ def handle_interactive_bmd_revoke_botmydesk(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}` again or the button to the right.\n\nBye! 👋"
+                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}` again.\n\nBye! 👋"
                     ),
-                },
-                "accessory": {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": gettext("BotMyDesk settings"),
-                    },
-                    "value": "open_settings",
                 },
             },
         ],

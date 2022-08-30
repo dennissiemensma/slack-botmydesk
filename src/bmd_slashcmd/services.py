@@ -294,7 +294,7 @@ def handle_slash_command_settings(
     )
     initial_view_result.validate()
     full_name = f"{profile.first_name} {profile.infix} {profile.last_name}"
-    full_name = re.sub(' +', ' ', full_name)
+    full_name = re.sub(" +", " ", full_name)
 
     # Now perform slow calls. Fetch options now. @TODO implement
     view_data = {
@@ -366,9 +366,7 @@ def handle_slash_command_settings(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext(
-                        "Select *which time* to be reminded at:"
-                    ),
+                    "text": gettext("Select *which time* to be reminded at:"),
                 },
                 "accessory": {
                     "type": "timepicker",

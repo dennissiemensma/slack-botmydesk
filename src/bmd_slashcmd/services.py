@@ -140,9 +140,7 @@ def handle_slash_command_help(
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": gettext(
-                    "_Click the button to the right for preferences or (dis)connecting BotMyDesk._\n\n\n"
-                ),
+                "text": " ",
             },
             "accessory": {
                 "type": "button",

@@ -364,11 +364,11 @@ def handle_slash_command_settings(
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext("Select *which time* to be reminded at:"),
+                    "text": gettext("Select *what time* to be reminded at:"),
                 },
                 "accessory": {
                     "type": "timepicker",
-                    "initial_time": "09:00",  # TODO - fetch from DB
+                    "initial_time": "{:%H:%M}".format(botmydesk_user.notification_time),
                     "action_id": "daily_notification_time",
                 },
             },

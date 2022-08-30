@@ -1,5 +1,4 @@
 import logging
-import pprint
 
 from slack_sdk.socket_mode import SocketModeClient
 from django.utils import timezone, translation

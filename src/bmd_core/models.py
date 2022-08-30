@@ -1,3 +1,5 @@
+from datetime import time
+
 from django.db import models
 from django.utils import timezone
 
@@ -26,6 +28,14 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
     # The actual expiry is unknown, but assume one hour.
     access_token_expires_at = models.DateTimeField(null=True, default=None)
     refresh_token = models.CharField(null=True, default=None, max_length=255)
+
+    # Preferences
+    notification_on_mondays = models.BooleanField(db_index=True, default=True)
+    notification_on_tuesdays = models.BooleanField(db_index=True, default=True)
+    notification_on_wednesdays = models.BooleanField(db_index=True, default=True)
+    notification_on_thursdays = models.BooleanField(db_index=True, default=True)
+    notification_on_fridays = models.BooleanField(db_index=True, default=True)
+    notification_time = models.TimeField(default=time(8, 30, 0))
 
     def authorized_bot(self) -> bool:
         """Whether the bot is authorized for this user (has session)."""

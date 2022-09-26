@@ -221,7 +221,9 @@ def reservation_check_in_out(
         "(%s) Request sent: %s", botmydesk_user.email, response.request.url
     )
 
-    if response.status_code != 204:
+    expected_status_code = 200 if check_in else 204
+
+    if response.status_code != expected_status_code:
         bookmydesk_client_logger.error(
             f"FAILED to {check_in_or_out} from reservation of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
         )

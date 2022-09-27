@@ -391,7 +391,7 @@ def handle_slash_command_status(
                         "text": {
                             "type": "mrkdwn",
                             "text": gettext(
-                                "❌ You're not working today or you're already done.\n\nI will cancel your pending reservations for today (if any).\nAlso, if you were already checked in, I'll check you out now."
+                                "❌ You're not working today or you're already done.\n\nI will delete your pending reservations for today (if any).\nAlso, if you were already checked in, I'll check you out now."
                             ),
                         },
                         "confirm": {
@@ -602,7 +602,7 @@ def handle_user_not_working_today(
                     report_text += gettext(
                         f"{current_reservation_text}\n\t\t ✅ _I checked you out_"
                     )
-            # Cancel.
+            # Delete.
             elif current_status in ("reserved",):
                 try:
                     bmd_api_client.client.delete_reservation_v3(

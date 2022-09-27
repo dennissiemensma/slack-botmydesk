@@ -144,7 +144,7 @@ def handle_slash_command_help(
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": gettext("BotMyDesk preferences"),
+                        "text": "🤖",
                     },
                     "value": "open_settings",
                 },
@@ -274,7 +274,7 @@ def handle_slash_command_settings(
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": gettext("BotMyDesk preferences"),
+            "text": gettext("🤖 BotMyDesk preferences"),
         },
         "blocks": [
             {
@@ -300,7 +300,7 @@ def handle_slash_command_settings(
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": gettext("BotMyDesk preferences"),
+            "text": gettext("🤖 BotMyDesk preferences"),
         },
         "blocks": [
             {
@@ -637,7 +637,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
     )
 
     title = gettext("BotMyDesk connected!")
-    client.web_client.chat_postEphemeral(
+    client.web_client.chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=title,
@@ -659,7 +659,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
                 },
             },
         ],
-    )
+    ).validate()
 
     # Just display the default help info.
     handle_slash_command_help(client, botmydesk_user)

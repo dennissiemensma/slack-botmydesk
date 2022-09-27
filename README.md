@@ -37,6 +37,7 @@ im:read
 im:write
 users:read
 users:read.email
+users:write
 ```
 
 Finally, scroll up at _"OAuth & Permissions"_ and click the **Install to Workspace** button.

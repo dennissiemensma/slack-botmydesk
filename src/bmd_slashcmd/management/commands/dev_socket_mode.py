@@ -60,6 +60,10 @@ class Command(BaseCommand):
         client.socket_mode_request_listeners.append(process)
         # Establish a WebSocket connection to the Socket Mode servers
         client.connect()
+
+        # # Set as active.
+        # client.web_client.users_setPresence(presence='auto').validate()
+
         # Just not to stop this process
         from threading import Event
 
@@ -179,4 +183,4 @@ class Command(BaseCommand):
                     ],
                 },
             ],
-        )
+        ).validate()

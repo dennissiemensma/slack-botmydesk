@@ -206,7 +206,7 @@ def reservation_check_in_out(
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
 
-    check_in_or_out = "checkout" if check_in else "checkin"
+    check_in_or_out = "checkin" if check_in else "checkout"
     response = requests.post(
         url=f"{settings.BOOKMYDESK_API_URL}/reservation/{reservation_id}/{check_in_or_out}",
         json={

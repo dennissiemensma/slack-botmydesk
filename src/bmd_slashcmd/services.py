@@ -52,16 +52,11 @@ def handle_slash_command(
                 settings.SLACK_SLASHCOMMAND_BMD_HELP: handle_slash_command_help,
                 settings.SLACK_SLASHCOMMAND_BMD_SETTINGS: handle_slash_command_settings,
                 settings.SLACK_SLASHCOMMAND_BMD_STATUS: bmd_core.services.handle_slash_command_status,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1: bmd_core.services.handle_user_working_home_today,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2: bmd_core.services.handle_user_working_home_today,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1: bmd_core.services.handle_user_working_in_office_today,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2: bmd_core.services.handle_user_working_in_office_today,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_1: bmd_core.services.handle_user_working_externally_today,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2: bmd_core.services.handle_user_working_externally_today,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1: bmd_core.services.handle_user_not_working_today,
-                settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2: bmd_core.services.handle_user_not_working_today,
-                settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1: bmd_core.services.handle_slash_command_list_reservations,
-                settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2: bmd_core.services.handle_slash_command_list_reservations,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME: bmd_core.services.handle_user_working_home_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE: bmd_core.services.handle_user_working_in_office_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY: bmd_core.services.handle_user_working_externally_today,
+                settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED: bmd_core.services.handle_user_not_working_today,
+                settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS: bmd_core.services.handle_slash_command_list_reservations,
             }[text.strip()]
         except KeyError:
             # Help when unknown sub.
@@ -91,7 +86,7 @@ def handle_slash_command_help(
             "_Show your BookMyDesk status today. Allows you to choose what to book for you today. Similar to notifications sent by BotMyDesk._\n\n\n"
         )
         help_text += gettext(
-            f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
+            f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* \n"
         )
         help_text += gettext(
             "_List your upcoming reservations (e.g. coming days)._\n\n\n"
@@ -100,25 +95,25 @@ def handle_slash_command_help(
             "\nYou can use the following commands at any moment, without having to wait for my notification(s) first.\n\n"
         )
         help_text += gettext(
-            f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
+            f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* \n"
         )
         help_text += gettext(
             "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n\n\n"
         )
         help_text += gettext(
-            f"🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
+            f"🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`*\n"
         )
         help_text += gettext(
             "_Mark today as *working from the office*. Only works if you already have a reservation. I will check you in though._\n\n\n"
         )
         help_text += gettext(
-            f"🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
+            f"🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* \n"
         )
         help_text += gettext(
             "_Mark today as *working externally* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n\n\n"
         )
         help_text += gettext(
-            f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_1}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
+            f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* \n"
         )
         help_text += gettext(
             "_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n ⚠️ _Care, will be applied instantly without confirmation._\n\n\n"
@@ -144,7 +139,7 @@ def handle_slash_command_help(
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": "🤖",
+                        "text": "⚙️",
                     },
                     "value": "open_settings",
                 },
@@ -274,7 +269,7 @@ def handle_slash_command_settings(
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": gettext("🤖 BotMyDesk preferences"),
+            "text": gettext("⚙️ BotMyDesk preferences"),
         },
         "blocks": [
             {
@@ -294,13 +289,13 @@ def handle_slash_command_settings(
     full_name = f"{profile.first_name} {profile.infix} {profile.last_name}"
     full_name = re.sub(" +", " ", full_name)
 
-    # Now perform slow calls. Fetch options now. @TODO implement
+    # Now perform slow calls. Fetch options. @TODO implement
     view_data = {
         "type": "modal",
         "callback_id": "bmd-authorized-welcome",
         "title": {
             "type": "plain_text",
-            "text": gettext("🤖 BotMyDesk preferences"),
+            "text": gettext("⚙️ BotMyDesk preferences"),
         },
         "blocks": [
             {

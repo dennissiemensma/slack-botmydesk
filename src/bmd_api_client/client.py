@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 import requests
 
-from bmd_api_client.dto import BookMyDeskProfile
+from bmd_api_client.dto import V3BookMyDeskProfileResult, V3CompanyExtendedResult
 from bmd_api_client.exceptions import BookMyDeskException
 from bmd_core.models import BotMyDeskUser
 
@@ -61,6 +61,7 @@ def token_login(username: str, otp: str) -> dict:
         )
         raise BookMyDeskException(response.content)
 
+    # @TODO: DTO
     return response.json()
 
 
@@ -124,7 +125,7 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
     )
 
 
-def me_v3(botmydesk_user: BotMyDeskUser) -> BookMyDeskProfile:
+def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
     """Profile call about current user"""
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
@@ -150,7 +151,42 @@ def me_v3(botmydesk_user: BotMyDeskUser) -> BookMyDeskProfile:
         )
         raise BookMyDeskException(response.content)
 
-    return BookMyDeskProfile(profile_v3_result=response.json())
+    return V3BookMyDeskProfileResult(profile_v3_result=response.json()["result"])
+
+
+def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResult:
+    """Fetch extended details of the user's company."""
+    if botmydesk_user.access_token_expired():
+        refresh_session(botmydesk_user)
+        botmydesk_user.refresh_from_db()
+
+    # For now, always use the first company found.
+    profile = me_v3(botmydesk_user=botmydesk_user)
+
+    response = requests.get(
+        url=f"{settings.BOOKMYDESK_API_URL}/v3/companyExtended",
+        params={
+            "companyId": profile.company_id,
+        },
+        headers={
+            "User-Agent": settings.BOTMYDESK_USER_AGENT,
+            "Authorization": f"Bearer {botmydesk_user.access_token}",
+        },
+    )
+    bookmydesk_client_logger.info(
+        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+    )
+    bookmydesk_client_logger.debug(
+        "(%s) Response:\n%s", botmydesk_user.email, pformat(response.json(), indent=2)
+    )
+
+    if response.status_code != 200:
+        bookmydesk_client_logger.error(
+            f"FAILED to get own reservations (HTTP {response.status_code}): {response.content}"
+        )
+        raise BookMyDeskException(response.content)
+
+    return V3CompanyExtendedResult(response.json()['result']['company'])
 
 
 def list_reservations_v3(botmydesk_user: BotMyDeskUser, **override_parameters) -> dict:
@@ -195,6 +231,7 @@ def list_reservations_v3(botmydesk_user: BotMyDeskUser, **override_parameters) -
         )
         raise BookMyDeskException(response.content)
 
+    # @TODO: Convert to DTO
     return response.json()
 
 

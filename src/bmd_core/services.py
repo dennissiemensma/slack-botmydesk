@@ -272,7 +272,7 @@ def handle_slash_command_status(
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": "🤖",
+                        "text": "⚙️",
                     },
                     "value": "open_settings",
                 },
@@ -454,8 +454,8 @@ def handle_user_working_in_office_today(
         ).validate()
         return
 
-    # Worst-case
-    report_text = gettext("⚠️ No office reservation found for today")
+    # Worst-case.
+    report_text = gettext("⚠️ No office reservation found for this day")
 
     if reservations_result["result"]["items"]:
         for current in reservations_result["result"]["items"]:
@@ -513,10 +513,53 @@ def handle_user_working_externally_today(
     if not botmydesk_user.authorized_bot():
         return unauthorized_reply_shortcut(client, botmydesk_user)
 
-    message_to_user = gettext(
-        f"🚋 _You requested me to check you in for working externally._\n\n\nTODO"
-    )
-    _post_handle_report_update(client, botmydesk_user, message_to_user, **payload)
+    # Only when required/supported.
+    if not settings.BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME:
+        return client.web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=gettext("✋ Sorry, not supported at this time"),
+        ).validate()
+
+    try:
+        reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
+    except BookMyDeskException as error:
+        client.web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=gettext(
+                f"Sorry, an error occurred while requesting your reservations: ```{error}```"
+            ),
+        ).validate()
+        return
+
+    # Check whether we only need to check in.
+    # @TODO
+
+    # try:
+    #     company_extended_result = bmd_api_client.client.company_extended_v3(botmydesk_user)
+    # except BookMyDeskException as error:
+    #     return client.web_client.chat_postEphemeral(
+    #         channel=botmydesk_user.slack_user_id,
+    #         user=botmydesk_user.slack_user_id,
+    #         text=gettext(
+    #             f"Sorry, an error occurred while requesting company information: ```{error}```"
+    #         ),
+    #     ).validate()
+    #
+    # # Find "external" location.
+    # matches = [x for x in company_extended_result.locations() if x.name() == settings.BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME]
+    #
+    # if not matches:
+    #     raise AssertionError('Failed to find location for working externally')
+    #
+    # # First and only floor. Just find any seat available.
+    # seats = matches[0].maps()[0].seats()
+
+    # message_to_user = gettext(
+    #     f"🚋 _You requested me to check you in for working externally._\n\n\nTODO"
+    # )
+    # _post_handle_report_update(client, botmydesk_user, message_to_user, **payload)
 
     # @TODO: Implement
     client.web_client.chat_postEphemeral(

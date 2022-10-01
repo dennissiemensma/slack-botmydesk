@@ -5,7 +5,12 @@ from django.conf import settings
 from django.utils import timezone
 import requests
 
-from bmd_api_client.dto import V3BookMyDeskProfileResult, V3CompanyExtendedResult, TokenLoginResult
+from bmd_api_client.dto import (
+    V3BookMyDeskProfileResult,
+    V3CompanyExtendedResult,
+    TokenLoginResult,
+    V3ReservationsResult,
+)
 from bmd_api_client.exceptions import BookMyDeskException
 from bmd_core.models import BotMyDeskUser
 
@@ -185,10 +190,12 @@ def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResul
         )
         raise BookMyDeskException(response.content)
 
-    return V3CompanyExtendedResult(response.json()['result']['company'])
+    return V3CompanyExtendedResult(response.json()["result"]["company"])
 
 
-def list_reservations_v3(botmydesk_user: BotMyDeskUser, **override_parameters) -> dict:
+def list_reservations_v3(
+    botmydesk_user: BotMyDeskUser, **override_parameters
+) -> V3ReservationsResult:
     """Fetch reservations (for today by default). Any parameters given will overrule any defaults below."""
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
@@ -230,8 +237,7 @@ def list_reservations_v3(botmydesk_user: BotMyDeskUser, **override_parameters) -
         )
         raise BookMyDeskException(response.content)
 
-    # @TODO: Convert to DTO
-    return response.json()
+    return V3ReservationsResult(response.json()["result"])
 
 
 def reservation_check_in_out(

@@ -110,63 +110,43 @@ def handle_slash_command_list_reservations(
         result.validate()
         return
 
-    if not reservations_result["result"]["items"]:
-        reservations_text = gettext("_No reservations found (or too far away)..._")
-    else:
+    reservations_text = gettext("_No reservations found (or too far away)..._")
+
+    if reservations_result.reservations():
         reservations_text = ""
-        for current in reservations_result["result"]["items"]:
-            reservation_start = timezone.datetime.fromisoformat(current["dateStart"])
+
+        for current in reservations_result.reservations():
+            reservation_start = current.date_start()
             reservation_start_text = reservation_start.strftime("%A %-d %B")
             natural_time_until_start = humanize.naturaltime(reservation_start)
 
-            current_status = current["status"]
-            current_from = (
-                current["checkedInTime"]
-                if "checkedInTime" in current
-                else current["from"]
-            )
-            current_to = (
-                current["checkedOutTime"]
-                if "checkedOutTime" in current
-                else current["to"]
-            )
-            if current_status in ("checkedIn", "checkedOut", "cancelled", "expired"):
-                if current_status in ("cancelled", "expired"):
+            current_from = current.checked_in_time() or current.from_time()
+            current_to = current.checked_out_time() or current.to_time()
+
+            if current.status() in ("checkedIn", "checkedOut", "cancelled", "expired"):
+                if current.status() in ("cancelled", "expired"):
                     emoji = "❌ "
                 else:
                     emoji = "✔️"
 
                 reservations_text += gettext(
-                    f"\n\n\n{emoji} {reservation_start_text}: {current_from} to {current_to}\n_{current_status}_"
+                    f"\n\n\n{emoji} {reservation_start_text}: {current_from} to {current_to}\n_{current.status()}_"
                 )
                 continue
 
             # Skip weird ones.
-            if current_status != "reserved":
+            if current.status() != "reserved":
                 continue
 
             # Exclude visitors:
-            if current["type"] == "visitor":
+            if current.type() == "visitor":
                 continue
 
-            if (
-                current["seat"] is not None
-                and current["seat"]["map"]["name"] == "Extern"
-            ):
-                emoji = "🚋"
-                location = current["seat"]["map"]["name"]
-            elif current["seat"] is not None and current["type"] == "normal":
-                emoji = "🏢"
-                location = current["seat"]["map"]["name"]
-            elif current["seat"] is None and current["type"] == "home":
-                emoji = "🏡"
-                location = gettext("Home")
-            else:
-                emoji = "❓"
-                location = "❓"
+            emoji = current.emoji_shortcut()
+            location = current.location_name_shortcut()
 
             reservations_text += gettext(
-                f"\n\n\n{emoji} {reservation_start_text} from {current_from} to {current_to}\n_About {natural_time_until_start} at *{location}*_"
+                f"\n\n\n{emoji} {reservation_start_text} from {current_from} to {current_to}\n_In about {natural_time_until_start} at *{location}*_"
             )
 
     blocks = [
@@ -203,32 +183,34 @@ def handle_slash_command_status(
         return unauthorized_reply_shortcut(client, botmydesk_user)
 
     today_text = timezone.localtime(timezone.now()).strftime("%A %-d %B")
-    reservations_today_result = bmd_api_client.client.list_reservations_v3(
-        botmydesk_user
-    )
+    reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
     reservation_count = 0  # Omits ignored ones below
     has_home_reservation = has_office_reservation = has_external_reservation = False
     checked_in = checked_out = False
     reservation_start = reservation_end = None
 
     # Very shallow assertions.
-    for current in reservations_today_result["result"]["items"]:
-        if current["type"] == "visitor":
+    for current in reservations_result.reservations():
+        if current.type() == "visitor":
             continue
 
         reservation_count += 1
-        reservation_start = current["from"]
-        reservation_end = current["to"]
+        reservation_start = current.from_time()
+        reservation_end = current.to_time()
 
-        if current["seat"] is not None and current["seat"]["map"]["name"] == "Extern":
+        if (
+            current.seat() is not None
+            and current.seat().map_name()
+            == settings.BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME
+        ):
             has_external_reservation = True
-            checked_in = current["status"] == "checkedIn"
-            checked_out = current["status"] == "checkedOut"
-        elif current["seat"] is not None and current["type"] == "normal":
+            checked_in = current.status() == "checkedIn"
+            checked_out = current.status() == "checkedOut"
+        elif current.seat() is not None and current.type() == "normal":
             has_office_reservation = True
-            checked_in = current["status"] == "checkedIn"
-            checked_out = current["status"] == "checkedOut"
-        elif current["seat"] is None and current["type"] == "home":
+            checked_in = current.status() == "checkedIn"
+            checked_out = current.status() == "checkedOut"
+        elif current.seat() is None and current.type() == "home":
             has_home_reservation = True
 
     if has_home_reservation:
@@ -244,7 +226,7 @@ def handle_slash_command_status(
             f"🚋 You have an *external reservation* outside home/office for {today_text} ({reservation_start} - {reservation_end})"
         )
     else:
-        reservation_text = gettext(f"❌ You have *no reservation* yet for {today_text}")
+        reservation_text = gettext(f"You have *no reservation* yet for {today_text}")
 
     # Edge-cases, for those wanting to see the world burn.
     if reservation_count > 1:
@@ -273,7 +255,7 @@ def handle_slash_command_status(
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": "⚙️",
+                        "text": gettext("⚙️Preferences"),
                     },
                     "value": "open_settings",
                 },
@@ -425,7 +407,7 @@ def handle_user_working_home_today(
         return unauthorized_reply_shortcut(client, botmydesk_user)
 
     message_to_user = gettext(
-        f"🏡 _You requested me to book you for working at home._\n\n\nTODO"
+        "🏡 _You requested me to book you for working at home._\n\n\nTODO"
     )
     _post_handle_report_update(client, botmydesk_user, message_to_user, **payload)
 
@@ -456,34 +438,35 @@ def handle_user_working_in_office_today(
         return
 
     # Worst-case.
-    report_text = gettext("⚠️ No office reservation found for this day")
+    report_text = gettext(
+        "⚠️ No office reservation found for this day. Please book an office seat and check-in anyway."
+    )
 
-    if reservations_result["result"]["items"]:
-        for current in reservations_result["result"]["items"]:
+    if reservations_result.reservations():
+        for current in reservations_result.reservations():
             # Ignore everything we're not interested in. E.g. visitors or home reservations.
-            if current["seat"] is None or current["type"] != "normal":
+            if current.seat() is None or current.type() != "normal":
                 continue
 
-            location = current["seat"]["map"]["name"]
-            current_reservation_id = current["id"]
-            current_status = current["status"]
+            location = current.seat().map_name()
+            current_reservation_id = current.id()
 
             # The logic below just assumes a single reservation. We may or may not want to have it compatible
             # with multiple items in the future (which is way more code than it currently already is).
 
-            if current_status == "checkedIn":
+            if current.status() == "checkedIn":
                 report_text = gettext(
                     "✔️ _I left it as-is, since you're already *checked in.*_"
                 )
                 break
 
-            if current_status == "checkedOut":
+            if current.status() == "checkedOut":
                 report_text = gettext(
                     "⚠️ _I did nothing, as you seem to be *checked out* already?_"
                 )
                 break
 
-            if current_status == "reserved":
+            if current.status() == "reserved":
                 try:
                     bmd_api_client.client.reservation_check_in_out(
                         botmydesk_user, current_reservation_id, check_in=True
@@ -536,6 +519,7 @@ def handle_user_working_externally_today(
 
     # Check whether we only need to check in.
     # @TODO
+    reservations_result
 
     # try:
     #     company_extended_result = bmd_api_client.client.company_extended_v3(botmydesk_user)
@@ -590,41 +574,24 @@ def handle_user_not_working_today(
         return
 
     # Create a report per reservation.
-    if not reservations_result["result"]["items"]:
-        report_text = gettext("✔️ No reservations found")
-    else:
-        report_text = ""
-        for current in reservations_result["result"]["items"]:
-            if (
-                current["seat"] is not None
-                and current["seat"]["map"]["name"] == "Extern"
-            ):
-                location = current["seat"]["map"]["name"]
-            elif current["seat"] is not None and current["type"] == "normal":
-                location = current["seat"]["map"]["name"]
-            elif current["seat"] is None and current["type"] == "home":
-                location = gettext("Home")
-            else:
-                location = "❓"
+    report_text = gettext("✔️ No reservations found anyway")
 
-            current_reservation_id = current["id"]
-            current_status = current["status"]
-            current_from = (
-                current["checkedInTime"]
-                if "checkedInTime" in current
-                else current["from"]
-            )
-            current_to = (
-                current["checkedOutTime"]
-                if "checkedOutTime" in current
-                else current["to"]
-            )
+    if reservations_result.reservations():
+        report_text = ""
+
+        for current in reservations_result.reservations():
+            location = current.location_name_shortcut()
+
+            current_reservation_id = current.id()
+            current_status = current.status()
+            current_from = current.checked_in_time() or current.from_time()
+            current_to = current.checked_out_time() or current.to_time()
             current_reservation_text = gettext(
                 f"\n\n\n• *{current_from} to {current_to}* (*{location}*)"
             )
 
             # Exclude visitors:
-            if current["type"] == "visitor":
+            if current.type() == "visitor":
                 continue
 
             # Do not touch these.
@@ -632,7 +599,7 @@ def handle_user_not_working_today(
                 report_text += gettext(
                     f"{current_reservation_text}\n\t\t ✔️ _I left it as-is ({current_status})_"
                 )
-            # Just check out
+            # Just check out.
             elif current_status in ("checkedIn",):
                 try:
                     bmd_api_client.client.reservation_check_in_out(
@@ -720,5 +687,5 @@ def unauthorized_reply_shortcut(
     client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=gettext(f"✋ Sorry, you will need to connect me first."),
+        text=gettext("✋ Sorry, you will need to connect me first."),
     ).validate()

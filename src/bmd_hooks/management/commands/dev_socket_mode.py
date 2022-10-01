@@ -2,7 +2,6 @@ from pprint import pformat
 import traceback
 import logging
 
-from slack_sdk.web import WebClient
 from slack_sdk.socket_mode import SocketModeClient
 from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.socket_mode.request import SocketModeRequest
@@ -13,7 +12,7 @@ from django.conf import settings
 
 import bmd_slashcmd.services
 import bmd_core.services
-
+import bmd_hooks.services
 
 console_commands_logger = logging.getLogger("console_commands")
 botmydesk_logger = logging.getLogger("botmydesk")
@@ -32,13 +31,7 @@ class Command(BaseCommand):
         run_with_reloader(self._run)
 
     def _run(self):
-        # Initialize SocketModeClient with an app-level token + WebClient
-        socket_mode_client = SocketModeClient(
-            # This app-level token will be used only for establishing a connection
-            app_token=settings.SLACK_APP_TOKEN,  # xapp-A111-222-xyz
-            # You will be using this WebClient for performing Web API calls in listeners
-            web_client=WebClient(token=settings.SLACK_BOT_TOKEN),  # xoxb-111-222-xyz
-        )
+        socket_mode_client = bmd_hooks.services.slack_socket_mode_client()
 
         def process(socket_mode_client: SocketModeClient, req: SocketModeRequest):
             try:  # Ugly workaround, since exceptions seem to be silent otherwise.

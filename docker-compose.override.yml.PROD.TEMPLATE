@@ -10,6 +10,8 @@ services:
       - prod_web
     volumes:
      - gunicorn-socket:/run/gunicorn/
+    env_file:
+      - .env
     environment:
       - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
 

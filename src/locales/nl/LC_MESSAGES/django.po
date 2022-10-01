@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-27 19:55+0000\n"
+"POT-Creation-Date: 2022-10-01 13:58+0000\n"
 "PO-Revision-Date: 2022-08-23 23:02+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
@@ -182,7 +182,7 @@ msgstr ""
 msgid ""
 "❌ You're not working today or you're already done.\n"
 "\n"
-"I will cancel your pending reservations for today (if any).\n"
+"I will delete your pending reservations for today (if any).\n"
 "Also, if you were already checked in, I'll check you out now."
 msgstr ""
 "❌ *Niet aan het werk*\n"
@@ -201,7 +201,7 @@ msgstr "Sorry, nog niet werkend 🧑‍💻"
 
 #, fuzzy
 #| msgid "_No reservations found (or too far away)..._"
-msgid "⚠️ No office reservation found for today"
+msgid "⚠️ No office reservation found for this day"
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
 
 msgid "✔️ _I left it as-is, since you're already *checked in.*_"
@@ -231,11 +231,7 @@ msgid ""
 "{report_text}"
 msgstr ""
 
-msgid ""
-"🚋 _You requested me to check you in for working externally._\n"
-"\n"
-"\n"
-"TODO"
+msgid "✋ Sorry, not supported at this time"
 msgstr ""
 
 #, fuzzy
@@ -290,16 +286,19 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "❌ _You requested me to clear your reservations._ {report_text}"
+msgid ""
+"❌ _You requested me to clear your reservations._\n"
+"\n"
+"\n"
+"{report_text}"
 msgstr ""
 
 #, python-brace-format
 msgid "{today_text} update"
 msgstr ""
 
-#, python-brace-format
-msgid "✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-msgstr "✋ Sorry, je zult me eerst moeten koppelen. Zie `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
+msgid "✋ Sorry, you will need to connect me first."
+msgstr ""
 
 msgid "Unexpected error"
 msgstr "Onverwachte fout"
@@ -340,9 +339,14 @@ msgid ""
 "\n"
 msgstr ""
 
-#, python-brace-format
-msgid "*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
-msgstr "*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
+#, fuzzy, python-brace-format
+#| msgid ""
+#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+#| "\n"
+msgid "*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* \n"
+msgstr ""
+"*`{settings.SLACK_SLASHCOMMAND_BMD}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+"\n"
 
 msgid ""
 "_List your upcoming reservations (e.g. coming days)._\n"
@@ -367,9 +371,14 @@ msgstr ""
 "*Je kunt deze commando's op elk moment gebruiken, zonder eerst te wachten voor een notificatie van mij:*\n"
 "\n"
 
-#, python-brace-format
-msgid "🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
-msgstr "🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
+#, fuzzy, python-brace-format
+#| msgid ""
+#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+#| "\n"
+msgid "🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* \n"
+msgstr ""
+"*`{settings.SLACK_SLASHCOMMAND_BMD}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+"\n"
 
 msgid ""
 "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n"
@@ -380,9 +389,14 @@ msgstr ""
 "\n"
 "\n"
 
-#, python-brace-format
-msgid "🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
-msgstr "🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
+#, fuzzy, python-brace-format
+#| msgid ""
+#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+#| "\n"
+msgid "🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`*\n"
+msgstr ""
+"*`{settings.SLACK_SLASHCOMMAND_BMD}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+"\n"
 
 #, fuzzy
 #| msgid ""
@@ -398,9 +412,14 @@ msgstr ""
 "\n"
 "\n"
 
-#, python-brace-format
-msgid "🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
-msgstr "🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
+#, fuzzy, python-brace-format
+#| msgid ""
+#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+#| "\n"
+msgid "🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* \n"
+msgstr ""
+"*`{settings.SLACK_SLASHCOMMAND_BMD}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+"\n"
 
 #, fuzzy
 #| msgid ""
@@ -416,9 +435,14 @@ msgstr ""
 "\n"
 "\n"
 
-#, python-brace-format
-msgid "❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
-msgstr "❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
+#, fuzzy, python-brace-format
+#| msgid ""
+#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+#| "\n"
+msgid "❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* \n"
+msgstr ""
+"*`{settings.SLACK_SLASHCOMMAND_BMD}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
+"\n"
 
 #, fuzzy
 #| msgid ""
@@ -465,9 +489,13 @@ msgstr "Om te beginnen zul je me toegang moeten geven tot je BookMyDesk-account,
 msgid "Connect"
 msgstr "Koppel"
 
-#, python-brace-format
+#, fuzzy, python-brace-format
+#| msgid ""
+#| "Request BookMyDesk login code for *{botmydesk_user.email}*?\n"
+#| "\n"
+#| "_You can enter it on the next screen._"
 msgid ""
-"Request BookMyDesk login code for *{botmydesk_user.email}*?\n"
+"Request BookMyDesk login code by email for *{botmydesk_user.email}*?\n"
 "\n"
 "_You can enter it on the next screen._"
 msgstr ""
@@ -475,7 +503,9 @@ msgstr ""
 "\n"
 "_Je kunt deze op het volgende scherm invoeren._"
 
-msgid "Yes, send it"
+#, fuzzy
+#| msgid "Yes, send it"
+msgid "Yes, email it"
 msgstr "Ja, verstuur"
 
 msgid "No, hold on"
@@ -528,10 +558,15 @@ msgstr ""
 msgid "Disconnect BotMyDesk"
 msgstr "Ontkoppel BotMyDesk"
 
+#, fuzzy
+#| msgid ""
+#| "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n"
+#| "\n"
+#| "*Revoke my access to your account in BookMyDesk?*"
 msgid ""
 "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n"
 "\n"
-"*Revoke my access to your account in BookMyDesk?*"
+"*Disconnect me from your account in BookMyDesk?*"
 msgstr ""
 "Dit ontkoppelt met van je BookMyDesk-account en zal je niet meer lastig vallen.\n"
 "\n"
@@ -562,7 +597,7 @@ msgstr "BotMyDesk ontkoppeld"
 #| "\n"
 #| "Bye! 👋"
 msgid ""
-"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}` again.\n"
+"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n"
 "\n"
 "Bye! 👋"
 msgstr ""
@@ -573,7 +608,9 @@ msgstr ""
 msgid "Error validating your login code. You can try it another time or restart this flow to have a new code sent to you."
 msgstr "Fout bij het valideren van je logincode. Je kunt het nogmaals proberen of deze flow opnieuw doorlopen om een nieuwe code te ontvangen."
 
-msgid "BotMyDesk connected!"
+#, fuzzy
+#| msgid "BotMyDesk connected!"
+msgid "BotMyDesk connected"
 msgstr "BotMyDesk gekoppeld!"
 
 #, python-brace-format
@@ -585,3 +622,27 @@ msgstr ""
 "Yes! Je hebt me gekoppeld aan je BookMyDesk-account 👏\n"
 "\n"
 "Ik geef nu een opsomming van alle commando's die je kunt gebruiken, vergelijkbaar wanneer je *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`* typt"
+
+#, python-brace-format
+#~ msgid "✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
+#~ msgstr "✋ Sorry, je zult me eerst moeten koppelen. Zie `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
+
+#, python-brace-format
+#~ msgid "*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
+#~ msgstr "*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
+
+#, python-brace-format
+#~ msgid "🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
+#~ msgstr "🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
+
+#, python-brace-format
+#~ msgid "🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
+#~ msgstr "🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
+
+#, python-brace-format
+#~ msgid "🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
+#~ msgstr "🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
+
+#, python-brace-format
+#~ msgid "❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
+#~ msgstr "❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"

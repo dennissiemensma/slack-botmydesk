@@ -95,7 +95,8 @@ def handle_slash_command_list_reservations(
             botmydesk_user,
             **{
                 "from": start.date(),
-                "to": (start + timezone.timedelta(days=7)).date(),
+                "to": (start + timezone.timedelta(days=28)).date(),
+                "take": 3,
             },
         )
     except BookMyDeskException as error:
@@ -666,7 +667,7 @@ def handle_user_not_working_today(
                 )
 
     message_to_user = gettext(
-        f"❌ _You requested me to clear your reservations._ {report_text}"
+        f"❌ _You requested me to clear your reservations._\n\n\n{report_text}"
     )
     _post_handle_report_update(client, botmydesk_user, message_to_user, **payload)
 

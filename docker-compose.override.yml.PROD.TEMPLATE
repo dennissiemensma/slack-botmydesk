@@ -6,7 +6,6 @@ services:
       target: prod-app
       args:
         - BUILD_GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
-    command: sleep 1000
     depends_on:
       - prod_web
     volumes:

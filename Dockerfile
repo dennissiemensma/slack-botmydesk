@@ -20,24 +20,29 @@ RUN python3 -m venv $VIRTUAL_ENV
 # Credits to: https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-COPY poetry.lock pyproject.toml /code/
-RUN python3 -m pip install --upgrade pip && \
-    pip3 install poetry && \
-    poetry install --no-dev
+RUN python3 -m pip install --upgrade pip && pip3 install poetry
+COPY ./poetry.lock ./pyproject.toml /code/
 
 
 
+### Production.
+FROM base-app AS prod-app
+ARG BUILD_GUNICORN_SOCKET
+ENV GUNICORN_SOCKET=$BUILD_GUNICORN_SOCKET
+
+COPY src/ poetry.lock pyproject.toml /code/
+RUN poetry install --only main
+
+#ENTRYPOINT poetry run gunicorn --bind unix:$BUILD_GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
+ENTRYPOINT poetry run gunicorn --log-level debug --bind unix:$GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
+
+
+
+### Development.
 FROM base-app AS dev-app
 
-RUN poetry install
-RUN rm /code/poetry.lock /code/pyproject.toml
-#ENTRYPOINT @TODO script
+RUN poetry install ; \
+    rm /code/poetry.lock /code/pyproject.toml
 
-
-
-FROM base-app AS prod-app
-
-RUN rm /code/poetry.lock /code/pyproject.toml
-COPY src/ /code/
-#ENTRYPOINT @TODO script
-#ENTRYPOINT poetry run gunicorn --timeout 10 --workers 4 --max-requests 100 --bind 127.0.0.1:8080 botmydesk.wsgi
+#ENTRYPOINT poetry run /code/manage.py dev_socket_mode
+#ENTRYPOINT poetry run /code/manage.py runserver 0.0.0.0:8000

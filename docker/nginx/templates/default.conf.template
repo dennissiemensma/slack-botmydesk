@@ -1,0 +1,17 @@
+upstream gunicorn_server {
+    server unix://${GUNICORN_SOCKET} fail_timeout=0;
+}
+
+server {
+#    listen 443 http2;
+    listen 80;
+
+    location / {
+        proxy_pass http://gunicorn_server;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+
+    # No static file hosting required, yet.
+}

@@ -48,6 +48,7 @@ You should now see a _"Bot User OAuth Token"_ there. Save it and set it (later) 
 
 ----
 
+
 ## Installation
 ### (Local) development
 Install poetry, e.g.:
@@ -74,7 +75,7 @@ docker-compose up -d
 
 #### Translations
 - Currently supported: `en`, `nl`
-- Did you change strings? Generate PO file using all translation tags/strings in codebase.:
+- Did you change strings? Generate PO file using all translation tags/strings in codebase:
 ```shell
 ./manage.py makemessages --no-wrap --no-location --locale nl 
 ```
@@ -84,15 +85,30 @@ docker-compose up -d
 
 ### Production/deploy
 
-```@TODO: Finish when deploying to prod server.```
+- Checkout the code base
+- Install Docker/Docker-compose
+- Run:
 ```shell
 cp docker-compose.override.yml.PROD.TEMPLATE docker-compose.override.yml
 
-# Either load your .env on your server or use real env vars. Either way see the env template for what you need.
+# Load your .env on your server or use real env vars. 
+# Either way, see the env template for what you need.
 cp .env.TEMPLATE .env
 ```
 
-Make sure to run database migrations before running:
+- Build images:
 ```shell
-./manage.py migrate
+docker-compose build
 ```
+
+- Before each deploy, make sure to run database migrations first:
+```shell
+docker-compose -f docker-compose.override.yml exec web python manage.py migrate --noinput
+```
+
+- Run:
+```shell
+docker-compose up -d
+```
+
+- Whatever hostname or public URLs you are using for incoming Slack requests, make sure to update your Bot settings in Slack accordingly.

@@ -33,14 +33,14 @@ class Command(BaseCommand):
 
     def _run(self):
         # Initialize SocketModeClient with an app-level token + WebClient
-        client = SocketModeClient(
+        socket_mode_client = SocketModeClient(
             # This app-level token will be used only for establishing a connection
             app_token=settings.SLACK_APP_TOKEN,  # xapp-A111-222-xyz
             # You will be using this WebClient for performing Web API calls in listeners
             web_client=WebClient(token=settings.SLACK_BOT_TOKEN),  # xoxb-111-222-xyz
         )
 
-        def process(client: SocketModeClient, req: SocketModeRequest):
+        def process(socket_mode_client: SocketModeClient, req: SocketModeRequest):
             try:  # Ugly workaround, since exceptions seem to be silent otherwise.
                 payload_dump = pformat(req.payload, indent=4)
                 botmydesk_logger.debug(
@@ -48,21 +48,21 @@ class Command(BaseCommand):
                 )
 
                 if req.type == "slash_commands":
-                    self._handle_slash_commands(client, req)
+                    self._handle_slash_commands(socket_mode_client, req)
                 if req.type == "interactive":
-                    self._handle_interactivity(client, req)
+                    self._handle_interactivity(socket_mode_client, req)
             except Exception as error:
                 console_commands_logger.exception(error)
                 raise
 
         # Add a new listener to receive messages from Slack
         # You can add more listeners like this
-        client.socket_mode_request_listeners.append(process)
+        socket_mode_client.socket_mode_request_listeners.append(process)
         # Establish a WebSocket connection to the Socket Mode servers
-        client.connect()
+        socket_mode_client.connect()
 
         # # Set as active.
-        # client.web_client.users_setPresence(presence='auto').validate()
+        # web_client.users_setPresence(presence='auto').validate()
 
         # Just not to stop this process
         from threading import Event
@@ -72,33 +72,39 @@ class Command(BaseCommand):
         )
         Event().wait()
 
-    def _handle_slash_commands(self, client: SocketModeClient, req: SocketModeRequest):
+    def _handle_slash_commands(
+        self, socket_mode_client: SocketModeClient, req: SocketModeRequest
+    ):
         user_id = req.payload["user_id"]
         botmydesk_user = bmd_core.services.get_botmydesk_user(
-            client, slack_user_id=user_id
+            socket_mode_client.web_client, slack_user_id=user_id
         )
 
         # Ack first (Slack timeout @ 3s).
-        client.send_socket_mode_response(
+        socket_mode_client.send_socket_mode_response(
             SocketModeResponse(envelope_id=req.envelope_id)
         )
 
         try:
-            bmd_slashcmd.services.on_slash_command(client, botmydesk_user, req.payload)
+            bmd_slashcmd.services.on_slash_command(
+                socket_mode_client.web_client, botmydesk_user, req.payload
+            )
         except Exception as error:
-            self._on_error(client, user_id, error)
+            self._on_error(socket_mode_client, user_id, error)
             return
 
-    def _handle_interactivity(self, client: SocketModeClient, req: SocketModeRequest):
+    def _handle_interactivity(
+        self, socket_mode_client: SocketModeClient, req: SocketModeRequest
+    ):
         user_id = req.payload["user"]["id"]
         botmydesk_user = bmd_core.services.get_botmydesk_user(
-            client, slack_user_id=user_id
+            socket_mode_client.web_client, slack_user_id=user_id
         )
 
         # Respond to view UX.
         if req.payload["type"] == "block_actions":
             # Ack first (Slack timeout @ 3s).
-            client.send_socket_mode_response(
+            socket_mode_client.send_socket_mode_response(
                 SocketModeResponse(envelope_id=req.envelope_id)
             )
 
@@ -106,11 +112,14 @@ class Command(BaseCommand):
                 try:
                     (
                         bmd_slashcmd.services.on_interactive_block_action(
-                            client, botmydesk_user, current, **req.payload
+                            socket_mode_client.web_client,
+                            botmydesk_user,
+                            current,
+                            **req.payload,
                         )
                     )
                 except Exception as error:
-                    self._on_error(client, user_id, error)
+                    self._on_error(socket_mode_client, user_id, error)
                     return
 
         # Respond to submits.
@@ -119,34 +128,36 @@ class Command(BaseCommand):
 
             try:
                 response_payload = bmd_slashcmd.services.on_interactive_view_submission(
-                    client, botmydesk_user, req.payload
+                    socket_mode_client.web_client, botmydesk_user, req.payload
                 )
             except Exception as error:
-                self._on_error(client, user_id, error)
+                self._on_error(socket_mode_client, user_id, error)
                 return
 
             # Conditional response. E.g. for closing modal dialogs or form errors.
             if response_payload is not None:
                 botmydesk_logger.debug(f"Sending response payload: {response_payload}")
-                client.send_socket_mode_response(
+                socket_mode_client.send_socket_mode_response(
                     SocketModeResponse(
                         envelope_id=req.envelope_id, payload=response_payload
                     )
                 )
             else:
                 # Just ACK
-                client.send_socket_mode_response(
+                socket_mode_client.send_socket_mode_response(
                     SocketModeResponse(envelope_id=req.envelope_id)
                 )
 
-    def _on_error(self, client: SocketModeClient, slack_user_id: str, error: Exception):
+    def _on_error(
+        self, socket_mode_client: SocketModeClient, slack_user_id: str, error: Exception
+    ):
         error_trace = "\n".join(traceback.format_exc().splitlines())
         console_commands_logger.error(
             f"{slack_user_id}: Unexpected error: {error} ({error.__class__})\n{error_trace}"
         )
 
         title = gettext("Unexpected error")
-        client.web_client.chat_postEphemeral(
+        socket_mode_client.web_client.chat_postEphemeral(
             channel=slack_user_id,
             user=slack_user_id,
             text=title,

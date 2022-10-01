@@ -6,7 +6,7 @@ from typing import Optional
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext
-from slack_sdk.socket_mode import SocketModeClient
+from slack_sdk.web import WebClient
 
 from bmd_api_client.exceptions import BookMyDeskException
 from bmd_core.models import BotMyDeskUser
@@ -18,7 +18,7 @@ botmydesk_logger = logging.getLogger("botmydesk")
 
 
 def on_slash_command(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, payload: dict
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, payload: dict
 ):
     """Pass me your slash command payload to map."""
     command = payload["command"]
@@ -33,11 +33,11 @@ def on_slash_command(
     except KeyError:
         raise NotImplementedError(f"Slash command unknown or misconfigured: {command}")
 
-    service_module(client, botmydesk_user, **payload)
+    service_module(web_client, botmydesk_user, **payload)
 
 
 def handle_slash_command(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, text, **payload
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, text, **payload
 ):
     """Called on generic slash command."""
     botmydesk_logger.debug(
@@ -61,21 +61,23 @@ def handle_slash_command(
             }[text.strip()]
         except KeyError:
             # Help when unknown sub.
-            handle_slash_command_help(client, botmydesk_user, **payload)
+            handle_slash_command_help(web_client, botmydesk_user, **payload)
         else:
-            sub_command_module(client, botmydesk_user, **payload)
+            sub_command_module(web_client, botmydesk_user, **payload)
 
         return
 
     # Status or settings when no parameters given.
     if botmydesk_user.authorized_bot():
-        bmd_core.services.handle_slash_command_status(client, botmydesk_user, **payload)
+        bmd_core.services.handle_slash_command_status(
+            web_client, botmydesk_user, **payload
+        )
     else:
-        handle_slash_command_settings(client, botmydesk_user, **payload)
+        handle_slash_command_settings(web_client, botmydesk_user, **payload)
 
 
 def handle_slash_command_help(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     help_text = ""
 
@@ -154,7 +156,7 @@ def handle_slash_command_help(
         },
     ]
 
-    result = client.web_client.chat_postEphemeral(
+    result = web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=gettext("BotMyDesk help"),
@@ -164,7 +166,7 @@ def handle_slash_command_help(
 
 
 def handle_slash_command_settings(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     """Modal settings."""
 
@@ -256,9 +258,7 @@ def handle_slash_command_settings(
             ],
         }
         # @see https://app.slack.com/block-kit-builder/
-        result = client.web_client.views_open(
-            trigger_id=payload["trigger_id"], view=view_data
-        )
+        result = web_client.views_open(trigger_id=payload["trigger_id"], view=view_data)
         result.validate()
         return
 
@@ -283,7 +283,7 @@ def handle_slash_command_settings(
         ],
     }
     # @see https://app.slack.com/block-kit-builder/
-    initial_view_result = client.web_client.views_open(
+    initial_view_result = web_client.views_open(
         trigger_id=payload["trigger_id"], view=view_data
     )
     initial_view_result.validate()
@@ -434,7 +434,7 @@ def handle_slash_command_settings(
         ],
     }
     # @see https://api.slack.com/surfaces/modals/using#updating_apis
-    update_result = client.web_client.views_update(
+    update_result = web_client.views_update(
         view_id=initial_view_result["view"]["id"],
         hash=initial_view_result["view"]["hash"],
         view=view_data,
@@ -443,7 +443,7 @@ def handle_slash_command_settings(
 
 
 def on_interactive_block_action(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, action: dict, **payload
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, action: dict, **payload
 ):
     """Respond to user (inter)actions. Some are follow-ups, some are aliases."""
     action_value = action["value"]
@@ -468,11 +468,11 @@ def on_interactive_block_action(
             f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive block action unknown or misconfigured: {action_value}"
         )
 
-    service_module(client, botmydesk_user, **payload)
+    service_module(web_client, botmydesk_user, **payload)
 
 
 def handle_interactive_send_bookmydesk_login_code(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     botmydesk_logger.debug(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Rendering login code form"
@@ -518,7 +518,7 @@ def handle_interactive_send_bookmydesk_login_code(
     }
 
     # @see https://api.slack.com/surfaces/modals/using#updating_apis
-    result = client.web_client.views_update(
+    result = web_client.views_update(
         view_id=payload["view"]["id"],
         hash=payload["view"]["hash"],
         view=view_data,
@@ -533,7 +533,7 @@ def handle_interactive_send_bookmydesk_login_code(
 
 
 def handle_interactive_bmd_revoke_botmydesk(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
 ):
     botmydesk_logger.debug(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Revoking bot access, ending BookMyDesk session"
@@ -559,7 +559,7 @@ def handle_interactive_bmd_revoke_botmydesk(
         ],
     }
     # @see https://api.slack.com/surfaces/modals/using#updating_apis
-    result = client.web_client.views_update(
+    result = web_client.views_update(
         view_id=payload["view"]["id"],
         hash=payload["view"]["hash"],
         view=view_data,
@@ -576,7 +576,7 @@ def handle_interactive_bmd_revoke_botmydesk(
     botmydesk_user.clear_tokens()
 
     title = gettext("BotMyDesk disconnected")
-    client.web_client.chat_postMessage(
+    web_client.chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=title,
@@ -602,7 +602,7 @@ def handle_interactive_bmd_revoke_botmydesk(
 
 
 def on_interactive_view_submission(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, payload: dict
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, payload: dict
 ) -> Optional[dict]:
     """Respond to user (inter)actions."""
     view_callback_id = payload["view"]["callback_id"]
@@ -619,11 +619,11 @@ def on_interactive_view_submission(
             f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive view submission unknown or misconfigured: {view_callback_id}"
         )
 
-    return service_module(client, botmydesk_user, **payload)
+    return service_module(web_client, botmydesk_user, **payload)
 
 
 def handle_interactive_bmd_authorize_login_code_submit(
-    client: SocketModeClient, botmydesk_user: BotMyDeskUser, **payload
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
 ) -> Optional[dict]:
     botmydesk_logger.info(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Authorizing credentials entered for user"
@@ -658,7 +658,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
     )
 
     title = gettext("BotMyDesk connected")
-    client.web_client.chat_postMessage(
+    web_client.chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=title,
@@ -686,6 +686,6 @@ def handle_interactive_bmd_authorize_login_code_submit(
     time.sleep(0.5)
 
     # Just display the default help info.
-    handle_slash_command_help(client, botmydesk_user)
+    handle_slash_command_help(web_client, botmydesk_user)
 
     return {"response_action": "clear"}

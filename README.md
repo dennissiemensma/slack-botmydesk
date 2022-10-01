@@ -103,7 +103,7 @@ docker-compose build
 
 - Before each deploy, make sure to run database migrations first:
 ```shell
-docker-compose -f docker-compose.override.yml exec web python manage.py migrate --noinput
+docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.py migrate --noinput
 ```
 
 - Run:

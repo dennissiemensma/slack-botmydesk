@@ -12,7 +12,6 @@ services:
      - gunicorn-socket:/run/gunicorn/
     environment:
       - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
-      - DJANGO_ALLOWED_HOST=localhost
 
   prod_web:
     image: nginx

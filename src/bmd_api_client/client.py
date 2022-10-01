@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 import requests
 
-from bmd_api_client.dto import V3BookMyDeskProfileResult, V3CompanyExtendedResult
+from bmd_api_client.dto import V3BookMyDeskProfileResult, V3CompanyExtendedResult, TokenLoginResult
 from bmd_api_client.exceptions import BookMyDeskException
 from bmd_core.models import BotMyDeskUser
 
@@ -34,7 +34,7 @@ def request_login_code(email: str):
         raise BookMyDeskException(response.content)
 
 
-def token_login(username: str, otp: str) -> dict:
+def token_login(username: str, otp: str) -> TokenLoginResult:
     """Login with OTP and fetch access/refresh tokens."""
     response = requests.post(
         url=f"{settings.BOOKMYDESK_API_URL}/token",
@@ -61,8 +61,7 @@ def token_login(username: str, otp: str) -> dict:
         )
         raise BookMyDeskException(response.content)
 
-    # @TODO: DTO
-    return response.json()
+    return TokenLoginResult(response.json())
 
 
 def logout(botmydesk_user: BotMyDeskUser):
@@ -151,7 +150,7 @@ def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
         )
         raise BookMyDeskException(response.content)
 
-    return V3BookMyDeskProfileResult(profile_v3_result=response.json()["result"])
+    return V3BookMyDeskProfileResult(response.json()["result"])
 
 
 def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResult:
@@ -166,7 +165,7 @@ def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResul
     response = requests.get(
         url=f"{settings.BOOKMYDESK_API_URL}/v3/companyExtended",
         params={
-            "companyId": profile.company_id,
+            "companyId": profile.first_company_id(),
         },
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
@@ -200,7 +199,7 @@ def list_reservations_v3(botmydesk_user: BotMyDeskUser, **override_parameters) -
 
     today = timezone.localtime(timezone.now())
     parameters = {
-        "companyId": profile.company_id,
+        "companyId": profile.first_company_id(),
         "includeAnonymous": "true",
         "from": today.date(),
         "to": (

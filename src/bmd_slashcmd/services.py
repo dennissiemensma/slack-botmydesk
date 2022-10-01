@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 from typing import Optional
 
 from django.conf import settings
@@ -226,12 +227,12 @@ def handle_slash_command_settings(
                                 "text": {
                                     "type": "mrkdwn",
                                     "text": gettext(
-                                        f"Request BookMyDesk login code for *{botmydesk_user.email}*?\n\n_You can enter it on the next screen._"
+                                        f"Request BookMyDesk login code by email for *{botmydesk_user.email}*?\n\n_You can enter it on the next screen._"
                                     ),
                                 },
                                 "confirm": {
                                     "type": "plain_text",
-                                    "text": gettext("Yes, send it"),
+                                    "text": gettext("Yes, email it"),
                                 },
                                 "deny": {
                                     "type": "plain_text",
@@ -286,7 +287,7 @@ def handle_slash_command_settings(
         trigger_id=payload["trigger_id"], view=view_data
     )
     initial_view_result.validate()
-    full_name = f"{profile.first_name} {profile.infix} {profile.last_name}"
+    full_name = f"{profile.first_name()} {profile.infix()} {profile.last_name()}"
     full_name = re.sub(" +", " ", full_name)
 
     # Now perform slow calls. Fetch options. @TODO implement
@@ -414,7 +415,7 @@ def handle_slash_command_settings(
                             "text": {
                                 "type": "mrkdwn",
                                 "text": gettext(
-                                    "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n\n*Revoke my access to your account in BookMyDesk?*"
+                                    "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n\n*Disconnect me from your account in BookMyDesk?*"
                                 ),
                             },
                             "confirm": {
@@ -551,7 +552,7 @@ def handle_interactive_bmd_revoke_botmydesk(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}` again.\n\nBye! 👋"
+                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n\nBye! 👋"
                     ),
                 },
             },
@@ -573,6 +574,31 @@ def handle_interactive_bmd_revoke_botmydesk(
 
     # Clear session data. For now, we're not deleting the user to keep their preferences.
     botmydesk_user.clear_tokens()
+
+    title = gettext("BotMyDesk disconnected")
+    client.web_client.chat_postMessage(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text=title,
+        blocks=[
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": title,
+                },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": gettext(
+                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n\nBye! 👋"
+                    ),
+                },
+            },
+        ],
+    ).validate()
 
 
 def on_interactive_view_submission(
@@ -608,7 +634,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
     ]
 
     try:
-        json_response = bmd_api_client.client.token_login(
+        login_result = bmd_api_client.client.token_login(
             username=botmydesk_user.email, otp=otp
         )
     except BookMyDeskException:
@@ -622,16 +648,16 @@ def handle_interactive_bmd_authorize_login_code_submit(
         }
 
     botmydesk_user.update(
-        access_token=json_response["access_token"],
+        access_token=login_result.access_token(),
         access_token_expires_at=timezone.now()
         + timezone.timedelta(minutes=settings.BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES),
-        refresh_token=json_response["refresh_token"],
+        refresh_token=login_result.refresh_token(),
     )
     botmydesk_logger.info(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Successful authorization, updated token credentials"
     )
 
-    title = gettext("BotMyDesk connected!")
+    title = gettext("BotMyDesk connected")
     client.web_client.chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
@@ -655,6 +681,9 @@ def handle_interactive_bmd_authorize_login_code_submit(
             },
         ],
     ).validate()
+
+    # Seems to be a timing issue with message order. This ensures the order.
+    time.sleep(0.5)
 
     # Just display the default help info.
     handle_slash_command_help(client, botmydesk_user)

@@ -115,7 +115,7 @@ def handle_slash_command_list_reservations(
         reservations_text = ""
         for current in reservations_result["result"]["items"]:
             reservation_start = timezone.datetime.fromisoformat(current["dateStart"])
-            reservation_start_text = reservation_start.strftime("%A %d %B")
+            reservation_start_text = reservation_start.strftime("%A %-d %B")
             natural_time_until_start = humanize.naturaltime(reservation_start)
 
             current_status = current["status"]
@@ -201,7 +201,7 @@ def handle_slash_command_status(
     if not botmydesk_user.authorized_bot():
         return unauthorized_reply_shortcut(client, botmydesk_user)
 
-    today_text = timezone.localtime(timezone.now()).strftime("%A %d %B")
+    today_text = timezone.localtime(timezone.now()).strftime("%A %-d %B")
     reservations_today_result = bmd_api_client.client.list_reservations_v3(
         botmydesk_user
     )
@@ -677,7 +677,7 @@ def _post_handle_report_update(
     message_to_user: str,
     **payload,
 ):
-    today_text = timezone.localtime(timezone.now()).strftime("%A %d %B")
+    today_text = timezone.localtime(timezone.now()).strftime("%A %-d %B")
     title = gettext(f"{today_text} update")
     client.web_client.chat_postMessage(
         channel=botmydesk_user.slack_user_id,
@@ -719,7 +719,5 @@ def unauthorized_reply_shortcut(
     client.web_client.chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=gettext(
-            f"✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-        ),
+        text=gettext(f"✋ Sorry, you will need to connect me first."),
     ).validate()

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "bmd_core",
     "bmd_slashcmd",
+    "bmd_hooks",
 ]
 
 MIDDLEWARE = [

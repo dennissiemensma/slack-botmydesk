@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  prod_app:
+  app:
     build:
       context: .
       target: prod-app

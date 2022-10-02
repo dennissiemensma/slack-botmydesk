@@ -30,11 +30,13 @@ FROM base-app AS prod-app
 ARG BUILD_GUNICORN_SOCKET
 ENV GUNICORN_SOCKET=$BUILD_GUNICORN_SOCKET
 
-COPY src/ poetry.lock pyproject.toml /code/
+COPY poetry.lock pyproject.toml /code/
 RUN poetry install --only main
 
-#ENTRYPOINT poetry run gunicorn --bind unix:$BUILD_GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
-ENTRYPOINT poetry run gunicorn --log-level debug --bind unix:$GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
+COPY src/ /code/
+
+#ENTRYPOINT poetry run gunicorn --log-level debug --bind unix:$BUILD_GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
+ENTRYPOINT poetry run gunicorn --bind unix:$GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
 
 
 

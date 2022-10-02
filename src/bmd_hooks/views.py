@@ -53,4 +53,4 @@ class SlackSlashCommandView(View):
         #     web_client=bmd_hooks.services.slack_web_client(),
         #
         # )
-        return JsonResponse({})  # @TODO
+        return HttpResponse()  # @TODO

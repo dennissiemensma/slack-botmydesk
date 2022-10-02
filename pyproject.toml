@@ -22,6 +22,7 @@ python-decouple = "^3.5"
 requests = "^2.26"
 slack_sdk = "^3.18"
 urllib3 = "^1.26"
+aiohttp = "^3.8.3"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0"

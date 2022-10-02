@@ -7,29 +7,30 @@ Create your Slack app/bot:
 - _"Create an app"_ -> _"From scratch"_
 - App name, for example: _"BotMyDesk"_
 
-After creation, go to _"Socket Mode"_ first! 
+After creation, go to **Socket Mode** first.
+*This is only required if you want to run this bot in development mode!*
 
-Enable it and create an App-level token, which you'll need later anyway.
+Enable "Socket Mode" and create an App-level token, which you'll need later anyway.
 The default ``connections:write`` scope will suffice.
 
-Set the generated in App-level token as ``SLACK_APP_TOKEN`` env var (or in ``.env``) later.
+- Set the generated **App-level token** as ``SLACK_APP_TOKEN`` env var (or in ``.env``) later.
 
+- Now go to **App Home**, scroll down the page and ensure to activate (direct) messaging for your **App** by clicking the checkbox for:
 
-- Now go to _"App Home"_, scroll down the page and ensure to activate (direct) messaging for your **App** by clicking the checkbox for:
 ```
 Allow users to send Slash commands and messages from the messages tab
 ```
 
-- Go to _"Slash Commands"_, create a new command and make sure it has the following "slash command(s)":
+- Go to **Slash Commands**, create a new command and make sure it has the following "slash command(s)":
 
 | Slash command | Description                               | Parameters                           |
 |:--------------|-------------------------------------------|:-------------------------------------|
 | `/bmd`        | Access BotMyDesk commands and preferences | help                                 |
 
-_Note: You can choose any command name you'd like and override it as ``SLACK_SLASHCOMMAND_BMD`` env var._
+*Note: You can choose any command name you'd like and override it as ``SLACK_SLASHCOMMAND_BMD`` env var.*
 
 
-- We're almost done. Go to _"OAuth & Permissions"_, scroll down to _"Scopes"_ and set these **Bot Token Scopes**:
+- Open **OAuth & Permissions**, scroll down to _"Scopes"_ and add these **Bot Token Scopes**:
 ```
 commands
 chat:write
@@ -43,7 +44,7 @@ users:write
 Finally, scroll up at _"OAuth & Permissions"_ and click the **Install to Workspace** button.
 This will prompt you to install it for your workspace and redirect back to _"OAuth & Permissions"_. 
 
-You should now see a _"Bot User OAuth Token"_ there. Save it and set it (later) as ``SLACK_BOT_TOKEN`` env var (or in your ``.env`` below).
+- You should now see a _"Bot User OAuth Token"_ there. Save it and set it (later) as ``SLACK_BOT_TOKEN`` env var (or in your ``.env`` below).
 
 
 ----
@@ -111,7 +112,16 @@ docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.p
 docker-compose up -d
 ```
 
-- Go back to Slack, open your Bot settings and go to ** Interactivity & Shortcuts** and enter the following URL:
+- Go back to Slack, open your Bot settings and go to **Interactivity & Shortcuts** and enter the following URL:
 ```shell
 https://<YOUR HOSTNAME>/hooks/slack/interactivity
 ```
+
+- Add a similar URL for your slash command in the Slack bot settings:
+```shell
+https://<YOUR HOSTNAME>/hooks/slack/slashcommand
+```
+
+Now go to you Bot its **Basic Information** and find the "Signing Secret":
+
+- Set the value of the **Signing Secret** as ``SLACK_BOT_SIGNING_SECRET`` env var (or in ``.env``) in your BotMyDesk hosting.

@@ -9,6 +9,7 @@ services:
       - database
     # Assumes you want socket mode + autoreload during development.
     command: poetry run /code/manage.py dev_socket_mode
+#    command: poetry run /code/manage.py runserver 0.0.0.0:8000
     volumes:
       - ./src:/code
       - ./pyproject.toml:/code/pyproject.toml
@@ -26,8 +27,6 @@ services:
 #      - DEV_BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES=0
       - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=development
-      # https://docs.djangoproject.com/en/4.1/ref/settings/#allowed-hosts
-      - DJANGO_ALLOWED_HOST=localhost
       # TODO: Choose your DB engine. See below for quick options. More engines are available but not recommended. See Django docs for details.
       - DJANGO_DATABASE_ENGINE=django.db.backends.mysql
       - DJANGO_DATABASE_HOST=database
@@ -35,7 +34,8 @@ services:
       - DJANGO_DATABASE_USER=devuser
       - DJANGO_DATABASE_PASSWORD=devpasswd
       - DJANGO_DATABASE_NAME=botmydesk
-
+      # https://docs.djangoproject.com/en/4.1/ref/settings/#allowed-hosts
+      - DJANGO_ALLOWED_HOST=localhost
 
 ### Option 1 ###
 #  database:

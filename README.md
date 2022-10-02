@@ -111,4 +111,7 @@ docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.p
 docker-compose up -d
 ```
 
-- Whatever hostname or public URLs you are using for incoming Slack requests, make sure to update your Bot settings in Slack accordingly.
+- Go back to Slack, open your Bot settings and go to ** Interactivity & Shortcuts** and enter the following URL:
+```shell
+https://<YOUR HOSTNAME>/hooks/slack/interactivity
+```

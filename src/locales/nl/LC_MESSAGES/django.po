@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-01 13:58+0000\n"
+"POT-Creation-Date: 2022-10-02 19:45+0000\n"
 "PO-Revision-Date: 2022-08-23 23:02+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
@@ -16,6 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.3\n"
+
+msgid "Home"
+msgstr "Thuis"
 
 msgid "Your upcoming BookMyDesk reservations"
 msgstr "Je komende boekingen in BookMyDesk"
@@ -27,7 +30,7 @@ msgstr ""
 msgid "_No reservations found (or too far away)..._"
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
 
-#, fuzzy, python-brace-format
+#, fuzzy
 #| msgid ""
 #| "\n"
 #| "\n"
@@ -39,16 +42,13 @@ msgid ""
 "\n"
 "\n"
 "{emoji} {reservation_start_text}: {current_from} to {current_to}\n"
-"_{current_status}_"
+"_{current.status()}_"
 msgstr ""
 "\n"
 "\n"
 "\n"
 "✔️ ~{reservation_start_text}: {current['from']} tot {current['to']}~\n"
 "_{current['status']}_"
-
-msgid "Home"
-msgstr "Thuis"
 
 #, fuzzy, python-brace-format
 #| msgid ""
@@ -62,7 +62,7 @@ msgid ""
 "\n"
 "\n"
 "{emoji} {reservation_start_text} from {current_from} to {current_to}\n"
-"_About {natural_time_until_start} at *{location}*_"
+"_In about {natural_time_until_start} at *{location}*_"
 msgstr ""
 "\n"
 "\n"
@@ -84,7 +84,7 @@ msgstr ""
 
 #, fuzzy, python-brace-format
 #| msgid "_No reservations found (or too far away)..._"
-msgid "❌ You have *no reservation* yet for {today_text}"
+msgid "You have *no reservation* yet for {today_text}"
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
 
 msgid ", along with {reservation_count-1} other reservation(s)"
@@ -107,6 +107,11 @@ msgid ""
 "\n"
 "_Where are you today?_"
 msgstr ""
+
+#, fuzzy
+#| msgid "⚙️ BotMyDesk preferences"
+msgid "⚙️Preferences"
+msgstr "⚙️ BotMyDesk-voorkeuren"
 
 msgid "🏡 Working home"
 msgstr ""
@@ -201,7 +206,7 @@ msgstr "Sorry, nog niet werkend 🧑‍💻"
 
 #, fuzzy
 #| msgid "_No reservations found (or too far away)..._"
-msgid "⚠️ No office reservation found for this day"
+msgid "⚠️ No office reservation found for this day. Please book an office seat and check-in anyway."
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
 
 msgid "✔️ _I left it as-is, since you're already *checked in.*_"
@@ -236,7 +241,7 @@ msgstr ""
 
 #, fuzzy
 #| msgid "_No reservations found (or too far away)..._"
-msgid "✔️ No reservations found"
+msgid "✔️ No reservations found anyway"
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
 
 #, python-brace-format

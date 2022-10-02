@@ -35,6 +35,7 @@ def get_botmydesk_user(web_client: WebClient, slack_user_id: str) -> BotMyDeskUs
 
     users_info_result = web_client.users_info(user=slack_user_id, include_locale=True)
     users_info_result.validate()
+    botmydesk_logger.debug(f"Users info result: {users_info_result}")
 
     # Dev only: Override email address when required for development.
     DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default="")
@@ -47,7 +48,7 @@ def get_botmydesk_user(web_client: WebClient, slack_user_id: str) -> BotMyDeskUs
     else:
         email_address = users_info_result.get("user")["profile"]["email"]
 
-    firstName = users_info_result.get("user")["profile"]["firstName"]
+    first_name = users_info_result.get("user")["profile"]["first_name"]
     locale = users_info_result.get("user")["locale"]
 
     next_profile_update = timezone.now() + timezone.timedelta(days=1)
@@ -59,7 +60,7 @@ def get_botmydesk_user(web_client: WebClient, slack_user_id: str) -> BotMyDeskUs
             slack_user_id=slack_user_id,
             locale=locale,
             email=email_address,
-            name=firstName,
+            name=first_name,
             next_profile_update=next_profile_update,
         )
     else:
@@ -68,7 +69,7 @@ def get_botmydesk_user(web_client: WebClient, slack_user_id: str) -> BotMyDeskUs
         botmydesk_user.update(
             locale=locale,
             email=email_address,
-            name=firstName,
+            name=first_name,
             next_profile_update=next_profile_update,
         )
 

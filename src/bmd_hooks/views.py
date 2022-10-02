@@ -6,8 +6,8 @@ from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseBad
 from django.views import View
 from slack_sdk.signature import SignatureVerifier
 
-import bmd_slashcmd.services
-import bmd_hooks.services
+# import bmd_slashcmd.services
+# import bmd_hooks.services
 
 
 botmydesk_logger = logging.getLogger("botmydesk")

@@ -51,7 +51,7 @@ class SlackSlashCommandView(View):
         )
 
         bmd_slashcmd.services.handle_slash_command(
-            web_client=web_client, botmydesk_user=botmydesk_user, **request.POST
+            web_client=web_client, botmydesk_user=botmydesk_user, **request.POST.items()
         )
 
         # For now just empty response. We'll send commands tru the web client.

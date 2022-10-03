@@ -60,15 +60,16 @@ class SlackInteractivityView(View):
         )
 
         if payload["type"] == "view_submission":
-            result = bmd_slashcmd.services.on_interactive_view_submission(
+            response_payload = bmd_slashcmd.services.on_interactive_view_submission(
                 web_client=web_client,
                 botmydesk_user=botmydesk_user,
                 payload=payload,
             )
 
             # These type of calls may or may not have a response with directives.
-            if result is not None:
-                return JsonResponse(result)
+            if response_payload is not None:
+                botmydesk_logger.debug(f"Sending response payload: {response_payload}")
+                return JsonResponse(response_payload)
 
         # Never a direct response with new instructions.
         elif payload["type"] == "block_action":

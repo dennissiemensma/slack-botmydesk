@@ -54,7 +54,6 @@ class SlackSlashCommandView(View):
         bmd_slashcmd.services.handle_slash_command(
             web_client=web_client,
             botmydesk_user=botmydesk_user,
-            text=payload.get("text"),
             **payload
         )
 

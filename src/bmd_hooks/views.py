@@ -55,7 +55,7 @@ class SlackSlashCommandView(View):
             web_client=web_client,
             botmydesk_user=botmydesk_user,
             text=payload.get("text"),
-            payload=payload,
+            **payload
         )
 
         # For now just empty response. We'll send commands tru the web client.

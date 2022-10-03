@@ -43,18 +43,19 @@ class SlackSlashCommandView(View):
             botmydesk_logger.error("Dropped invalid Slack slash command request")
             return HttpResponseBadRequest()
 
-        botmydesk_logger.info(f"Handling Slack slash command request: {request.POST}")
+        payload = request.POST.dict()
+        botmydesk_logger.info(f"Handling Slack slash command request: {payload}")
 
         web_client = bmd_hooks.services.slack_web_client()
         botmydesk_user = bmd_core.services.get_botmydesk_user(
-            web_client=web_client, slack_user_id=request.POST.get("user_id")
+            web_client=web_client, slack_user_id=payload.get("user_id")
         )
 
         bmd_slashcmd.services.handle_slash_command(
             web_client=web_client,
             botmydesk_user=botmydesk_user,
-            text=request.POST.get("text"),
-            payload=request.POST.items(),
+            text=payload.get("text"),
+            payload=payload,
         )
 
         # For now just empty response. We'll send commands tru the web client.

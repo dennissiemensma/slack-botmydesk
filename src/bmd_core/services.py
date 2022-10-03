@@ -37,10 +37,13 @@ def get_botmydesk_user(web_client: WebClient, slack_user_id: str) -> BotMyDeskUs
     users_info_result.validate()
     botmydesk_logger.debug(f"Users info result: {users_info_result}")
 
-    # Dev only: Override email address when required for development.
+    # Dev only: Override email address when required for development AND the current user is marked as developer.
     DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default="")
+    BOTMYDESK_SLACK_ID_ON_ERROR = config(
+        "BOTMYDESK_SLACK_ID_ON_ERROR", cast=str, default=""
+    )
 
-    if settings.DEBUG and DEV_EMAIL_ADDRESS:
+    if slack_user_id in BOTMYDESK_SLACK_ID_ON_ERROR and DEV_EMAIL_ADDRESS:
         email_address = DEV_EMAIL_ADDRESS
         botmydesk_logger.debug(
             f"DEV_EMAIL_ADDRESS: Overriding email address with: {email_address}"

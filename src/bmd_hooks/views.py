@@ -20,48 +20,65 @@ def verify_request(request: HttpRequest) -> bool:
     return verifier.is_valid_request(body=request.body, headers=request.headers)
 
 
-class SlackInteractivityEventView(View):
+class SlackEventView(View):
+    """https://api.slack.com/events"""
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        if not verify_request(request):
+            botmydesk_logger.error("Dropped invalid Slack event request")
+            return HttpResponseBadRequest()
+
+        payload = json.loads(request.body)
+        event_type = payload.get("type")
+        botmydesk_logger.info(f"Handling Slack event request: {payload}")
+
+        if event_type == "url_verification":
+            return JsonResponse({"challenge": payload.get("challenge")})
+
+        return HttpResponse()
+
+
+class SlackInteractivityView(View):
+    """https://api.slack.com/reference/interaction-payloads"""
+
     def post(self, request: HttpRequest) -> HttpResponse:
         if not verify_request(request):
             botmydesk_logger.error("Dropped invalid Slack interactivity request")
             return HttpResponseBadRequest()
 
-        botmydesk_logger.info(f"Handling Slack interactivity request: {request.body}")
-
-        parsed_body = json.loads(request.body)
-        event_type = parsed_body.get("type")
-
-        if event_type == "url_verification":
-            return JsonResponse({"challenge": parsed_body.get("challenge")})
+        payload = json.loads(request.POST.get("payload"))
+        botmydesk_logger.info(f"Handling Slack interactivity request: {payload}")
 
         web_client = bmd_hooks.services.slack_web_client()
         botmydesk_user = bmd_core.services.get_botmydesk_user(
-            web_client=web_client, slack_user_id=parsed_body.get("user_id")
+            web_client=web_client, slack_user_id=payload.get("user_id")
         )
 
-        if event_type == "view_submission":
+        if payload["type"] == "view_submission":
             result = bmd_slashcmd.services.on_interactive_view_submission(
                 web_client=web_client,
                 botmydesk_user=botmydesk_user,
-                payload=parsed_body,
+                payload=payload,
             )
 
             if result is not None:
                 return JsonResponse(result)
 
-        elif event_type == "block_action":
-            for current_action in parsed_body["actions"]:
+        elif payload["type"] == "block_action":
+            for current_action in payload["actions"]:
                 bmd_slashcmd.services.on_interactive_block_action(
                     web_client=web_client,
                     botmydesk_user=botmydesk_user,
                     action=current_action,
-                    **parsed_body,
+                    **payload,
                 )
 
         return HttpResponse()
 
 
 class SlackSlashCommandView(View):
+    """https://api.slack.com/interactivity/slash-commands"""
+
     def post(self, request: HttpRequest) -> HttpResponse:
         if not verify_request(request):
             botmydesk_logger.error("Dropped invalid Slack slash command request")

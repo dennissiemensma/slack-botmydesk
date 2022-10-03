@@ -186,7 +186,9 @@ if DEBUG:
 
 # Project related.
 BOTMYDESK_USER_AGENT = "BotMyDesk Slack Integration"
-SLACK_APP_TOKEN = config("SLACK_APP_TOKEN", cast=str)
+SLACK_APP_TOKEN = config(
+    "SLACK_APP_TOKEN", cast=str, default=""
+)  # Ony required for Socket Mode.
 SLACK_BOT_TOKEN = config("SLACK_BOT_TOKEN", cast=str)
 SLACK_BOT_SIGNING_SECRET = config("SLACK_BOT_SIGNING_SECRET", cast=str)
 

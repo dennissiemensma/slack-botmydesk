@@ -1,5 +1,6 @@
 import json
 import logging
+import pprint
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseBadRequest
@@ -30,7 +31,9 @@ class SlackEventView(View):
 
         payload = json.loads(request.body)
         event_type = payload.get("type")
-        botmydesk_logger.info(f"Handling Slack event request: {payload}")
+        botmydesk_logger.info(
+            f"Handling Slack event request: {pprint.pformat(payload, indent=4)}"
+        )
 
         if event_type == "url_verification":
             return JsonResponse({"challenge": payload.get("challenge")})
@@ -47,7 +50,9 @@ class SlackInteractivityView(View):
             return HttpResponseBadRequest()
 
         payload = json.loads(request.POST.get("payload"))
-        botmydesk_logger.info(f"Handling Slack interactivity request: {payload}")
+        botmydesk_logger.info(
+            f"Handling Slack interactivity request: {pprint.pformat(payload, indent=4)}"
+        )
 
         web_client = bmd_hooks.services.slack_web_client()
         botmydesk_user = bmd_core.services.get_botmydesk_user(
@@ -85,7 +90,9 @@ class SlackSlashCommandView(View):
             return HttpResponseBadRequest()
 
         payload = request.POST.dict()
-        botmydesk_logger.info(f"Handling Slack slash command request: {payload}")
+        botmydesk_logger.info(
+            f"Handling Slack slash command request: {pprint.pformat(payload, indent=4)}"
+        )
 
         web_client = bmd_hooks.services.slack_web_client()
         botmydesk_user = bmd_core.services.get_botmydesk_user(

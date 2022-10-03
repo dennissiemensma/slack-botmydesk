@@ -34,7 +34,31 @@ class SlackInteractivityEventView(View):
         if event_type == "url_verification":
             return JsonResponse({"challenge": parsed_body.get("challenge")})
 
-        return HttpResponse()  # @TODO
+        web_client = bmd_hooks.services.slack_web_client()
+        botmydesk_user = bmd_core.services.get_botmydesk_user(
+            web_client=web_client, slack_user_id=parsed_body.get("user_id")
+        )
+
+        if event_type == "view_submission":
+            result = bmd_slashcmd.services.on_interactive_view_submission(
+                web_client=web_client,
+                botmydesk_user=botmydesk_user,
+                payload=parsed_body,
+            )
+
+            if result is not None:
+                return JsonResponse(result)
+
+        elif event_type == "block_action":
+            for current_action in parsed_body["actions"]:
+                bmd_slashcmd.services.on_interactive_block_action(
+                    web_client=web_client,
+                    botmydesk_user=botmydesk_user,
+                    action=current_action,
+                    **parsed_body,
+                )
+
+        return HttpResponse()
 
 
 class SlackSlashCommandView(View):

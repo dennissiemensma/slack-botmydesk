@@ -101,13 +101,13 @@ class Command(BaseCommand):
                 SocketModeResponse(envelope_id=req.envelope_id)
             )
 
-            for current in req.payload["actions"]:
+            for current_action in req.payload["actions"]:
                 try:
                     (
                         bmd_slashcmd.services.on_interactive_block_action(
                             socket_mode_client.web_client,
                             botmydesk_user,
-                            current,
+                            current_action,
                             **req.payload,
                         )
                     )

@@ -54,10 +54,11 @@ You're done, for now. The remaining configuration depends on whether you want to
 apt-get install python3-pip
 pip install poetry
 
+cd src/
 poetry config virtualenvs.in-project true
-poetry install
 
 # You may or may not require some additional dev packages on your host. Good luck Googling.
+poetry install
 ```
 
 - In either case, continue with:

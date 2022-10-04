@@ -131,8 +131,6 @@ dmypy.json
 
 # Misc
 /.idea/
-/src/pyproject.toml
-/src/poetry.lock
 /docker-compose.override.yml
 /docker/mysql/
 /docker/postgres/

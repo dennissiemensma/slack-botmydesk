@@ -90,6 +90,15 @@ SLACK_BOT_TOKEN=
 SLACK_BOT_SIGNING_SECRET=
 ```
 
+- After enabling Socket Mode, go to **Features > Event Subscriptions** and toggle **Enable Events** to have it enabled.
+- Finally, on the same page, click **Subscribe to bot events** and add this event:
+
+```shell
+app_home_opened
+```
+
+- Click _"Save Changes"_.
+
 The configuration should be done now! You can try building and running the container/bot now.
 
 
@@ -183,9 +192,14 @@ https://<YOUR BOT HOSTNAME>/hooks/slack/slashcommand
 ```shell
 https://<YOUR BOT HOSTNAME>/hooks/slack/event
 ```
-- It should validate.
-- Scroll down to "Subscribe to bot event"
-- Add ``app_home_opened `` event *(no permissions required)*
+- It should validate if you configured and hosted this bot correctly.
+- Finally, on the same page, click **Subscribe to bot events** and add this event:
+
+```shell
+app_home_opened
+```
+
+- Click _"Save Changes"_.
 - Save changes *(bottom)*
 
 ----

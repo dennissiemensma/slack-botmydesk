@@ -7,7 +7,6 @@ from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseBad
 from django.views import View
 from slack_sdk.signature import SignatureVerifier
 
-import bmd_slashcmd.services
 import bmd_hooks.services
 import bmd_core.services
 
@@ -60,7 +59,7 @@ class SlackInteractivityView(View):
         )
 
         if payload["type"] == "view_submission":
-            response_payload = bmd_slashcmd.services.on_interactive_view_submission(
+            response_payload = bmd_hooks.services.on_interactive_view_submission(
                 web_client=web_client,
                 botmydesk_user=botmydesk_user,
                 payload=payload,
@@ -74,7 +73,7 @@ class SlackInteractivityView(View):
         # Never a direct response with new instructions.
         elif payload["type"] == "block_action":
             for current_action in payload["actions"]:
-                bmd_slashcmd.services.on_interactive_block_action(
+                bmd_hooks.services.on_interactive_block_action(
                     web_client=web_client,
                     botmydesk_user=botmydesk_user,
                     action=current_action,
@@ -102,7 +101,7 @@ class SlackSlashCommandView(View):
             web_client=web_client, slack_user_id=payload.get("user_id")
         )
 
-        bmd_slashcmd.services.handle_slash_command(
+        bmd_hooks.services.handle_slash_command(
             web_client=web_client, botmydesk_user=botmydesk_user, **payload
         )
 

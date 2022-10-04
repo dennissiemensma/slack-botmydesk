@@ -10,7 +10,6 @@ from django.utils.translation import gettext
 from django.utils.autoreload import run_with_reloader
 from django.conf import settings
 
-import bmd_slashcmd.services
 import bmd_core.services
 import bmd_hooks.services
 
@@ -79,7 +78,7 @@ class Command(BaseCommand):
         )
 
         try:
-            bmd_slashcmd.services.on_slash_command(
+            bmd_hooks.services.on_slash_command(
                 socket_mode_client.web_client, botmydesk_user, req.payload
             )
         except Exception as error:
@@ -104,7 +103,7 @@ class Command(BaseCommand):
             for current_action in req.payload["actions"]:
                 try:
                     (
-                        bmd_slashcmd.services.on_interactive_block_action(
+                        bmd_hooks.services.on_interactive_block_action(
                             socket_mode_client.web_client,
                             botmydesk_user,
                             current_action,
@@ -120,7 +119,7 @@ class Command(BaseCommand):
             # Do NOT ack yet. As we may or may not need to return a different payload.
 
             try:
-                response_payload = bmd_slashcmd.services.on_interactive_view_submission(
+                response_payload = bmd_hooks.services.on_interactive_view_submission(
                     socket_mode_client.web_client, botmydesk_user, req.payload
                 )
             except Exception as error:

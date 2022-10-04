@@ -9,9 +9,11 @@ services:
       - database
     # Assumes you want socket mode + autoreload during development.
     command: poetry run /code/manage.py dev_socket_mode
+    # OR use "runserver" (includes autoreload), to simulate web hook hosting (pre-production) @ http://localhost:8000
 #    command: poetry run /code/manage.py runserver 0.0.0.0:8000
     volumes:
       - ./src:/code
+      # @TODO relocate these to src folder
       - ./pyproject.toml:/code/pyproject.toml
       - ./poetry.lock:/code/poetry.lock
     ports:
@@ -20,8 +22,8 @@ services:
       - .env
     environment:
       # TODO: Set DEV_EMAIL_ADDRESS if you develop on a different Slack workspace (and DJANGO_DEBUG = True). Omit or keep empty otherwise.
-      - DEV_EMAIL_ADDRESS=
-      # Enable if you want to test Dutch locales
+#      - DEV_EMAIL_ADDRESS=
+      # Enable if you want to always run with Dutch locales, no matter your own Slack user its preferences.
 #      - DEV_LOCALE=nl_NL
       # Enable to refresh all the time. Only makes sense during session development.
 #      - DEV_BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES=0
@@ -37,6 +39,7 @@ services:
       # https://docs.djangoproject.com/en/4.1/ref/settings/#allowed-hosts
       - DJANGO_ALLOWED_HOST=localhost
 
+# TODO: Choose your DB
 ### Option 1 ###
 #  database:
 #    # Use with "app" environment:

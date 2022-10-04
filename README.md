@@ -2,34 +2,15 @@
 _This project is NOT officially affiliated with BookMyDesk in any way!_
 
 ## Setup
-Create your Slack app/bot: 
+### Creating your Slack app
 - Go to: https://api.slack.com/apps
-- _"Create an app"_ -> _"From scratch"_
-- App name, for example: _"BotMyDesk"_
+- Click _"Create an app"_ > _"From scratch"_, enter an app name, for example: _"BotMyDesk"_
 
-----
+After creation of your app:
 
-- After creation, go to **Socket Mode** first.
-*This is only required if you want to run this bot in development mode!*
-
-- Enable "Socket Mode" and create an App-level token, which you'll need later anyway. The default ``connections:write`` scope will suffice.
-
-
-- Now go to **App Home**, scroll down the page and ensure to activate (direct) messaging for your **App** by clicking the checkbox for:
-
-> "Allow users to send Slash commands and messages from the messages tab"
-
-- Go to **Slash Commands**, create a new command and make sure it has the following "slash command(s)":
-
-| Slash command | Description                               | Parameters                           |
-|:--------------|-------------------------------------------|:-------------------------------------|
-| `/bmd`        | Access BotMyDesk commands and preferences | help                                 |
-
-*Note: You can choose any command name you'd like and override it as ``SLACK_SLASHCOMMAND_BMD`` env var. Also, you can omit the "Request URL" until you go production.*
-
-
-- Open **OAuth & Permissions**, scroll down to _"Scopes"_ and add these **Bot Token Scopes**:
-```
+- Open the menu item **Features > OAuth & Permissions**.
+- Scroll down to _"Scopes"_ and add these _"Bot Token Scopes"_ (one at a time):
+```shell
 commands
 chat:write
 im:read
@@ -39,47 +20,77 @@ users:read.email
 users:write
 ```
 
-- Scroll up at _"OAuth & Permissions"_ and click the **Install to Workspace** button.
-This will prompt you to install it for your workspace and redirect back to _"OAuth & Permissions"_. 
+- Now go to **Features > App Home**, scroll down the page to _"Show Tabs"_ and **enable** the **Home Tab** option.
+- Also, (a bit below that) ensure to activate direct messaging for your **App** by checking the checkbox for:
 
-- Finally, go back to Slack, open your Bot settings and set these as env var (or in ``.env``) in your development setup:
+> "Allow users to send Slash commands and messages from the messages tab"
 
-```shell
-# Slack -> Your Bot -> OAuth & Permissions -> Bot User OAuth Token
-SLACK_BOT_TOKEN=
-# Slack -> Your Bot -> Basic Information -> App Credentials -> Signing Secret
-SLACK_BOT_SIGNING_SECRET=
-```
+- Continue to **Features > Slash Commands**, create a new slash command and save it:
 
 ```shell
-# (only required when running Socket Mode)
-# Slack -> Your Bot -> Basic Information -> App-Level Tokens
-SLACK_APP_TOKEN=
+Slash command:          /bmd
+Request URL:            https://example.com
+Short Description:      Trigger BotMyDesk
+Usage Hint:             <empty>
 ```
+*Note: You can choose any command name you'd like and override it as ``SLACK_SLASHCOMMAND_BMD`` env var. Also, you can omit the "Request URL" until you go production.*
+
+*Note 2: The request URL does not matter until you actually host the bot somewhere.* 
+
+- Open **Features > Basic Information** and click the **Install to workspace** button. You will now authorize your bot for the workspace you'd like to use it in.
+
+You're done, for now. The remaining configuration depends on whether you want to run this bot locally for development or host it for production usage. Continue below with either route.
 
 
 ----
 
 
-## Installation
-### (Local) development
-If you want your IDE to detect packages code, install ``poetry`` on your host, e.g.:
+*Choose either **local development** or **production hosting**, as the configuration in Slack is quite different between these.*
+
+## Local development installation
+- **Optional:** If you want your IDE to detect packages code, install ``poetry`` on your host, e.g.:
 ```shell
 # Debian
 apt-get install python3-pip
 pip install poetry
-```
 
-- After that (or if you skipped it):
-```shell
 poetry config virtualenvs.in-project true
 poetry install
 
+# You may or may not require some additional dev packages on your host. Good luck Googling.
+```
+
+- In either case, continue with:
+```shell
 cp docker-compose.override.yml.DEV.TEMPLATE docker-compose.override.yml
 cp .env.TEMPLATE .env
 ```
 
 - Set your env vars in ``.env`` or ``docker-compose.override.yml``.
+
+For running your bot locally you should use **Socket Mode** in Slack.
+- Go to: https://api.slack.com/apps
+- Find your bot and go to **Features > Socket Mode**
+- Click **Enable Socket Mode**, type a hint for your token in the popup (e.g. "local dev") and click _"Generate"_. 
+- This will generate an **App-level token**, set it in your ``.env`` file:
+
+```shell
+# Slack -> Your Bot -> Basic Information -> App-Level Tokens
+SLACK_APP_TOKEN=
+```
+
+- Also go to *Features > OAuth & Permissions** and set both **Bot User OAuth Token** / **Signing Secret** in your ``.env``:  
+
+```shell
+# Slack > Your Bot > Features > OAuth & Permissions > Bot User OAuth Token
+SLACK_BOT_TOKEN=
+
+# Slack > Your Bot > Basic Information > App Credentials > Signing Secret
+SLACK_BOT_SIGNING_SECRET=
+```
+
+The configuration should be done now! You can try building and running the container/bot now.
+
 
 - Run this to bootstrap the app/bot:
 
@@ -87,7 +98,10 @@ cp .env.TEMPLATE .env
 docker-compose up -d
 ```
 
-#### Translations
+----
+
+## Developing
+### Translations
 - Currently supported: `en`, `nl`
 - Did you change strings? Regenerate PO file using all translation tags/strings marked in the codebase:
 ```shell
@@ -99,7 +113,8 @@ docker exec -it botmydesk_dev_app poetry run /code/manage.py makemessages --no-w
 
 ----
 
-### Production hosting
+
+## Production hosting installation
 
 - Checkout the code base
 - Install Docker/Docker-compose
@@ -119,9 +134,9 @@ cp .env.TEMPLATE .env
 - Go back to Slack, open your Bot settings and set these as env var (or in .env) in your BotMyDesk hosting:
 
 ```shell
-# Slack -> Your Bot -> OAuth & Permissions -> Bot User OAuth Token
+# Slack > Your Bot > Features > OAuth & Permissions > Bot User OAuth Token
 SLACK_BOT_TOKEN=
-# Slack -> Your Bot -> Basic Information -> App Credentials -> Signing Secret
+# Slack > Your Bot > Settings > Basic Information > App Credentials > Signing Secret
 SLACK_BOT_SIGNING_SECRET=
 ```
 

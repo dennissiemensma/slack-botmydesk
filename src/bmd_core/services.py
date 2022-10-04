@@ -257,7 +257,7 @@ def handle_slash_command_status(
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": gettext("⚙️Preferences"),
+                        "text": gettext("⚙️ Preferences"),
                     },
                     "value": "open_settings",
                 },

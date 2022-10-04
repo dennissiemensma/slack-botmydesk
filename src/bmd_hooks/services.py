@@ -18,17 +18,40 @@ import bmd_core.services
 botmydesk_logger = logging.getLogger("botmydesk")
 
 
+def slack_web_client() -> WebClient:
+    return WebClient(token=settings.SLACK_BOT_TOKEN)
+
+
 def slack_socket_mode_client() -> SocketModeClient:
     return SocketModeClient(
         # This app-level token will be used only for establishing a connection
-        app_token=settings.SLACK_APP_TOKEN,  # xapp-A111-222-xyz
-        # You will be using this WebClient for performing Web API calls in listeners
+        app_token=settings.SLACK_APP_TOKEN,
         web_client=slack_web_client(),
     )
 
 
-def slack_web_client() -> WebClient:
-    return WebClient(token=settings.SLACK_BOT_TOKEN)  # xoxb-111-222-xyz
+def on_event(payload: dict):
+    """https://api.slack.com/events"""
+    event_type = payload["event"]["type"]
+    user_id = payload["event"]["user"]  # May fail for unexpected events.
+
+    web_client = slack_web_client()
+    botmydesk_user = bmd_core.services.get_botmydesk_user(
+        web_client=web_client, slack_user_id=user_id
+    )
+
+    botmydesk_logger.info(
+        f"@{botmydesk_user.slack_user_id} | Incoming event: {event_type}"
+    )
+
+    try:
+        service_module = {
+            "app_home_opened": handle_app_home_opened_event,  # https://api.slack.com/events/app_home_opened
+        }[event_type]
+    except KeyError:
+        raise NotImplementedError(f"Event unknown or misconfigured: {event_type}")
+
+    service_module(web_client, botmydesk_user, payload)
 
 
 def on_slash_command(
@@ -37,7 +60,7 @@ def on_slash_command(
     """Pass me your slash command payload to map."""
     command = payload["command"]
     botmydesk_logger.info(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Incoming slash command '{command}'"
+        f"@{botmydesk_user.slack_user_id} | Incoming slash command: {command}"
     )
 
     try:
@@ -50,10 +73,92 @@ def on_slash_command(
     service_module(web_client, botmydesk_user, **payload)
 
 
+def on_interactive_block_action(
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, action: dict, **payload
+):
+    """Respond to user (inter)actions. Some are follow-ups, some are aliases."""
+    action_value = action["value"]
+    botmydesk_logger.info(
+        f"@{botmydesk_user.slack_user_id} | Incoming interactive block action: {action_value}"
+    )
+
+    try:
+        service_module = {
+            "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
+            "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
+            "open_settings": handle_slash_command_settings,  # Alias
+            "open_help": handle_slash_command_help,  # Alias
+            "send_status_notification": bmd_core.services.handle_slash_command_status,  # Alias
+            "mark_working_from_home_today": bmd_core.services.handle_user_working_home_today,
+            "mark_working_at_the_office_today": bmd_core.services.handle_user_working_in_office_today,
+            "mark_working_externally_today": bmd_core.services.handle_user_working_externally_today,
+            "mark_not_working_today": bmd_core.services.handle_user_not_working_today,
+        }[action_value]
+    except KeyError:
+        raise NotImplementedError(
+            f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive block action unknown or misconfigured: {action_value}"
+        )
+
+    service_module(web_client, botmydesk_user, **payload)
+
+
+def on_interactive_view_submission(
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, payload: dict
+) -> Optional[dict]:
+    """https://api.slack.com/reference/interaction-payloads"""
+    view_callback_id = payload["view"]["callback_id"]
+    botmydesk_logger.info(
+        f"@{botmydesk_user.slack_user_id} | Incoming interactive view submission: {view_callback_id}"
+    )
+
+    try:
+        service_module = {
+            "bmd-modal-authorize-login-code": handle_interactive_bmd_authorize_login_code_submit,
+        }[view_callback_id]
+    except KeyError:
+        raise NotImplementedError(
+            f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive view submission unknown or misconfigured: {view_callback_id}"
+        )
+
+    return service_module(web_client, botmydesk_user, **payload)
+
+
+def handle_app_home_opened_event(
+    web_client: WebClient, botmydesk_user: BotMyDeskUser, payload: dict
+):
+    # Only home tab, for now. Maybe messages tab later.
+    if payload["event"]["tab"] != "home":
+        return
+
+    # @TODO: Rework later to dynamic view of reservations or status.
+    web_client.views_publish(
+        user_id=payload["event"]["user"],
+        view={
+            "type": "home",
+            "blocks": [
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "emoji": True,
+                                "text": gettext("⚙️ Preferences"),
+                            },
+                            "value": "open_settings",
+                        },
+                    ],
+                },
+            ],
+        },
+    ).validate()
+
+
 def handle_slash_command(
     web_client: WebClient, botmydesk_user: BotMyDeskUser, text, **payload
 ):
-    """Called on generic slash command."""
+    """https://api.slack.com/interactivity/slash-commands"""
     botmydesk_logger.debug(
         f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): User triggered slash command with text '{text}'"
     )
@@ -182,9 +287,7 @@ def handle_slash_command_help(
 def handle_slash_command_settings(
     web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
 ):
-    """Modal settings."""
-
-    # Just the slash command was entered. Unauthorized.
+    # Unauthorized. Ask to connect.
     if not botmydesk_user.authorized_bot():
         botmydesk_logger.info(
             f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Unauthorized, requesting user auth"
@@ -456,35 +559,6 @@ def handle_slash_command_settings(
     update_result.validate()
 
 
-def on_interactive_block_action(
-    web_client: WebClient, botmydesk_user: BotMyDeskUser, action: dict, **payload
-):
-    """Respond to user (inter)actions. Some are follow-ups, some are aliases."""
-    action_value = action["value"]
-    botmydesk_logger.debug(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Incoming interactive block action '{action_value}'"
-    )
-
-    try:
-        service_module = {
-            "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
-            "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
-            "open_settings": handle_slash_command_settings,  # Alias
-            "open_help": handle_slash_command_help,  # Alias
-            "send_status_notification": bmd_core.services.handle_slash_command_status,  # Alias
-            "mark_working_from_home_today": bmd_core.services.handle_user_working_home_today,
-            "mark_working_at_the_office_today": bmd_core.services.handle_user_working_in_office_today,
-            "mark_working_externally_today": bmd_core.services.handle_user_working_externally_today,
-            "mark_not_working_today": bmd_core.services.handle_user_not_working_today,
-        }[action_value]
-    except KeyError:
-        raise NotImplementedError(
-            f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive block action unknown or misconfigured: {action_value}"
-        )
-
-    service_module(web_client, botmydesk_user, **payload)
-
-
 def handle_interactive_send_bookmydesk_login_code(
     web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
 ):
@@ -613,27 +687,6 @@ def handle_interactive_bmd_revoke_botmydesk(
             },
         ],
     ).validate()
-
-
-def on_interactive_view_submission(
-    web_client: WebClient, botmydesk_user: BotMyDeskUser, payload: dict
-) -> Optional[dict]:
-    """Respond to user (inter)actions."""
-    view_callback_id = payload["view"]["callback_id"]
-    botmydesk_logger.debug(
-        f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Incoming interactive view submission '{view_callback_id}'"
-    )
-
-    try:
-        service_module = {
-            "bmd-modal-authorize-login-code": handle_interactive_bmd_authorize_login_code_submit,
-        }[view_callback_id]
-    except KeyError:
-        raise NotImplementedError(
-            f"{botmydesk_user.slack_user_id} ({botmydesk_user.email}): Interactive view submission unknown or misconfigured: {view_callback_id}"
-        )
-
-    return service_module(web_client, botmydesk_user, **payload)
 
 
 def handle_interactive_bmd_authorize_login_code_submit(

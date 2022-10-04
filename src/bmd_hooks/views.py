@@ -21,8 +21,6 @@ def verify_request(request: HttpRequest) -> bool:
 
 
 class SlackEventView(View):
-    """https://api.slack.com/events"""
-
     def post(self, request: HttpRequest) -> HttpResponse:
         if not verify_request(request):
             botmydesk_logger.error("Dropped invalid Slack event request")
@@ -34,15 +32,16 @@ class SlackEventView(View):
             f"Handling Slack event request: {pprint.pformat(payload, indent=4)}"
         )
 
+        # The one event we can always respond to.
         if event_type == "url_verification":
             return JsonResponse({"challenge": payload.get("challenge")})
+
+        bmd_hooks.services.on_event(payload)
 
         return HttpResponse()
 
 
 class SlackInteractivityView(View):
-    """https://api.slack.com/reference/interaction-payloads"""
-
     def post(self, request: HttpRequest) -> HttpResponse:
         if not verify_request(request):
             botmydesk_logger.error("Dropped invalid Slack interactivity request")
@@ -84,8 +83,6 @@ class SlackInteractivityView(View):
 
 
 class SlackSlashCommandView(View):
-    """https://api.slack.com/interactivity/slash-commands"""
-
     def post(self, request: HttpRequest) -> HttpResponse:
         if not verify_request(request):
             botmydesk_logger.error("Dropped invalid Slack slash command request")

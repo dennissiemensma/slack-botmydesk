@@ -1,14 +1,12 @@
 import json
 import logging
-import pprint
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.views import View
 from slack_sdk.signature import SignatureVerifier
 
-import bmd_hooks.services
-import bmd_core.services
+import bmd_hooks.services.callbacks
 
 
 botmydesk_logger = logging.getLogger("botmydesk")
@@ -23,20 +21,22 @@ def verify_request(request: HttpRequest) -> bool:
 class SlackEventView(View):
     def post(self, request: HttpRequest) -> HttpResponse:
         if not verify_request(request):
-            botmydesk_logger.error("Dropped invalid Slack event request")
+            botmydesk_logger.warning(
+                "Dropped event request failed passing verification"
+            )
             return HttpResponseBadRequest()
 
         payload = json.loads(request.body)
-        event_type = payload.get("type")
-        botmydesk_logger.info(
-            f"Handling Slack event request: {pprint.pformat(payload, indent=4)}"
-        )
 
-        # The one event we can always respond to.
-        if event_type == "url_verification":
+        # This event we can always respond to. No need to pass on.
+        if payload.get("type") == "url_verification":
+            # @see https://api.slack.com/events/url_verification
             return JsonResponse({"challenge": payload.get("challenge")})
 
-        bmd_hooks.services.on_event(payload)
+        try:
+            bmd_hooks.services.callbacks.on_event(payload)
+        except Exception as error:
+            bmd_hooks.services.callbacks.on_error(error)
 
         return HttpResponse()
 
@@ -44,40 +44,17 @@ class SlackEventView(View):
 class SlackInteractivityView(View):
     def post(self, request: HttpRequest) -> HttpResponse:
         if not verify_request(request):
-            botmydesk_logger.error("Dropped invalid Slack interactivity request")
+            botmydesk_logger.warning(
+                "Dropped interactivity request failed passing verification"
+            )
             return HttpResponseBadRequest()
 
         payload = json.loads(request.POST.get("payload"))
-        botmydesk_logger.info(
-            f"Handling Slack interactivity request: {pprint.pformat(payload, indent=4)}"
-        )
 
-        web_client = bmd_hooks.services.slack_web_client()
-        botmydesk_user = bmd_core.services.get_botmydesk_user(
-            web_client=web_client, slack_user_id=payload["user"]["id"]
-        )
-
-        if payload["type"] == "view_submission":
-            response_payload = bmd_hooks.services.on_interactive_view_submission(
-                web_client=web_client,
-                botmydesk_user=botmydesk_user,
-                payload=payload,
-            )
-
-            # These type of calls may or may not have a response with directives.
-            if response_payload is not None:
-                botmydesk_logger.debug(f"Sending response payload: {response_payload}")
-                return JsonResponse(response_payload)
-
-        # Never a direct response with new instructions.
-        elif payload["type"] == "block_action":
-            for current_action in payload["actions"]:
-                bmd_hooks.services.on_interactive_block_action(
-                    web_client=web_client,
-                    botmydesk_user=botmydesk_user,
-                    action=current_action,
-                    **payload,
-                )
+        try:
+            bmd_hooks.services.callbacks.on_interactivity(payload)
+        except Exception as error:
+            bmd_hooks.services.callbacks.on_error(error)
 
         return HttpResponse()
 
@@ -85,22 +62,16 @@ class SlackInteractivityView(View):
 class SlackSlashCommandView(View):
     def post(self, request: HttpRequest) -> HttpResponse:
         if not verify_request(request):
-            botmydesk_logger.error("Dropped invalid Slack slash command request")
+            botmydesk_logger.warning(
+                "Dropped slash command request failed passing verification"
+            )
             return HttpResponseBadRequest()
 
         payload = request.POST.dict()
-        botmydesk_logger.info(
-            f"Handling Slack slash command request: {pprint.pformat(payload, indent=4)}"
-        )
 
-        web_client = bmd_hooks.services.slack_web_client()
-        botmydesk_user = bmd_core.services.get_botmydesk_user(
-            web_client=web_client, slack_user_id=payload.get("user_id")
-        )
+        try:
+            bmd_hooks.services.callbacks.on_slash_command(payload)
+        except Exception as error:
+            bmd_hooks.services.callbacks.on_error(error)
 
-        bmd_hooks.services.handle_slash_command(
-            web_client=web_client, botmydesk_user=botmydesk_user, **payload
-        )
-
-        # For now just empty response. We'll send commands tru the web client.
         return HttpResponse()

@@ -15,7 +15,11 @@ import bmd_api_client.client
 botmydesk_logger = logging.getLogger("botmydesk")
 
 
-def get_botmydesk_user(web_client: WebClient, slack_user_id: str) -> BotMyDeskUser:
+def slack_web_client() -> WebClient:
+    return WebClient(token=settings.SLACK_BOT_TOKEN)
+
+
+def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
     """Fetches Slack user info and creates/updates the user info on our side."""
     try:
         # Ensure every user is known internally.
@@ -33,17 +37,17 @@ def get_botmydesk_user(web_client: WebClient, slack_user_id: str) -> BotMyDeskUs
 
         return botmydesk_user
 
-    users_info_result = web_client.users_info(user=slack_user_id, include_locale=True)
+    users_info_result = slack_web_client().users_info(
+        user=slack_user_id, include_locale=True
+    )
     users_info_result.validate()
     botmydesk_logger.debug(f"Users info result: {users_info_result}")
 
     # Dev only: Override email address when required for development AND the current user is marked as developer.
     DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default="")
-    BOTMYDESK_SLACK_ID_ON_ERROR = config(
-        "BOTMYDESK_SLACK_ID_ON_ERROR", cast=str, default=""
-    )
+    BOTMYDESK_OWNER_SLACK_ID = config("BOTMYDESK_OWNER_SLACK_ID", cast=str, default="")
 
-    if slack_user_id in BOTMYDESK_SLACK_ID_ON_ERROR and DEV_EMAIL_ADDRESS:
+    if DEV_EMAIL_ADDRESS and slack_user_id in BOTMYDESK_OWNER_SLACK_ID:
         email_address = DEV_EMAIL_ADDRESS
         botmydesk_logger.debug(
             f"DEV_EMAIL_ADDRESS: Overriding email address with: {email_address}"
@@ -83,11 +87,9 @@ def get_botmydesk_user(web_client: WebClient, slack_user_id: str) -> BotMyDeskUs
     return botmydesk_user
 
 
-def handle_slash_command_list_reservations(
-    web_client: WebClient, botmydesk_user: BotMyDeskUser, **_
-):
-    if not botmydesk_user.authorized_bot():
-        return unauthorized_reply_shortcut(web_client, botmydesk_user)
+def handle_slash_command_list_reservations(botmydesk_user: BotMyDeskUser, **_):
+    if not botmydesk_user.has_authorized_bot():
+        return unauthorized_reply_shortcut(botmydesk_user)
 
     title = gettext("Your upcoming BookMyDesk reservations")
     start = timezone.localtime(timezone.now())
@@ -102,7 +104,7 @@ def handle_slash_command_list_reservations(
             },
         )
     except BookMyDeskException as error:
-        result = web_client.chat_postEphemeral(
+        result = slack_web_client().chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
             text=gettext(
@@ -170,7 +172,7 @@ def handle_slash_command_list_reservations(
         },
     ]
 
-    web_client.chat_postEphemeral(
+    slack_web_client().chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=title,
@@ -178,11 +180,9 @@ def handle_slash_command_list_reservations(
     ).validate()
 
 
-def handle_slash_command_status(
-    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    if not botmydesk_user.authorized_bot():
-        return unauthorized_reply_shortcut(web_client, botmydesk_user)
+def handle_slash_command_status(botmydesk_user: BotMyDeskUser, payload: dict):
+    if not botmydesk_user.has_authorized_bot():
+        return unauthorized_reply_shortcut(botmydesk_user)
 
     today_text = timezone.localtime(timezone.now()).strftime("%A %-d %B")
     reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
@@ -257,7 +257,7 @@ def handle_slash_command_status(
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": gettext("⚙️ Preferences"),
+                        "text": gettext(f"⚙️ {settings.BOTMYDESK_NAME} preferences"),
                     },
                     "value": "open_settings",
                 },
@@ -394,43 +394,38 @@ def handle_slash_command_status(
         },
     ]
 
-    result = web_client.chat_postMessage(
+    slack_web_client().chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         blocks=blocks,
-    )
-    result.validate()
+    ).validate()
 
 
-def handle_user_working_home_today(
-    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    if not botmydesk_user.authorized_bot():
-        return unauthorized_reply_shortcut(web_client, botmydesk_user)
+def handle_user_working_home_today(botmydesk_user: BotMyDeskUser, payload):
+    if not botmydesk_user.has_authorized_bot():
+        return unauthorized_reply_shortcut(botmydesk_user)
 
     message_to_user = gettext(
         "🏡 _You requested me to book you for working at home._\n\n\nTODO"
     )
-    _post_handle_report_update(web_client, botmydesk_user, message_to_user, **payload)
+    _post_handle_report_update(botmydesk_user, message_to_user, payload)
 
     # @TODO: Implement
-    web_client.chat_postEphemeral(
+    slack_web_client().chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=gettext("Sorry, not yet implemented 🧑‍💻"),
     ).validate()
 
 
-def handle_user_working_in_office_today(
-    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    if not botmydesk_user.authorized_bot():
-        return unauthorized_reply_shortcut(web_client, botmydesk_user)
+def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
+    if not botmydesk_user.has_authorized_bot():
+        return unauthorized_reply_shortcut(botmydesk_user)
 
     try:
         reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
     except BookMyDeskException as error:
-        web_client.chat_postEphemeral(
+        slack_web_client().chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
             text=gettext(
@@ -490,27 +485,29 @@ def handle_user_working_in_office_today(
     message_to_user = gettext(
         f"🏢 _You requested me to check you in for the office._\n\n\n{report_text}"
     )
-    _post_handle_report_update(web_client, botmydesk_user, message_to_user, **payload)
+    _post_handle_report_update(botmydesk_user, message_to_user, payload)
 
 
-def handle_user_working_externally_today(
-    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
-):
-    if not botmydesk_user.authorized_bot():
-        return unauthorized_reply_shortcut(web_client, botmydesk_user)
+def handle_user_working_externally_today(botmydesk_user: BotMyDeskUser, payload):
+    if not botmydesk_user.has_authorized_bot():
+        return unauthorized_reply_shortcut(botmydesk_user)
 
     # Only when required/supported.
     if not settings.BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME:
-        return web_client.chat_postEphemeral(
-            channel=botmydesk_user.slack_user_id,
-            user=botmydesk_user.slack_user_id,
-            text=gettext("✋ Sorry, not supported at this time"),
-        ).validate()
+        return (
+            slack_web_client()
+            .chat_postEphemeral(
+                channel=botmydesk_user.slack_user_id,
+                user=botmydesk_user.slack_user_id,
+                text=gettext("✋ Sorry, not supported at this time"),
+            )
+            .validate()
+        )
 
     try:
         reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
     except BookMyDeskException as error:
-        web_client.chat_postEphemeral(
+        slack_web_client().chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
             text=gettext(
@@ -526,7 +523,7 @@ def handle_user_working_externally_today(
     # try:
     #     company_extended_result = bmd_api_client.client.company_extended_v3(botmydesk_user)
     # except BookMyDeskException as error:
-    #     return web_client.chat_postEphemeral(
+    #     return slack_web_client().chat_postEphemeral(
     #         channel=botmydesk_user.slack_user_id,
     #         user=botmydesk_user.slack_user_id,
     #         text=gettext(
@@ -546,27 +543,25 @@ def handle_user_working_externally_today(
     # message_to_user = gettext(
     #     f"🚋 _You requested me to check you in for working externally._\n\n\nTODO"
     # )
-    # _post_handle_report_update(client, botmydesk_user, message_to_user, **payload)
+    # _post_handle_report_update(botmydesk_user, message_to_user, payload)
 
     # @TODO: Implement
-    web_client.chat_postEphemeral(
+    slack_web_client().chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=gettext("Sorry, not yet implemented 🧑‍💻"),
     ).validate()
 
 
-def handle_user_not_working_today(
-    web_client: WebClient, botmydesk_user: BotMyDeskUser, **payload
-):
+def handle_user_not_working_today(botmydesk_user: BotMyDeskUser, payload):
     """Fetches your reservations of the current day and cancels them all, when applicable."""
-    if not botmydesk_user.authorized_bot():
-        return unauthorized_reply_shortcut(web_client, botmydesk_user)
+    if not botmydesk_user.has_authorized_bot():
+        return unauthorized_reply_shortcut(botmydesk_user)
 
     try:
         reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
     except BookMyDeskException as error:
-        web_client.chat_postEphemeral(
+        slack_web_client().chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
             text=gettext(
@@ -638,18 +633,18 @@ def handle_user_not_working_today(
     message_to_user = gettext(
         f"❌ _You requested me to clear your reservations._\n\n\n{report_text}"
     )
-    _post_handle_report_update(web_client, botmydesk_user, message_to_user, **payload)
+    _post_handle_report_update(botmydesk_user, message_to_user, payload)
 
 
 def _post_handle_report_update(
-    web_client: WebClient,
     botmydesk_user: BotMyDeskUser,
     message_to_user: str,
-    **payload,
+    payload: dict,
 ):
     today_text = timezone.localtime(timezone.now()).strftime("%A %-d %B")
     title = gettext(f"{today_text} update")
-    web_client.chat_postMessage(
+
+    slack_web_client().chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=title,
@@ -675,7 +670,7 @@ def _post_handle_report_update(
 
     try:
         # Delete trigger, if any was given.
-        web_client.chat_delete(
+        slack_web_client().chat_delete(
             channel=payload["container"]["channel_id"],
             ts=payload["container"]["message_ts"],
         ).validate()
@@ -683,8 +678,8 @@ def _post_handle_report_update(
         pass
 
 
-def unauthorized_reply_shortcut(web_client: WebClient, botmydesk_user: BotMyDeskUser):
-    web_client.chat_postEphemeral(
+def unauthorized_reply_shortcut(botmydesk_user: BotMyDeskUser):
+    slack_web_client().chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=gettext("✋ Sorry, you will need to connect me first."),

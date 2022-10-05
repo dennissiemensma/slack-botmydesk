@@ -165,11 +165,6 @@ LOGGING = {
             "level": "WARNING",
             " propagate": False,
         },
-        "console_commands": {
-            "handlers": ["console"],
-            "level": "WARNING",
-            "propagate": False,
-        },
         "django.db": {
             "handlers": ["console"],
             "level": "ERROR",
@@ -181,10 +176,11 @@ LOGGING = {
 if DEBUG:
     LOGGING["loggers"]["botmydesk"]["level"] = "DEBUG"
     LOGGING["loggers"]["bookmydesk_client"]["level"] = "DEBUG"
-    LOGGING["loggers"]["console_commands"]["level"] = "DEBUG"
 
 # Project related.
-BOTMYDESK_USER_AGENT = "BotMyDesk Slack Integration"
+BOTMYDESK_USER_AGENT = "BotMyDesk Slack Bot"
+BOTMYDESK_NAME = "BotMyDesk"
+
 SLACK_APP_TOKEN = config(
     "SLACK_APP_TOKEN", cast=str, default=""
 )  # Ony required for Socket Mode.
@@ -202,14 +198,13 @@ BOOKMYDESK_CLIENT_SECRET = config("BOOKMYDESK_CLIENT_SECRET", cast=str)
 
 SLACK_SLASHCOMMAND_BMD = config("SLACK_SLASHCOMMAND_BMD", cast=str)
 
-BOTMYDESK_SLACK_ID_ON_ERROR = config(
-    "BOTMYDESK_SLACK_ID_ON_ERROR", cast=str, default=""
-)
+BOTMYDESK_OWNER_SLACK_ID = config("BOTMYDESK_OWNER_SLACK_ID", cast=str, default="")
 BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME = config(
     "BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME", cast=str, default=None
 )
 
 # Sub commands and aliases
+SLACK_SLASHCOMMAND_BMD_DEBUGP = "debug"
 SLACK_SLASHCOMMAND_BMD_HELP = "help"
 SLACK_SLASHCOMMAND_BMD_SETTINGS = "settings"
 SLACK_SLASHCOMMAND_BMD_STATUS = "status"

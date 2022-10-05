@@ -37,7 +37,7 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
     notification_on_fridays = models.BooleanField(db_index=True, default=True)
     notification_time = models.TimeField(default=time(8, 30, 0))
 
-    def authorized_bot(self) -> bool:
+    def has_authorized_bot(self) -> bool:
         """Whether the bot is authorized for this user (has session)."""
         return self.refresh_token is not None
 

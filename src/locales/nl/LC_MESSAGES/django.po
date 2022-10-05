@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-02 19:45+0000\n"
+"POT-Creation-Date: 2022-10-05 22:08+0000\n"
 "PO-Revision-Date: 2022-08-23 23:02+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
@@ -108,9 +108,9 @@ msgid ""
 "_Where are you today?_"
 msgstr ""
 
-#, fuzzy
+#, fuzzy, python-brace-format
 #| msgid "⚙️ BotMyDesk preferences"
-msgid "⚙️Preferences"
+msgid "⚙️ {settings.BOTMYDESK_NAME} preferences"
 msgstr "⚙️ BotMyDesk-voorkeuren"
 
 msgid "🏡 Working home"
@@ -305,8 +305,9 @@ msgstr ""
 msgid "✋ Sorry, you will need to connect me first."
 msgstr ""
 
-msgid "Unexpected error"
-msgstr "Onverwachte fout"
+#, python-brace-format
+msgid "{settings.BOTMYDESK_NAME}: Unexpected error"
+msgstr ""
 
 msgid "I'm not sure what to do, sorry! 🤷‍♀"
 msgstr "Ik weet niet wat ik moet doen, sorry! 🤷‍♀"
@@ -326,8 +327,53 @@ msgstr ""
 "```{error}```"
 
 #, python-brace-format
-msgid "_Report to <{settings.BOTMYDESK_SLACK_ID_ON_ERROR}>_ 🤨"
-msgstr "_Rapporteer aan <{settings.BOTMYDESK_SLACK_ID_ON_ERROR}>_ 🤨"
+msgid "_Report to <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
+msgstr "_Rapporteer aan <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
+
+#, python-brace-format
+msgid "Connecting {settings.BOTMYDESK_NAME}"
+msgstr ""
+
+#, python-brace-format
+msgid "Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received."
+msgstr "Controleer je mailbox voor *{botmydesk_user.email}*. Vul de BookMyDesk logincode in die je hebt ontvangen."
+
+msgid "Login code"
+msgstr "Logincode"
+
+msgid "Verify login code"
+msgstr "Verifieer logincode"
+
+#, python-brace-format
+msgid "{settings.BOTMYDESK_NAME} disconnected"
+msgstr ""
+
+#, fuzzy, python-brace-format
+#| msgid ""
+#| "I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again or the button to the right.\n"
+#| "\n"
+#| "Bye! 👋"
+msgid ""
+"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n"
+"\n"
+"Bye! 👋"
+msgstr ""
+"Ik ben nu ontkoppeld van je BookMyDesk-account. Je kunt me later weer koppelen door `{settings.SLACK_SLASHCOMMAND_BMD}` opnieuw uit te voeren, of te klikken op de knop aan de rechterzijde.\n"
+"\n"
+"Doei! 👋"
+
+msgid "Error validating your login code. You can try it another time or restart this flow to have a new code sent to you."
+msgstr "Fout bij het valideren van je logincode. Je kunt het nogmaals proberen of deze flow opnieuw doorlopen om een nieuwe code te ontvangen."
+
+#, python-brace-format
+msgid "{settings.BOTMYDESK_NAME} connected"
+msgstr ""
+
+msgid "Great! You've connected me to your BookMyDesk-account 👏"
+msgstr ""
+
+msgid "Check out your preferences by clicking the button below, or by going to the 'Home' tab of this bot."
+msgstr ""
 
 #, fuzzy, python-brace-format
 #| msgid ""
@@ -468,24 +514,27 @@ msgstr ""
 msgid "_More commands will be available after you've connected your account by typing *`{settings.SLACK_SLASHCOMMAND_BMD}`*_."
 msgstr "_More commando's zijn beschikbaar zodra je je account koppelt door *`{settings.SLACK_SLASHCOMMAND_BMD}`* te typen_."
 
-msgid "BotMyDesk help"
-msgstr "BotMyDesk hulp"
+#, python-brace-format
+msgid "{settings.BOTMYDESK_NAME} help"
+msgstr ""
 
 #, python-brace-format
 msgid "Hi {botmydesk_user.name}"
 msgstr "Hoi {botmydesk_user.name}"
 
+#, fuzzy, python-brace-format
+#| msgid ""
+#| "My name is BotMyDesk, I'm an unofficial Slack bot for BookMyDesk.\n"
+#| "\n"
+#| "I can remind you to check-in at the office or at home. Making life a bit easier for you!"
 msgid ""
-"My name is BotMyDesk, I'm an unofficial Slack bot for BookMyDesk.\n"
+"My name is {settings.BOTMYDESK_NAME}, I'm an unofficial Slack bot for BookMyDesk.\n"
 "\n"
 "I can remind you to check-in at the office or at home. Making life a bit easier for you!"
 msgstr ""
 "Mijn naam is BotMyDesk, ik ben een onofficiële Slack-bot voor BookMyDesk.\n"
 "\n"
 "Ik kan je herinneringen sturen om in te checken op kantoor of thuis. Maakt je leven wellicht net wat makkelijker!"
-
-msgid "Connecting BotMyDesk"
-msgstr "BotMyDesk koppelen"
 
 #, python-brace-format
 msgid "First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.email}*."
@@ -520,38 +569,37 @@ msgstr "Nee, wacht even"
 msgid "_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._"
 msgstr "_Je kunt me later op elk moment ontkoppelen door weer `{settings.SLACK_SLASHCOMMAND_BMD}` te typen._"
 
-msgid "⚙️ BotMyDesk preferences"
-msgstr "⚙️ BotMyDesk-voorkeuren"
-
-msgid "Loading..."
-msgstr "Bezig met laden..."
-
-msgid "Preferences"
+msgid "Loading your preferences..."
 msgstr ""
 
-msgid "Select *which working day(s)* to receive daily reminder on:"
+msgid "No"
 msgstr ""
 
-msgid "Mondays"
+msgid "Around 8:00"
 msgstr ""
 
-msgid "Tuesdays"
+msgid "Around 9:00"
 msgstr ""
 
-msgid "Wednesdays"
+msgid "Around 10:00"
 msgstr ""
 
-msgid "Thursdays"
+msgid "Select the days to receive a daily reminder on:"
 msgstr ""
 
-msgid "Fridays"
+msgid "Notify you on *mondays*?"
 msgstr ""
 
-msgid "Select *what time* to be reminded at:"
+msgid "Notify you on *tuesdays*?"
 msgstr ""
 
-#, python-brace-format
-msgid "_Connected to BookMyDesk account of *{full_name}*_"
+msgid "Notify you on *wednesdays*?"
+msgstr ""
+
+msgid "Notify you on *thursdays*?"
+msgstr ""
+
+msgid "Notify you on *fridays*?"
 msgstr ""
 
 msgid "Show help info in chat"
@@ -560,8 +608,13 @@ msgstr ""
 msgid "Test notification in chat"
 msgstr ""
 
-msgid "Disconnect BotMyDesk"
-msgstr "Ontkoppel BotMyDesk"
+#, python-brace-format
+msgid "_Connected to BookMyDesk account of *{full_name}*_"
+msgstr ""
+
+#, python-brace-format
+msgid "Disconnect {settings.BOTMYDESK_NAME}"
+msgstr ""
 
 #, fuzzy
 #| msgid ""
@@ -582,72 +635,3 @@ msgstr "Ja, ontkoppel"
 
 msgid "Nevermind, keep connected"
 msgstr "Laat maar, blijf gekoppeld"
-
-#, python-brace-format
-msgid "Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received."
-msgstr "Controleer je mailbox voor *{botmydesk_user.email}*. Vul de BookMyDesk logincode in die je hebt ontvangen."
-
-msgid "Login code"
-msgstr "Logincode"
-
-msgid "Verify login code"
-msgstr "Verifieer logincode"
-
-msgid "BotMyDesk disconnected"
-msgstr "BotMyDesk ontkoppeld"
-
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again or the button to the right.\n"
-#| "\n"
-#| "Bye! 👋"
-msgid ""
-"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n"
-"\n"
-"Bye! 👋"
-msgstr ""
-"Ik ben nu ontkoppeld van je BookMyDesk-account. Je kunt me later weer koppelen door `{settings.SLACK_SLASHCOMMAND_BMD}` opnieuw uit te voeren, of te klikken op de knop aan de rechterzijde.\n"
-"\n"
-"Doei! 👋"
-
-msgid "Error validating your login code. You can try it another time or restart this flow to have a new code sent to you."
-msgstr "Fout bij het valideren van je logincode. Je kunt het nogmaals proberen of deze flow opnieuw doorlopen om een nieuwe code te ontvangen."
-
-#, fuzzy
-#| msgid "BotMyDesk connected!"
-msgid "BotMyDesk connected"
-msgstr "BotMyDesk gekoppeld!"
-
-#, python-brace-format
-msgid ""
-"Great! You've connected me to your BookMyDesk-account 👏\n"
-"\n"
-"I will now summarize the commands you can use, which is similar to typing *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`*"
-msgstr ""
-"Yes! Je hebt me gekoppeld aan je BookMyDesk-account 👏\n"
-"\n"
-"Ik geef nu een opsomming van alle commando's die je kunt gebruiken, vergelijkbaar wanneer je *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`* typt"
-
-#, python-brace-format
-#~ msgid "✋ Sorry, you will need to connect me first. See `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-#~ msgstr "✋ Sorry, je zult me eerst moeten koppelen. Zie `{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_HELP}`"
-
-#, python-brace-format
-#~ msgid "*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
-#~ msgstr "*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS_2}`* \n"
-
-#, python-brace-format
-#~ msgid "🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
-#~ msgstr "🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_2}`* \n"
-
-#, python-brace-format
-#~ msgid "🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
-#~ msgstr "🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_2}`* \n"
-
-#, python-brace-format
-#~ msgid "🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
-#~ msgstr "🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_2}`* \n"
-
-#, python-brace-format
-#~ msgid "❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"
-#~ msgstr "❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_2}`* \n"

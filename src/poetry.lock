@@ -631,7 +631,7 @@ requests = "*"
 
 [[package]]
 name = "slack-sdk"
-version = "3.18.5"
+version = "3.19.0"
 description = "The Slack API Platform SDK for Python"
 category = "main"
 optional = false
@@ -694,7 +694,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-pytz"
-version = "2022.2.1.0"
+version = "2022.4.0.0"
 description = "Typing stubs for pytz"
 category = "dev"
 optional = false

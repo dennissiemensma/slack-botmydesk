@@ -27,16 +27,17 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
     except BotMyDeskUser.DoesNotExist:
         botmydesk_user = None
 
-    # Profile sync on each request is quite expensive, so once in a while suffices. Or when the user is unknown.
+    # Profile sync on each request is quite expensive, so once in a while suffices.
     if botmydesk_user is not None and botmydesk_user.profile_data_expired():
-        # Dev only: Override locale or use user's preference.
-        locale = config("DEV_LOCALE", cast=str, default=botmydesk_user.locale)
-
-        # Apply user locale.
+        # DEV only: Override locale or use the user's preference.
+        locale = config(
+            "DEV_FORCE_LOCALE", cast=str, default=botmydesk_user.slack_locale
+        )
         translation.activate(locale)
 
         return botmydesk_user
 
+    # Fetch Slack info for user.
     users_info_result = slack_web_client().users_info(
         user=slack_user_id, include_locale=True
     )
@@ -57,31 +58,34 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
 
     first_name = users_info_result.get("user")["profile"]["first_name"]
     locale = users_info_result.get("user")["locale"]
+    tz = users_info_result.get("user")["tz"]
 
-    next_profile_update = timezone.now() + timezone.timedelta(days=1)
+    next_profile_update = timezone.now() + timezone.timedelta(hours=1)
 
     # First-time/new user.
     if botmydesk_user is None:
         botmydesk_logger.debug(f"Creating new user: {slack_user_id}")
         botmydesk_user = BotMyDeskUser.objects.create(
             slack_user_id=slack_user_id,
-            locale=locale,
-            email=email_address,
-            name=first_name,
-            next_profile_update=next_profile_update,
+            slack_email=email_address,
+            slack_name=first_name,
+            slack_locale=locale,
+            slack_tz=tz,
+            next_slack_profile_update=next_profile_update,
         )
     else:
         botmydesk_logger.debug(f"Updating existing user: {slack_user_id}")
         # Data sync existing user.
         botmydesk_user.update(
-            locale=locale,
-            email=email_address,
-            name=first_name,
-            next_profile_update=next_profile_update,
+            slack_email=email_address,
+            slack_name=first_name,
+            slack_locale=locale,
+            slack_tz=tz,
+            next_slack_profile_update=next_profile_update,
         )
 
-    # Dev only: Override locale or use user's preference.
-    locale = config("DEV_LOCALE", cast=str, default=botmydesk_user.locale)
+    # DEV only: Override locale or use the user's preference.
+    locale = config("DEV_FORCE_LOCALE", cast=str, default=botmydesk_user.slack_locale)
     translation.activate(locale)
 
     return botmydesk_user

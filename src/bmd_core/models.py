@@ -14,47 +14,54 @@ class BotMyDeskSlackUserManager(models.Manager):
 class BotMyDeskUser(ModelUpdateMixin, models.Model):
     objects = BotMyDeskSlackUserManager()
 
-    slack_user_id = models.CharField(
-        db_index=True,
-        unique=True,
-        max_length=255,
-    )
-    locale = models.CharField(max_length=16)
-    email = models.EmailField(max_length=255)
-    name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now=True)
-    next_profile_update = models.DateTimeField(auto_now=True)
-    access_token = models.CharField(null=True, default=None, max_length=255)
-    # The actual expiry is unknown, but assume one hour.
-    access_token_expires_at = models.DateTimeField(null=True, default=None)
-    refresh_token = models.CharField(null=True, default=None, max_length=255)
+    next_background_run = models.DateTimeField(
+        db_index=True, auto_now=True
+    )  # Background processing schedule.
 
-    # Preferences
-    notification_on_mondays = models.BooleanField(db_index=True, default=True)
-    notification_on_tuesdays = models.BooleanField(db_index=True, default=True)
-    notification_on_wednesdays = models.BooleanField(db_index=True, default=True)
-    notification_on_thursdays = models.BooleanField(db_index=True, default=True)
-    notification_on_fridays = models.BooleanField(db_index=True, default=True)
-    notification_time = models.TimeField(default=time(8, 30, 0))
+    # Slack data.
+    slack_user_id = models.CharField(db_index=True, unique=True, max_length=255)
+    slack_email = models.EmailField(max_length=255)
+    slack_name = models.CharField(max_length=255)
+    slack_locale = models.CharField(max_length=16)
+    slack_tz = models.CharField(max_length=64)
+    next_slack_profile_update = models.DateTimeField(
+        auto_now=True
+    )  # Whenever WE update profile info here.
+
+    # BMD data
+    bookmydesk_access_token = models.CharField(null=True, default=None, max_length=255)
+    bookmydesk_access_token_expires_at = models.DateTimeField(null=True, default=None)
+    bookmydesk_refresh_token = models.CharField(null=True, default=None, max_length=255)
+
+    # User preferences
+    preferred_notification_time_on_mondays = models.TimeField(null=True, default=None)
+    preferred_notification_time_on_tuesdays = models.TimeField(null=True, default=None)
+    preferred_notification_time_on_wednesdays = models.TimeField(
+        null=True, default=None
+    )
+    preferred_notification_time_on_thursdays = models.TimeField(null=True, default=None)
+    preferred_notification_time_on_fridays = models.TimeField(null=True, default=None)
+    prefer_only_notifications_when_needed = models.BooleanField(default=True)
 
     def has_authorized_bot(self) -> bool:
         """Whether the bot is authorized for this user (has session)."""
-        return self.refresh_token is not None
+        return self.bookmydesk_refresh_token is not None
 
     def access_token_expired(self) -> bool:
         """Whether the access token needs to be refreshed."""
         return (
-            self.access_token_expires_at is None
-            or self.access_token_expires_at <= timezone.now()
+            self.bookmydesk_access_token_expires_at is None
+            or self.bookmydesk_access_token_expires_at <= timezone.now()
         )
 
     def profile_data_expired(self) -> bool:
         """Whether the profile data needs to be refreshed."""
-        return self.next_profile_update <= timezone.now()
+        return self.next_slack_profile_update <= timezone.now()
 
     def clear_tokens(self):
         self.update(
-            access_token=None,
-            access_token_expires_at=None,
-            refresh_token=None,
+            bookmydesk_access_token=None,
+            bookmydesk_access_token_expires_at=None,
+            bookmydesk_refresh_token=None,
         )

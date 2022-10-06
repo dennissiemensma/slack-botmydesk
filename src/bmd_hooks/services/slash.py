@@ -137,7 +137,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
             "callback_id": "bmd-unauthorized-welcome",
             "title": {
                 "type": "plain_text",
-                "text": gettext(f"Hi {botmydesk_user.name}"),
+                "text": gettext(f"Hi {botmydesk_user.slack_name}"),
             },
             "blocks": [
                 {
@@ -162,7 +162,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                     "text": {
                         "type": "mrkdwn",
                         "text": gettext(
-                            f"First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.email}*."
+                            f"First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.slack_email}*."
                         ),
                     },
                 },
@@ -185,7 +185,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                                 "text": {
                                     "type": "mrkdwn",
                                     "text": gettext(
-                                        f"Request BookMyDesk login code by email for *{botmydesk_user.email}*?\n\n_You can enter it on the next screen._"
+                                        f"Request BookMyDesk login code by email for *{botmydesk_user.slack_email}*?\n\n_You can enter it on the next screen._"
                                     ),
                                 },
                                 "confirm": {

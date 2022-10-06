@@ -68,7 +68,7 @@ def handle_interactive_send_bookmydesk_login_code(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        f"Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received."
+                        f"Check your mailbox for *{botmydesk_user.slack_email}*. Enter the BookMyDesk login code you've received."
                     ),
                 },
             },
@@ -107,9 +107,9 @@ def handle_interactive_send_bookmydesk_login_code(
 
     # Request code later so the response above is quick.
     botmydesk_logger.info(
-        f"{botmydesk_user.slack_user_id}: Sending BookMyDesk login code to {botmydesk_user.email}"
+        f"{botmydesk_user.slack_user_id}: Sending BookMyDesk login code to {botmydesk_user.slack_email}"
     )
-    bmd_api_client.client.request_login_code(email=botmydesk_user.email)
+    bmd_api_client.client.request_login_code(email=botmydesk_user.slack_email)
 
 
 def handle_interactive_bmd_revoke_botmydesk(
@@ -187,7 +187,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
 
     try:
         login_result = bmd_api_client.client.token_login(
-            username=botmydesk_user.email, otp=otp
+            username=botmydesk_user.slack_email, otp=otp
         )
     except BookMyDeskException:
         return {

@@ -74,16 +74,16 @@ def logout(botmydesk_user: BotMyDeskUser):
         url=f"{settings.BOOKMYDESK_API_URL}/logout",
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
-            "Authorization": f"Bearer {botmydesk_user.access_token}",
+            "Authorization": f"Bearer {botmydesk_user.bookmydesk_access_token}",
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
     )
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to terminate session of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to terminate session of {botmydesk_user.slack_email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
@@ -98,7 +98,7 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
             "grant_type": "refresh_token",
             "client_id": settings.BOOKMYDESK_CLIENT_ID,
             "client_secret": settings.BOOKMYDESK_CLIENT_SECRET,
-            "refresh_token": botmydesk_user.refresh_token,
+            "refresh_token": botmydesk_user.bookmydesk_refresh_token,
         },
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
@@ -106,17 +106,17 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
     )
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to refresh session of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to refresh session of {botmydesk_user.slack_email} (HTTP {response.status_code}): {response.content}"
         )
 
         botmydesk_user.clear_tokens()
         bookmydesk_client_logger.error(
-            f"Cleared session info of {botmydesk_user.email}, reauthorization required..."
+            f"Cleared session info of {botmydesk_user.slack_email}, reauthorization required..."
         )
         raise BookMyDeskException(response.content)
 
@@ -139,19 +139,21 @@ def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
         url=f"{settings.BOOKMYDESK_API_URL}/v3/me",
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
-            "Authorization": f"Bearer {botmydesk_user.access_token}",
+            "Authorization": f"Bearer {botmydesk_user.bookmydesk_access_token}",
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
     )
     bookmydesk_client_logger.debug(
-        "(%s) Response:\n%s", botmydesk_user.email, pformat(response.json(), indent=4)
+        "(%s) Response:\n%s",
+        botmydesk_user.slack_email,
+        pformat(response.json(), indent=4),
     )
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to get me/profile of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to get me/profile of {botmydesk_user.slack_email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
@@ -174,14 +176,16 @@ def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResul
         },
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
-            "Authorization": f"Bearer {botmydesk_user.access_token}",
+            "Authorization": f"Bearer {botmydesk_user.bookmydesk_access_token}",
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
     )
     bookmydesk_client_logger.debug(
-        "(%s) Response:\n%s", botmydesk_user.email, pformat(response.json(), indent=2)
+        "(%s) Response:\n%s",
+        botmydesk_user.slack_email,
+        pformat(response.json(), indent=2),
     )
 
     if response.status_code != 200:
@@ -221,19 +225,21 @@ def list_reservations_v3(
         params=parameters,
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
-            "Authorization": f"Bearer {botmydesk_user.access_token}",
+            "Authorization": f"Bearer {botmydesk_user.bookmydesk_access_token}",
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
     )
     bookmydesk_client_logger.debug(
-        "(%s) Response:\n%s", botmydesk_user.email, pformat(response.json(), indent=2)
+        "(%s) Response:\n%s",
+        botmydesk_user.slack_email,
+        pformat(response.json(), indent=2),
     )
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
-            f"FAILED to get reservations of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to get reservations of {botmydesk_user.slack_email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
@@ -256,18 +262,18 @@ def reservation_check_in_out(
         },
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
-            "Authorization": f"Bearer {botmydesk_user.access_token}",
+            "Authorization": f"Bearer {botmydesk_user.bookmydesk_access_token}",
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
     )
 
     expected_status_code = 200 if check_in else 204
 
     if response.status_code != expected_status_code:
         bookmydesk_client_logger.error(
-            f"FAILED to {check_in_or_out} from reservation of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to {check_in_or_out} from reservation of {botmydesk_user.slack_email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)
 
@@ -285,15 +291,15 @@ def delete_reservation_v3(botmydesk_user: BotMyDeskUser, reservation_id: str):
         },
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
-            "Authorization": f"Bearer {botmydesk_user.access_token}",
+            "Authorization": f"Bearer {botmydesk_user.bookmydesk_access_token}",
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.email, response.request.url
+        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
     )
 
     if response.status_code != 204:
         bookmydesk_client_logger.error(
-            f"FAILED to delete reservation of {botmydesk_user.email} (HTTP {response.status_code}): {response.content}"
+            f"FAILED to delete reservation of {botmydesk_user.slack_email} (HTTP {response.status_code}): {response.content}"
         )
         raise BookMyDeskException(response.content)

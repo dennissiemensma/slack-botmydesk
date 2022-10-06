@@ -48,7 +48,11 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
     DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default="")
     BOTMYDESK_OWNER_SLACK_ID = config("BOTMYDESK_OWNER_SLACK_ID", cast=str, default="")
 
-    if DEV_EMAIL_ADDRESS and slack_user_id in BOTMYDESK_OWNER_SLACK_ID:
+    if (
+        settings.DEBUG
+        and len(DEV_EMAIL_ADDRESS) > 0
+        and slack_user_id in BOTMYDESK_OWNER_SLACK_ID
+    ):
         email_address = DEV_EMAIL_ADDRESS
         botmydesk_logger.debug(
             f"DEV_EMAIL_ADDRESS: Overriding email address with: {email_address}"

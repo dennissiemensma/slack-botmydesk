@@ -98,18 +98,28 @@ def handle_interactive_send_bookmydesk_login_code(
         "submit": {"type": "plain_text", "text": gettext("Verify login code")},
     }
 
-    # @see https://api.slack.com/surfaces/modals/using#updating_apis
-    bmd_core.services.slack_web_client().views_update(
+    # Request code first, as it MAY fail.
+    botmydesk_logger.info(
+        f"{botmydesk_user.slack_user_id}: Sending BookMyDesk login code to {botmydesk_user.slack_email}"
+    )
+    web_client = bmd_core.services.slack_web_client()
+
+    try:
+        bmd_api_client.client.request_login_code(email=botmydesk_user.slack_email)
+    except BookMyDeskException as error:
+        web_client.chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=gettext(f"Sorry, failed to request BookMyDesk login code: `{error}`"),
+        ).validate()
+
+        return
+
+    web_client.views_update(
         view_id=payload["view"]["id"],
         hash=payload["view"]["hash"],
         view=view_data,
     ).validate()
-
-    # Request code later so the response above is quick.
-    botmydesk_logger.info(
-        f"{botmydesk_user.slack_user_id}: Sending BookMyDesk login code to {botmydesk_user.slack_email}"
-    )
-    bmd_api_client.client.request_login_code(email=botmydesk_user.slack_email)
 
 
 def handle_interactive_bmd_revoke_botmydesk(

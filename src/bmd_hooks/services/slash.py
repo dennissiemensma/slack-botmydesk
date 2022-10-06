@@ -137,24 +137,17 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
             "callback_id": "bmd-unauthorized-welcome",
             "title": {
                 "type": "plain_text",
-                "text": gettext(f"Hi {botmydesk_user.slack_name}"),
+                "text": gettext(f"Hi {botmydesk_user.slack_name} 👋"),
             },
             "blocks": [
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": gettext(
-                            f"My name is {settings.BOTMYDESK_NAME}, I'm an unofficial Slack bot for BookMyDesk.\n\nI can remind you to check-in at the office or at home. Making life a bit easier for you!"
-                        ),
-                    },
-                },
                 {"type": "divider"},
                 {
                     "type": "header",
                     "text": {
                         "type": "plain_text",
-                        "text": gettext(f"Connecting {settings.BOTMYDESK_NAME}"),
+                        "text": gettext(
+                            f"Connecting BookMyDesk to {settings.BOTMYDESK_NAME}"
+                        ),
                     },
                 },
                 {
@@ -162,7 +155,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                     "text": {
                         "type": "mrkdwn",
                         "text": gettext(
-                            f"First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.slack_email}*."
+                            "First, you will need to authorize me to access your BookMyDesk-account, presuming it's your Slack email address."
                         ),
                     },
                 },
@@ -185,7 +178,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                                 "text": {
                                     "type": "mrkdwn",
                                     "text": gettext(
-                                        f"Request BookMyDesk login code by email for *{botmydesk_user.slack_email}*?\n\n_You can enter it on the next screen._"
+                                        f"Request BookMyDesk login code by email for *{botmydesk_user.slack_email}*?\n\n_You can enter the code on the next screen._"
                                     ),
                                 },
                                 "confirm": {
@@ -207,7 +200,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                     "text": {
                         "type": "mrkdwn",
                         "text": gettext(
-                            f"_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._"
+                            "_You can disconnect me later at any time by accessing these preferences again._"
                         ),
                     },
                 },

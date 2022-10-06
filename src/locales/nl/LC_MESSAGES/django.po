@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-05 22:08+0000\n"
+"POT-Creation-Date: 2022-10-06 21:13+0000\n"
 "PO-Revision-Date: 2022-08-23 23:02+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
@@ -330,12 +330,32 @@ msgstr ""
 msgid "_Report to <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 msgstr "_Rapporteer aan <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 
+#, fuzzy, python-brace-format
+#| msgid "Hi {botmydesk_user.name}"
+msgid "Hi {botmydesk_user.slack_name} 👋"
+msgstr "Hoi {botmydesk_user.name}"
+
+#, fuzzy, python-brace-format
+#| msgid ""
+#| "My name is BotMyDesk, I'm an unofficial Slack bot for BookMyDesk.\n"
+#| "\n"
+#| "I can remind you to check-in at the office or at home. Making life a bit easier for you!"
+msgid "My name is {settings.BOTMYDESK_NAME}, I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
+msgstr ""
+"Mijn naam is BotMyDesk, ik ben een onofficiële Slack-bot voor BookMyDesk.\n"
+"\n"
+"Ik kan je herinneringen sturen om in te checken op kantoor of thuis. Maakt je leven wellicht net wat makkelijker!"
+
+msgid "Click the button below to link your BookMyDesk account to me."
+msgstr ""
+
 #, python-brace-format
 msgid "Connecting {settings.BOTMYDESK_NAME}"
 msgstr ""
 
-#, python-brace-format
-msgid "Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received."
+#, fuzzy, python-brace-format
+#| msgid "Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received."
+msgid "Check your mailbox for *{botmydesk_user.slack_email}*. Enter the BookMyDesk login code you've received."
 msgstr "Controleer je mailbox voor *{botmydesk_user.email}*. Vul de BookMyDesk logincode in die je hebt ontvangen."
 
 msgid "Login code"
@@ -343,6 +363,10 @@ msgstr "Logincode"
 
 msgid "Verify login code"
 msgstr "Verifieer logincode"
+
+#, python-brace-format
+msgid "Sorry, failed to request BookMyDesk login code: `{error}`"
+msgstr ""
 
 #, python-brace-format
 msgid "{settings.BOTMYDESK_NAME} disconnected"
@@ -519,25 +543,12 @@ msgid "{settings.BOTMYDESK_NAME} help"
 msgstr ""
 
 #, python-brace-format
-msgid "Hi {botmydesk_user.name}"
-msgstr "Hoi {botmydesk_user.name}"
-
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "My name is BotMyDesk, I'm an unofficial Slack bot for BookMyDesk.\n"
-#| "\n"
-#| "I can remind you to check-in at the office or at home. Making life a bit easier for you!"
-msgid ""
-"My name is {settings.BOTMYDESK_NAME}, I'm an unofficial Slack bot for BookMyDesk.\n"
-"\n"
-"I can remind you to check-in at the office or at home. Making life a bit easier for you!"
+msgid "Connecting BookMyDesk to {settings.BOTMYDESK_NAME}"
 msgstr ""
-"Mijn naam is BotMyDesk, ik ben een onofficiële Slack-bot voor BookMyDesk.\n"
-"\n"
-"Ik kan je herinneringen sturen om in te checken op kantoor of thuis. Maakt je leven wellicht net wat makkelijker!"
 
-#, python-brace-format
-msgid "First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.email}*."
+#, fuzzy
+#| msgid "First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.email}*."
+msgid "First, you will need to authorize me to access your BookMyDesk-account, presuming it's your Slack email address."
 msgstr "Om te beginnen zul je me toegang moeten geven tot je BookMyDesk-account, er vanuit gaande dat dat *{botmydesk_user.email}* is."
 
 msgid "Connect"
@@ -549,9 +560,9 @@ msgstr "Koppel"
 #| "\n"
 #| "_You can enter it on the next screen._"
 msgid ""
-"Request BookMyDesk login code by email for *{botmydesk_user.email}*?\n"
+"Request BookMyDesk login code by email for *{botmydesk_user.slack_email}*?\n"
 "\n"
-"_You can enter it on the next screen._"
+"_You can enter the code on the next screen._"
 msgstr ""
 "BookMyDesk logincode voor *{botmydesk_user.email}* aanvragen?\n"
 "\n"
@@ -565,8 +576,9 @@ msgstr "Ja, verstuur"
 msgid "No, hold on"
 msgstr "Nee, wacht even"
 
-#, python-brace-format
-msgid "_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._"
+#, fuzzy
+#| msgid "_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._"
+msgid "_You can disconnect me later at any time by accessing these preferences again._"
 msgstr "_Je kunt me later op elk moment ontkoppelen door weer `{settings.SLACK_SLASHCOMMAND_BMD}` te typen._"
 
 msgid "Loading your preferences..."

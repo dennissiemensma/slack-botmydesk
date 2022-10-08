@@ -27,7 +27,7 @@ def handle_slash_command(payload):
             settings.SLACK_SLASHCOMMAND_BMD_DEBUGP: handle_ephemeral_debug_message,
             settings.SLACK_SLASHCOMMAND_BMD_HELP: handle_slash_command_help,
             settings.SLACK_SLASHCOMMAND_BMD_SETTINGS: handle_slash_command_settings,
-            settings.SLACK_SLASHCOMMAND_BMD_STATUS: bmd_core.services.handle_slash_command_status,
+            settings.SLACK_SLASHCOMMAND_BMD_STATUS: bmd_core.services.gui_status_notification,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME: bmd_core.services.handle_user_working_home_today,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE: bmd_core.services.handle_user_working_in_office_today,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY: bmd_core.services.handle_user_working_externally_today,

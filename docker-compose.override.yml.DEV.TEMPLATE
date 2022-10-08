@@ -55,7 +55,8 @@ services:
 #     - MYSQL_USER=devuser
 #     - MYSQL_PASSWORD=devpasswd
 #     - MYSQL_ROOT_PASSWORD=rootpasswd
-
+#    ports:
+#      - '3306:3306'
 
 ### Option 2 ###
 #  database:
@@ -74,3 +75,5 @@ services:
 #      - POSTGRES_DB=botmydesk
 #      - POSTGRES_USER=devuser
 #      - POSTGRES_PASSWORD=devpasswd
+#    ports:
+#      - '5432:5432'

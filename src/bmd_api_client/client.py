@@ -122,10 +122,10 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
 
     json_response = response.json()
     botmydesk_user.update(
-        access_token=json_response["access_token"],
-        access_token_expires_at=timezone.now()
+        bookmydesk_access_token=json_response["access_token"],
+        bookmydesk_access_token_expires_at=timezone.now()
         + timezone.timedelta(minutes=settings.BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES),
-        refresh_token=json_response["refresh_token"],
+        bookmydesk_refresh_token=json_response["refresh_token"],
     )
 
 

@@ -29,12 +29,6 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
 
     # Profile sync on each request is quite expensive, so once in a while suffices.
     if botmydesk_user is not None and botmydesk_user.profile_data_expired():
-        # DEV only: Override locale or use the user's preference.
-        locale = config(
-            "DEV_FORCE_LOCALE", cast=str, default=botmydesk_user.slack_locale
-        )
-        translation.activate(locale)
-
         return botmydesk_user
 
     # Fetch Slack info for user.
@@ -44,22 +38,7 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
     users_info_result.validate()
     botmydesk_logger.debug(f"Users info result: {users_info_result}")
 
-    # Dev only: Override email address when required for development AND the current user is marked as developer.
-    DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default="")
-    BOTMYDESK_OWNER_SLACK_ID = config("BOTMYDESK_OWNER_SLACK_ID", cast=str, default="")
-
-    if (
-        settings.DEBUG
-        and len(DEV_EMAIL_ADDRESS) > 0
-        and slack_user_id in BOTMYDESK_OWNER_SLACK_ID
-    ):
-        email_address = DEV_EMAIL_ADDRESS
-        botmydesk_logger.debug(
-            f"DEV_EMAIL_ADDRESS: Overriding email address with: {email_address}"
-        )
-    else:
-        email_address = users_info_result.get("user")["profile"]["email"]
-
+    email_address = users_info_result.get("user")["profile"]["email"]
     first_name = users_info_result.get("user")["profile"]["first_name"]
     locale = users_info_result.get("user")["locale"]
     tz = users_info_result.get("user")["tz"]
@@ -88,11 +67,13 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
             next_slack_profile_update=next_profile_update,
         )
 
+    return botmydesk_user
+
+
+def apply_user_locale(botmydesk_user: BotMyDeskUser):
     # DEV only: Override locale or use the user's preference.
     locale = config("DEV_FORCE_LOCALE", cast=str, default=botmydesk_user.slack_locale)
     translation.activate(locale)
-
-    return botmydesk_user
 
 
 def handle_slash_command_list_reservations(botmydesk_user: BotMyDeskUser, **_):

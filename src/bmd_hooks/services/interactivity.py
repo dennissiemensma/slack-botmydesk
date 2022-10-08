@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from decouple import config
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext
@@ -98,14 +99,19 @@ def handle_interactive_send_bookmydesk_login_code(
         "submit": {"type": "plain_text", "text": gettext("Verify login code")},
     }
 
+    email_address = botmydesk_user.slack_email
+
+    if (
+        settings.DEBUG
+        and config("DEV_EMAIL_ADDRESS", cast=str, default=None) is not None
+    ):
+        email_address = config("DEV_EMAIL_ADDRESS", cast=str)
+
     # Request code first, as it MAY fail.
-    botmydesk_logger.info(
-        f"{botmydesk_user.slack_user_id}: Sending BookMyDesk login code to {botmydesk_user.slack_email}"
-    )
     web_client = bmd_core.services.slack_web_client()
 
     try:
-        bmd_api_client.client.request_login_code(email=botmydesk_user.slack_email)
+        bmd_api_client.client.request_login_code(email=email_address)
     except BookMyDeskException as error:
         web_client.chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
@@ -195,9 +201,17 @@ def handle_interactive_bmd_authorize_login_code_submit(
         "value"
     ]
 
+    email_address = botmydesk_user.slack_email
+
+    if (
+        settings.DEBUG
+        and config("DEV_EMAIL_ADDRESS", cast=str, default=None) is not None
+    ):
+        email_address = config("DEV_EMAIL_ADDRESS", cast=str)
+
     try:
         login_result = bmd_api_client.client.token_login(
-            username=botmydesk_user.slack_email, otp=otp
+            username=email_address, otp=otp
         )
     except BookMyDeskException:
         return {
@@ -210,10 +224,10 @@ def handle_interactive_bmd_authorize_login_code_submit(
         }
 
     botmydesk_user.update(
-        access_token=login_result.access_token(),
-        access_token_expires_at=timezone.now()
+        bookmydesk_access_token=login_result.access_token(),
+        bookmydesk_access_token_expires_at=timezone.now()
         + timezone.timedelta(minutes=settings.BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES),
-        refresh_token=login_result.refresh_token(),
+        bookmydesk_refresh_token=login_result.refresh_token(),
     )
 
     title = gettext(f"{settings.BOTMYDESK_NAME} connected")

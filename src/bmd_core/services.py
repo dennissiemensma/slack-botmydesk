@@ -95,7 +95,7 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
             **{
                 "from": start.date(),
                 "to": (start + timezone.timedelta(days=28)).date(),
-                "take": 20,
+                "take": 25,
             },
         )
     except BookMyDeskException as error:

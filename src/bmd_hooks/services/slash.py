@@ -1,5 +1,7 @@
+import datetime
 import logging
 import re
+import time
 
 from django.conf import settings
 from django.utils.translation import gettext
@@ -19,14 +21,14 @@ def handle_slash_command(payload):
 
     # Check text, e.g. sub commands
     if not text:
-        handle_slash_command_settings(botmydesk_user, payload)
+        handle_preferences_gui(botmydesk_user, payload)
         return
 
     try:
         sub_command_module = {
             settings.SLACK_SLASHCOMMAND_BMD_DEBUGP: handle_ephemeral_debug_message,
             settings.SLACK_SLASHCOMMAND_BMD_HELP: handle_slash_command_help,
-            settings.SLACK_SLASHCOMMAND_BMD_SETTINGS: handle_slash_command_settings,
+            settings.SLACK_SLASHCOMMAND_BMD_SETTINGS: handle_preferences_gui,
             settings.SLACK_SLASHCOMMAND_BMD_STATUS: bmd_core.services.gui_status_notification,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME: bmd_core.services.handle_user_working_home_today,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE: bmd_core.services.handle_user_working_in_office_today,
@@ -100,7 +102,7 @@ def handle_slash_command_help(botmydesk_user: BotMyDeskUser, *_):
                         "emoji": True,
                         "text": "⚙️",
                     },
-                    "value": "open_settings",
+                    "value": "open_preferences",
                 },
             ],
         },
@@ -120,10 +122,10 @@ def handle_slash_command_help(botmydesk_user: BotMyDeskUser, *_):
     ).validate()
 
 
-def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
+def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
     web_client = bmd_core.services.slack_web_client()
 
-    # Unauthorized. Ask to connect.
+    # Unauthorized. Ask to connect first.
     if not botmydesk_user.has_authorized_bot():
         view_data = {
             "type": "modal",
@@ -220,7 +222,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext("Loading your preferences..."),
+                    "text": gettext("_Loading your preferences..._"),
                 },
             },
         ],
@@ -233,7 +235,9 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
     full_name = f"{profile.first_name()} {profile.infix()} {profile.last_name()}"
     full_name = re.sub(" +", " ", full_name)
 
-    # Now perform slow calls. Fetch options. @TODO implement
+    # Now perform slow calls. Fetch options.
+    botmydesk_user.refresh_from_db()
+
     disabled_option = {
         "text": {
             "type": "plain_text",
@@ -241,30 +245,76 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
         },
         "value": "-",
     }
+    at_8am_option = {
+        "text": {
+            "type": "plain_text",
+            "text": gettext("Around 8:00"),
+        },
+        "value": "8:00",
+    }
+    at_9am_option = {
+        "text": {
+            "type": "plain_text",
+            "text": gettext("Around 9:00"),
+        },
+        "value": "9:00",
+    }
     notification_options = [
         disabled_option,
-        {
-            "text": {
-                "type": "plain_text",
-                "text": gettext("Around 8:00"),
-            },
-            "value": "8:00",
-        },
-        {
-            "text": {
-                "type": "plain_text",
-                "text": gettext("Around 9:00"),
-            },
-            "value": "9:00",
-        },
-        {
-            "text": {
-                "type": "plain_text",
-                "text": gettext("Around 10:00"),
-            },
-            "value": "9:00",
-        },
+        at_8am_option,
+        at_9am_option,
     ]
+    notification_preference_mapping = {
+        None: disabled_option,
+        datetime.time(hour=8): at_8am_option,
+        datetime.time(hour=9): at_9am_option,
+    }
+    initial_monday_preference = (
+        notification_preference_mapping[
+            botmydesk_user.preferred_notification_time_on_mondays
+        ]
+        or disabled_option
+    )
+    initial_tuesday_preference = (
+        notification_preference_mapping[
+            botmydesk_user.preferred_notification_time_on_tuesdays
+        ]
+        or disabled_option
+    )
+    initial_wednesday_preference = (
+        notification_preference_mapping[
+            botmydesk_user.preferred_notification_time_on_wednesdays
+        ]
+        or disabled_option
+    )
+    initial_thursday_preference = (
+        notification_preference_mapping[
+            botmydesk_user.preferred_notification_time_on_thursdays
+        ]
+        or disabled_option
+    )
+    initial_friday_preference = (
+        notification_preference_mapping[
+            botmydesk_user.preferred_notification_time_on_fridays
+        ]
+        or disabled_option
+    )
+
+    smart_notifications_enabled_option = {
+        "text": {
+            "type": "plain_text",
+            "text": gettext("Yes, don't bother"),
+        },
+        "value": "1",
+    }
+    smart_notifications_disabled_option = {
+        "text": {
+            "type": "plain_text",
+            "text": gettext("No, always notify"),
+        },
+        "value": "0",
+    }
+
     view_data = {
         "type": "modal",
         "callback_id": "bmd-authorized-welcome",
@@ -277,7 +327,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext("Select the days to receive a daily reminder on:"),
+                    "text": gettext("Select the days to receive a Slack reminder on:"),
                 },
             },
             {
@@ -291,8 +341,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                     "type": "static_select",
                     "placeholder": {"type": "plain_text", "text": "Select an item"},
                     "options": notification_options,
-                    # TODO - fetch from DB
-                    "initial_option": disabled_option,
+                    "initial_option": initial_monday_preference,
                 },
             },
             {
@@ -306,8 +355,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                     "type": "static_select",
                     "placeholder": {"type": "plain_text", "text": "Select an item"},
                     "options": notification_options,
-                    # TODO - fetch from DB
-                    "initial_option": disabled_option,
+                    "initial_option": initial_tuesday_preference,
                 },
             },
             {
@@ -321,8 +369,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                     "type": "static_select",
                     "placeholder": {"type": "plain_text", "text": "Select an item"},
                     "options": notification_options,
-                    # TODO - fetch from DB
-                    "initial_option": disabled_option,
+                    "initial_option": initial_wednesday_preference,
                 },
             },
             {
@@ -336,8 +383,7 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                     "type": "static_select",
                     "placeholder": {"type": "plain_text", "text": "Select an item"},
                     "options": notification_options,
-                    # TODO - fetch from DB
-                    "initial_option": disabled_option,
+                    "initial_option": initial_thursday_preference,
                 },
             },
             {
@@ -351,55 +397,30 @@ def handle_slash_command_settings(botmydesk_user: BotMyDeskUser, payload: dict):
                     "type": "static_select",
                     "placeholder": {"type": "plain_text", "text": "Select an item"},
                     "options": notification_options,
-                    # TODO - fetch from DB
-                    "initial_option": disabled_option,
+                    "initial_option": initial_friday_preference,
                 },
             },
             {"type": "divider"},
             {
                 "type": "section",
                 "text": {
-                    "type": "plain_text",
-                    "text": "However, should I not *not bother you* when you already seem to have booked and checked in for the day?",
+                    "type": "mrkdwn",
+                    "text": gettext(
+                        "However, should I not *not bother you* when you already seem to have booked and checked in for the days above?"
+                    ),
                 },
                 "accessory": {
-                    "type": "checkboxes",
                     "action_id": "dont_bug_me_when_not_needed",
-                    # TODO - fetch from DB
+                    "type": "static_select",
+                    "placeholder": {"type": "plain_text", "text": "Select an item"},
                     "options": [
-                        {
-                            "value": "1",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Yeah, in that case, don't bug me.",
-                            },
-                        },
+                        smart_notifications_enabled_option,
+                        smart_notifications_disabled_option,
                     ],
+                    "initial_option": smart_notifications_enabled_option
+                    if botmydesk_user.prefer_only_notifications_when_needed
+                    else smart_notifications_disabled_option,
                 },
-            },
-            {"type": "divider"},
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "emoji": True,
-                            "text": gettext("Show help info in chat"),
-                        },
-                        "value": "open_help",
-                    },
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "emoji": True,
-                            "text": gettext("Test notification in chat"),
-                        },
-                        "value": "send_status_notification",
-                    },
-                ],
             },
             {"type": "divider"},
             {
@@ -504,7 +525,7 @@ def handle_ephemeral_debug_message(botmydesk_user: BotMyDeskUser, *_):
                                 f"⚙️ {settings.BOTMYDESK_NAME} preferences"
                             ),
                         },
-                        "value": "open_settings",
+                        "value": "open_preferences",
                     },
                 ],
             },

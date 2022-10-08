@@ -24,9 +24,7 @@ def on_interactive_block_action(
         service_module = {
             "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
             "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
-            "open_settings": bmd_hooks.services.slash.handle_slash_command_settings,  # Alias
-            "open_help": bmd_hooks.services.slash.handle_slash_command_help,  # Alias
-            "send_status_notification": bmd_core.services.gui_status_notification,  # Alias
+            "open_preferences": bmd_hooks.services.slash.handle_preferences_gui,  # Alias
             "mark_working_from_home_today": bmd_core.services.handle_user_working_home_today,
             "mark_working_at_the_office_today": bmd_core.services.handle_user_working_in_office_today,
             "mark_working_externally_today": bmd_core.services.handle_user_working_externally_today,
@@ -273,7 +271,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
                                 f"⚙️ {settings.BOTMYDESK_NAME} preferences"
                             ),
                         },
-                        "value": "open_settings",
+                        "value": "open_preferences",
                     },
                 ],
             },

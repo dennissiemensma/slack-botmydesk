@@ -27,7 +27,7 @@ def handle_app_home_opened_event(payload: dict):
                         "emoji": True,
                         "text": gettext(f"⚙️ {settings.BOTMYDESK_NAME} preferences"),
                     },
-                    "value": "open_settings",
+                    "value": "open_preferences",
                 },
             ],
         }

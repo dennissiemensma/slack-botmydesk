@@ -1,3 +1,5 @@
+import zoneinfo
+
 from django.db import models
 from django.utils import timezone
 
@@ -56,6 +58,9 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
     def profile_data_expired(self) -> bool:
         """Whether the profile data needs to be refreshed."""
         return self.next_slack_profile_update <= timezone.now()
+
+    def user_tz_instance(self) -> zoneinfo.ZoneInfo:
+        return zoneinfo.ZoneInfo(str(self.slack_tz))
 
     def clear_tokens(self):
         self.update(

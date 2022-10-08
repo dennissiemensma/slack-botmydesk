@@ -76,12 +76,14 @@ def apply_user_locale(botmydesk_user: BotMyDeskUser):
     translation.activate(locale)
 
 
-def handle_slash_command_list_reservations(botmydesk_user: BotMyDeskUser, **_):
+def handle_slash_command_list_reservations(botmydesk_user: BotMyDeskUser, *_):
     if not botmydesk_user.has_authorized_bot():
         return unauthorized_reply_shortcut(botmydesk_user)
 
     title = gettext("Your upcoming BookMyDesk reservations")
-    start = timezone.localtime(timezone.now())
+    start = timezone.localtime(
+        timezone.now(), timezone=botmydesk_user.user_tz_instance()
+    )
 
     try:
         reservations_result = bmd_api_client.client.list_reservations_v3(
@@ -173,7 +175,9 @@ def handle_slash_command_status(botmydesk_user: BotMyDeskUser, payload: dict):
     if not botmydesk_user.has_authorized_bot():
         return unauthorized_reply_shortcut(botmydesk_user)
 
-    today_text = timezone.localtime(timezone.now()).strftime("%A %-d %B")
+    today_text = timezone.localtime(
+        timezone.now(), timezone=botmydesk_user.user_tz_instance()
+    ).strftime("%A %-d %B")
     reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
     reservation_count = 0  # Omits ignored ones below
     has_home_reservation = has_office_reservation = has_external_reservation = False
@@ -630,7 +634,9 @@ def _post_handle_report_update(
     message_to_user: str,
     payload: dict,
 ):
-    today_text = timezone.localtime(timezone.now()).strftime("%A %-d %B")
+    today_text = timezone.localtime(
+        timezone.now(), timezone=botmydesk_user.user_tz_instance()
+    ).strftime("%A %-d %B")
     title = gettext(f"{today_text} update")
 
     slack_web_client().chat_postMessage(

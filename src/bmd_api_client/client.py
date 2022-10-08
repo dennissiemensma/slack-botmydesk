@@ -208,7 +208,9 @@ def list_reservations_v3(
     # For now, always use the first company found.
     profile = me_v3(botmydesk_user=botmydesk_user)
 
-    today = timezone.localtime(timezone.now())
+    today = timezone.localtime(
+        timezone.now(), timezone=botmydesk_user.user_tz_instance()
+    )
     parameters = {
         "companyId": profile.first_company_id(),
         "includeAnonymous": "true",

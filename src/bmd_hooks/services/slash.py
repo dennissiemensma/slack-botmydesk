@@ -32,7 +32,6 @@ def handle_slash_command(payload):
             settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE: bmd_core.services.handle_user_working_in_office_today,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY: bmd_core.services.handle_user_working_externally_today,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED: bmd_core.services.handle_user_not_working_today,
-            settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS: bmd_core.services.handle_slash_command_list_reservations,
         }[text]
     except KeyError:
         # Help when unknown sub.
@@ -50,12 +49,6 @@ def handle_slash_command_help(botmydesk_user: BotMyDeskUser, *_):
         )
         help_text += gettext(
             "_Show your BookMyDesk status today. Allows you to choose what to book for you today. Similar to notifications sent by BotMyDesk._\n\n\n"
-        )
-        help_text += gettext(
-            f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* \n"
-        )
-        help_text += gettext(
-            "_List your upcoming reservations (e.g. coming days)._\n\n\n"
         )
         help_text += gettext(
             "\nYou can use the following commands at any moment, without having to wait for my notification(s) first.\n\n"

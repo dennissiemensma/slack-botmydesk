@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-06 21:13+0000\n"
+"POT-Creation-Date: 2022-10-08 18:43+0000\n"
 "PO-Revision-Date: 2022-08-23 23:02+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
@@ -330,6 +330,9 @@ msgstr ""
 msgid "_Report to <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 msgstr "_Rapporteer aan <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 
+msgid "_Refreshing your reservations..._"
+msgstr ""
+
 #, fuzzy, python-brace-format
 #| msgid "Hi {botmydesk_user.name}"
 msgid "Hi {botmydesk_user.slack_name} 👋"
@@ -346,7 +349,7 @@ msgstr ""
 "\n"
 "Ik kan je herinneringen sturen om in te checken op kantoor of thuis. Maakt je leven wellicht net wat makkelijker!"
 
-msgid "Click the button below to link your BookMyDesk account to me."
+msgid "Click the Preferences button above to link your BookMyDesk account to me."
 msgstr ""
 
 #, python-brace-format
@@ -413,24 +416,6 @@ msgid ""
 "\n"
 "\n"
 msgstr ""
-
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
-#| "\n"
-msgid "*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_RESERVATIONS}`* \n"
-msgstr ""
-"*`{settings.SLACK_SLASHCOMMAND_BMD}`* of *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
-"\n"
-
-msgid ""
-"_List your upcoming reservations (e.g. coming days)._\n"
-"\n"
-"\n"
-msgstr ""
-"_Weergeef je aankomende reserveringen (bijv. komende dagen)._\n"
-"\n"
-"\n"
 
 #, fuzzy
 #| msgid ""

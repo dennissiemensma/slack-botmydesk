@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from slack_sdk.web import WebClient
 from django.utils import timezone, translation
@@ -76,7 +77,10 @@ def apply_user_locale(botmydesk_user: BotMyDeskUser):
     translation.activate(locale)
 
 
-def handle_slash_command_list_reservations(botmydesk_user: BotMyDeskUser, *_):
+def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[list]:
+    """
+    :return: Slack blocks GUI elements
+    """
     if not botmydesk_user.has_authorized_bot():
         return unauthorized_reply_shortcut(botmydesk_user)
 
@@ -91,7 +95,7 @@ def handle_slash_command_list_reservations(botmydesk_user: BotMyDeskUser, *_):
             **{
                 "from": start.date(),
                 "to": (start + timezone.timedelta(days=28)).date(),
-                "take": 3,
+                "take": 20,
             },
         )
     except BookMyDeskException as error:
@@ -144,7 +148,7 @@ def handle_slash_command_list_reservations(botmydesk_user: BotMyDeskUser, *_):
                 f"\n\n\n{emoji} {reservation_start_text} from {current_from} to {current_to}\n_In about {natural_time_until_start} at *{location}*_"
             )
 
-    blocks = [
+    return [
         {
             "type": "header",
             "text": {
@@ -162,13 +166,6 @@ def handle_slash_command_list_reservations(botmydesk_user: BotMyDeskUser, *_):
             ],
         },
     ]
-
-    slack_web_client().chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=title,
-        blocks=blocks,
-    ).validate()
 
 
 def handle_slash_command_status(botmydesk_user: BotMyDeskUser, payload: dict):

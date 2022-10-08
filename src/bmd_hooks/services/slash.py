@@ -339,7 +339,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                 "accessory": {
                     "action_id": "monday_notification_at",
                     "type": "static_select",
-                    "placeholder": {"type": "plain_text", "text": "Select an item"},
+                    "placeholder": {"type": "plain_text", "text": gettext("Select an item")},
                     "options": notification_options,
                     "initial_option": initial_monday_preference,
                 },
@@ -353,7 +353,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                 "accessory": {
                     "action_id": "tuesday_notification_at",
                     "type": "static_select",
-                    "placeholder": {"type": "plain_text", "text": "Select an item"},
+                    "placeholder": {"type": "plain_text", "text": gettext("Select an item")},
                     "options": notification_options,
                     "initial_option": initial_tuesday_preference,
                 },
@@ -367,7 +367,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                 "accessory": {
                     "action_id": "wednesday_notification_at",
                     "type": "static_select",
-                    "placeholder": {"type": "plain_text", "text": "Select an item"},
+                    "placeholder": {"type": "plain_text", "text": gettext("Select an item")},
                     "options": notification_options,
                     "initial_option": initial_wednesday_preference,
                 },
@@ -381,7 +381,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                 "accessory": {
                     "action_id": "thursday_notification_at",
                     "type": "static_select",
-                    "placeholder": {"type": "plain_text", "text": "Select an item"},
+                    "placeholder": {"type": "plain_text", "text": gettext("Select an item")},
                     "options": notification_options,
                     "initial_option": initial_thursday_preference,
                 },
@@ -395,7 +395,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                 "accessory": {
                     "action_id": "friday_notification_at",
                     "type": "static_select",
-                    "placeholder": {"type": "plain_text", "text": "Select an item"},
+                    "placeholder": {"type": "plain_text", "text": gettext("Select an item")},
                     "options": notification_options,
                     "initial_option": initial_friday_preference,
                 },

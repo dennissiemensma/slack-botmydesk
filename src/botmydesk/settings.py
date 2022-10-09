@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 
-from django.utils.translation import gettext_lazy as _
 from decouple import config
 
 

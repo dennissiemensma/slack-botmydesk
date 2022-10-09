@@ -1,7 +1,6 @@
 import datetime
 import logging
 import re
-import time
 
 from django.conf import settings
 from django.utils.translation import gettext

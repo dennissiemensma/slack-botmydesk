@@ -9,7 +9,7 @@ services:
       - database
     # Assumes you want socket mode + autoreload during development.
     command: poetry run /code/manage.py dev_socket_mode
-    # OR use "runserver" (includes autoreload), to simulate web hook hosting (pre-production) @ http://localhost:8000
+    # OR use "runserver" (includes autoreload), to simulate webhook hosting (pre-production) @ http://localhost:8000
 #    command: poetry run /code/manage.py runserver 0.0.0.0:8000
     volumes:
       - ./src:/code

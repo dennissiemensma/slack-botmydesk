@@ -125,12 +125,13 @@ def handle_interactive_send_bookmydesk_login_code(
     }
 
     email_address = botmydesk_user.slack_email
+    DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default=None)
 
     if (
         settings.DEBUG
-        and config("DEV_EMAIL_ADDRESS", cast=str, default=None) is not None
+        and DEV_EMAIL_ADDRESS is not None
     ):
-        email_address = config("DEV_EMAIL_ADDRESS", cast=str)
+        email_address = DEV_EMAIL_ADDRESS
 
     # Request code first, as it MAY fail.
     web_client = bmd_core.services.slack_web_client()
@@ -283,12 +284,13 @@ def handle_interactive_bmd_authorize_login_code_submit(
     ]
 
     email_address = botmydesk_user.slack_email
+    DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default=None)
 
     if (
         settings.DEBUG
-        and config("DEV_EMAIL_ADDRESS", cast=str, default=None) is not None
+        and DEV_EMAIL_ADDRESS is not None
     ):
-        email_address = config("DEV_EMAIL_ADDRESS", cast=str)
+        email_address = DEV_EMAIL_ADDRESS
 
     try:
         login_result = bmd_api_client.client.token_login(

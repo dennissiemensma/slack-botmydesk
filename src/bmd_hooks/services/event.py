@@ -54,6 +54,7 @@ def handle_app_home_opened_event(payload: dict):
         ).validate()
 
         blocks.extend(bmd_core.services.gui_status_notification(botmydesk_user))
+        blocks.extend([{"type": "divider"}])
         blocks.extend(bmd_core.services.gui_list_upcoming_reservations(botmydesk_user))
     else:
         blocks.extend(

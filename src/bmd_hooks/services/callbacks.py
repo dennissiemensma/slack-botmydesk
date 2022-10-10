@@ -18,7 +18,7 @@ botmydesk_logger = logging.getLogger("botmydesk")
 def on_event(payload: dict):
     """https://api.slack.com/events"""
     botmydesk_logger.info(
-        f"Processing Slack event: {pprint.pformat(payload, indent=4)}"
+        f"Processing Slack event: {pprint.pformat(payload, indent=2)}"
     )
     event_type = payload["event"]["type"]
 
@@ -52,7 +52,7 @@ def on_slash_command(payload: dict):
 def on_interactivity(payload: dict):
     """https://api.slack.com/interactivity"""
     botmydesk_logger.info(
-        f"Processing Slack interactivity: {pprint.pformat(payload, indent=4)}"
+        f"Processing Slack interactivity: {pprint.pformat(payload, indent=2)}"
     )
     botmydesk_user = bmd_core.services.get_botmydesk_user(
         slack_user_id=payload["user"]["id"]
@@ -76,7 +76,7 @@ def on_interactivity(payload: dict):
         for current_action in payload["actions"]:
             bmd_hooks.services.interactivity.on_interactive_block_action(
                 botmydesk_user,
-                current_action["value"],
+                current_action,
                 payload,
             )
 

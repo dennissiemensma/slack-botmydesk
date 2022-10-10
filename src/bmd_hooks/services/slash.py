@@ -244,28 +244,46 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
         },
         "value": "-",
     }
+    at_7am_option = {
+        "text": {
+            "type": "plain_text",
+            "text": gettext("Around 7:00"),
+        },
+        "value": "07:00",
+    }
     at_8am_option = {
         "text": {
             "type": "plain_text",
             "text": gettext("Around 8:00"),
         },
-        "value": "8:00",
+        "value": "08:00",
+    }
+    at_830am_option = {
+        "text": {
+            "type": "plain_text",
+            "text": gettext("Around 8:30"),
+        },
+        "value": "08:30",
     }
     at_9am_option = {
         "text": {
             "type": "plain_text",
             "text": gettext("Around 9:00"),
         },
-        "value": "9:00",
+        "value": "09:00",
     }
     notification_options = [
         disabled_option,
+        at_7am_option,
         at_8am_option,
+        at_830am_option,
         at_9am_option,
     ]
     notification_preference_mapping = {
         None: disabled_option,
+        datetime.time(hour=7): at_7am_option,
         datetime.time(hour=8): at_8am_option,
+        datetime.time(hour=8, minute=30): at_830am_option,
         datetime.time(hour=9): at_9am_option,
     }
     initial_monday_preference = (
@@ -302,14 +320,14 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
     smart_notifications_enabled_option = {
         "text": {
             "type": "plain_text",
-            "text": gettext("Yes, don't bother"),
+            "text": gettext("Don't spam me"),
         },
         "value": "1",
     }
     smart_notifications_disabled_option = {
         "text": {
             "type": "plain_text",
-            "text": gettext("No, always notify"),
+            "text": gettext("Always notify"),
         },
         "value": "0",
     }
@@ -420,7 +438,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        "However, should I not *not bother you* when you already seem to have booked and checked in for the days above?"
+                        "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
                     ),
                 },
                 "accessory": {

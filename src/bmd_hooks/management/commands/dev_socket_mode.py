@@ -52,7 +52,7 @@ class Command(BaseCommand):
         Event().wait()
 
     def _on_incoming_request(self, client: SocketModeClient, req: SocketModeRequest):
-        payload_dump = pformat(req.payload, indent=4)
+        payload_dump = pformat(req.payload, indent=2)
         botmydesk_logger.debug(
             f"Socket Mode: Incoming '{req.type}' ({req.envelope_id}) with payload:\n{payload_dump}"
         )

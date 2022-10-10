@@ -17,23 +17,50 @@ botmydesk_logger = logging.getLogger("botmydesk")
 
 
 def on_interactive_block_action(
-    botmydesk_user: BotMyDeskUser, action: str, payload: dict
+    botmydesk_user: BotMyDeskUser, action_payload: dict, payload: dict
 ):
     """Respond to user (inter)actions. Some are follow-ups, some are aliases."""
     try:
-        service_module = {
-            "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
-            "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
-            "open_preferences": bmd_hooks.services.slash.handle_preferences_gui,  # Alias
-            "mark_working_from_home_today": bmd_core.services.handle_user_working_home_today,
-            "mark_working_at_the_office_today": bmd_core.services.handle_user_working_in_office_today,
-            "mark_working_externally_today": bmd_core.services.handle_user_working_externally_today,
-            "mark_not_working_today": bmd_core.services.handle_user_not_working_today,
-        }[action]
+        action_value = action_payload["value"]
     except KeyError:
-        raise NotImplementedError(f"Unknown block action: {action}")
+        action_value = None
 
-    service_module(botmydesk_user, payload)
+    try:
+        # Could be form value update.
+        action_id = action_payload["action_id"]
+    except KeyError:
+        action_id = None
+
+    if action_value:
+        try:
+            service_module = {
+                "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
+                "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
+                "open_preferences": bmd_hooks.services.slash.handle_preferences_gui,  # Alias
+                "mark_working_from_home_today": bmd_core.services.handle_user_working_home_today,
+                "mark_working_at_the_office_today": bmd_core.services.handle_user_working_in_office_today,
+                "mark_working_externally_today": bmd_core.services.handle_user_working_externally_today,
+                "mark_not_working_today": bmd_core.services.handle_user_not_working_today,
+            }[action_value]
+        except KeyError:
+            raise NotImplementedError(f"Unknown action value: {action_value}")
+        else:
+            return service_module(botmydesk_user, payload)
+
+    if action_id:
+        try:
+            service_module = {
+                "monday_notification_at": handle_user_preference_update,
+                "tuesday_notification_at": handle_user_preference_update,
+                "wednesday_notification_at": handle_user_preference_update,
+                "thursday_notification_at": handle_user_preference_update,
+                "friday_notification_at": handle_user_preference_update,
+                "dont_bug_me_when_not_needed": handle_user_preference_update,
+            }[action_id]
+        except KeyError:
+            raise NotImplementedError(f"Unknown action ID: {action_id}")
+        else:
+            return service_module(botmydesk_user, action_payload)
 
 
 def on_interactive_view_submission(
@@ -190,6 +217,62 @@ def handle_interactive_bmd_revoke_botmydesk(
             },
         ],
     ).validate()
+
+
+def handle_user_preference_update(botmydesk_user: BotMyDeskUser, action_payload: dict):
+    action_id = action_payload["action_id"]
+    selected_option_value = action_payload["selected_option"][
+        "value"
+    ]  # Only for <select> elements
+
+    # Alias, since we cannot pass NULL to Slack.
+    if selected_option_value == "-":
+        selected_option_value = None
+
+    if action_id == "dont_bug_me_when_not_needed":
+        botmydesk_user.update(
+            prefer_only_notifications_when_needed=selected_option_value  # Auto-convert to bool
+        )
+        botmydesk_logger.info(
+            f"(@{botmydesk_user.slack_user_id}: Updated 'prefer_only_notifications_when_needed' to {selected_option_value}"
+        )
+    elif action_id == "monday_notification_at":
+        botmydesk_user.update(
+            preferred_notification_time_on_mondays=selected_option_value
+        )
+        botmydesk_logger.info(
+            f"(@{botmydesk_user.slack_user_id}: Updated 'preferred_notification_time_on_mondays' to {selected_option_value}"
+        )
+    elif action_id == "tuesday_notification_at":
+        botmydesk_user.update(
+            preferred_notification_time_on_tuesdays=selected_option_value
+        )
+        botmydesk_logger.info(
+            f"(@{botmydesk_user.slack_user_id}: Updated 'preferred_notification_time_on_tuesdays' to {selected_option_value}"
+        )
+    elif action_id == "wednesday_notification_at":
+        botmydesk_user.update(
+            preferred_notification_time_on_wednesdays=selected_option_value
+        )
+        botmydesk_logger.info(
+            f"(@{botmydesk_user.slack_user_id}: Updated 'preferred_notification_time_on_wednesdays' to {selected_option_value}"
+        )
+    elif action_id == "thursday_notification_at":
+        botmydesk_user.update(
+            preferred_notification_time_on_thursdays=selected_option_value
+        )
+        botmydesk_logger.info(
+            f"(@{botmydesk_user.slack_user_id}: Updated 'preferred_notification_time_on_thursdays' to {selected_option_value}"
+        )
+    elif action_id == "friday_notification_at":
+        botmydesk_user.update(
+            preferred_notification_time_on_fridays=selected_option_value
+        )
+        botmydesk_logger.info(
+            f"(@{botmydesk_user.slack_user_id}: Updated 'preferred_notification_time_on_fridays' to {selected_option_value}"
+        )
+    else:
+        raise NotImplementedError(f"No handle_user_preference_update() for {action_id}")
 
 
 def handle_interactive_bmd_authorize_login_code_submit(

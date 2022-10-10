@@ -148,7 +148,7 @@ def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
     bookmydesk_client_logger.debug(
         "(%s) Response:\n%s",
         botmydesk_user.slack_email,
-        pformat(response.json(), indent=4),
+        pformat(response.json(), indent=2),
     )
 
     if response.status_code != 200:

@@ -258,7 +258,7 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
     )
 
     # Home shortcut?
-    if not has_home_reservation or not any_reservation:
+    if not checked_out and not has_home_reservation and not any_reservation:
         action_elements.append(
             {
                 "type": "button",
@@ -292,7 +292,9 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
         )
 
     # Office shortcut?
-    if not any_reservation or (has_office_reservation and not checked_in):
+    if not checked_out and (
+        not any_reservation or (has_office_reservation and not checked_in)
+    ):
         action_elements.append(
             {
                 "type": "button",
@@ -326,7 +328,9 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
         )
 
     # External shortcut?
-    if not any_reservation or (has_external_reservation and not checked_in):
+    if not checked_out and (
+        not any_reservation or (has_external_reservation and not checked_in)
+    ):
         action_elements.append(
             {
                 "type": "button",
@@ -360,7 +364,7 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
         )
 
     # Only clear when applicable.
-    if any_reservation:
+    if not checked_out and any_reservation:
         action_elements.append(
             {
                 "type": "button",
@@ -394,14 +398,16 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
             }
         )
 
-    blocks.extend(
-        [
-            {
-                "type": "actions",
-                "elements": action_elements,
-            }
-        ]
-    )
+    # We may end up with no buttons.
+    if action_elements:
+        blocks.extend(
+            [
+                {
+                    "type": "actions",
+                    "elements": action_elements,
+                }
+            ]
+        )
 
     return blocks
 

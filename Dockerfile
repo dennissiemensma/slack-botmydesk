@@ -19,10 +19,8 @@ RUN python3 -m venv $VIRTUAL_ENV
 
 # Credits to: https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-COPY src/ /code/
 
 RUN python3 -m pip install --upgrade pip && pip3 install poetry
-RUN poetry install --only main
 
 
 
@@ -30,6 +28,10 @@ RUN poetry install --only main
 FROM base-app AS prod-app
 ARG BUILD_GUNICORN_SOCKET
 ENV GUNICORN_SOCKET=$BUILD_GUNICORN_SOCKET
+
+COPY src/poetry.lock src/pyproject.toml /code/
+RUN poetry install --only main
+COPY src/ /code/
 
 #ENTRYPOINT poetry run gunicorn --log-level debug --bind unix:$BUILD_GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
 ENTRYPOINT poetry run gunicorn --bind unix:$GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
@@ -39,6 +41,7 @@ ENTRYPOINT poetry run gunicorn --bind unix:$GUNICORN_SOCKET --workers 1 --max-re
 ### Development.
 FROM base-app AS dev-app
 
+COPY src/poetry.lock src/pyproject.toml /code/
 RUN poetry install
 
 #ENTRYPOINT poetry run /code/manage.py dev_socket_mode

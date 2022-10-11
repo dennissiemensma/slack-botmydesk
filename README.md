@@ -206,6 +206,7 @@ When ready, go back to Slack, open your Bot settings for the following configura
 
 #### Interactivity & Shortcuts 
 
+- Toggle "Off" to "On"
 - Enter the following "Request URL":
 ```shell
 https://<YOUR BOT HOSTNAME>/hooks/slack/interactivity

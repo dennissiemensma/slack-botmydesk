@@ -173,9 +173,36 @@ docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.p
 
 ----
 
-Your bot should now be ready to receive requests.
+Your bot should now be ready to receive requests. 
+However, note that this guide does NOT include how to run Nginx with Certbot for HTTPS. 
+You WILL need it for receiving Slack callbacks. 
 
-Go back to Slack, open your Bot settings for the following configuration.
+An easy workaround is to install another Nginx instance with Certbot on your host.
+Update the nginx docker-compose port config (of this project) from:
+```shell
+    ports:
+     - "80:80"
+```
+
+To:
+```shell
+    ports:
+     - "8000:80"
+```
+
+Restart the container and configure the Nginx vhost **on your host** (which receives HTTPS traffic) to pass all requests upstream to the new port 8000.
+```shell
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+```
+
+----
+
+When ready, go back to Slack, open your Bot settings for the following configuration.
 
 #### Interactivity & Shortcuts 
 

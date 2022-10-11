@@ -127,8 +127,12 @@ def on_error(error: Exception, slack_user_id: Optional[str] = None):
                     {
                         "type": "mrkdwn",
                         "text": gettext(
-                            f"_Please tell my creator that the following failed_:\n\n```{error_trace}```"
+                            f"_Please tell my creator that the following happened:\n\n```{error}```"
                         ),
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": gettext(f"_Triggered by_:\n\n```{error_trace}```"),
                     },
                     {
                         "type": "mrkdwn",

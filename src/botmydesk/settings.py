@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 
-from decouple import config
+from decouple import config, Csv
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -198,6 +198,9 @@ BOOKMYDESK_CLIENT_SECRET = config("BOOKMYDESK_CLIENT_SECRET", cast=str)
 SLACK_SLASHCOMMAND_BMD = config("SLACK_SLASHCOMMAND_BMD", cast=str)
 
 BOTMYDESK_OWNER_SLACK_ID = config("BOTMYDESK_OWNER_SLACK_ID", cast=str, default="")
+BOTMYDESK_WHITELISTED_SLACK_IDS = config(
+    "BOTMYDESK_WHITELISTED_SLACK_IDS", cast=Csv(post_process=tuple), default=""
+)
 BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME = config(
     "BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME", cast=str, default=None
 )

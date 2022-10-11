@@ -15,6 +15,16 @@ def handle_app_home_opened_event(payload: dict):
     if payload["event"]["tab"] != "home":
         return
 
+    slack_user_id = payload["event"]["user"]
+
+    try:
+        bmd_core.services.validate_botmydesk_user(slack_user_id=slack_user_id)
+    except EnvironmentError:
+        # Ignore unknown users.
+        return
+
+    botmydesk_user = bmd_core.services.get_botmydesk_user(slack_user_id)
+
     # Always show preferences button
     blocks = [
         {
@@ -32,8 +42,6 @@ def handle_app_home_opened_event(payload: dict):
             ],
         }
     ]
-
-    botmydesk_user = bmd_core.services.get_botmydesk_user(payload["event"]["user"])
 
     if botmydesk_user.has_authorized_bot():
         # Clear on update.
@@ -80,7 +88,7 @@ def handle_app_home_opened_event(payload: dict):
                     "text": {
                         "type": "mrkdwn",
                         "text": gettext(
-                            "Click the Preferences button above to link your BookMyDesk account to me."
+                            "Click the preferences button above to link your BookMyDesk account to me."
                         ),
                     },
                 },

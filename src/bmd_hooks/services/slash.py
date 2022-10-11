@@ -13,9 +13,8 @@ import bmd_core.services
 botmydesk_logger = logging.getLogger("botmydesk")
 
 
-def handle_slash_command(payload):
+def handle_slash_command(botmydesk_user: BotMyDeskUser, payload: dict):
     """https://api.slack.com/interactivity/slash-commands"""
-    botmydesk_user = bmd_core.services.get_botmydesk_user(payload["user_id"])
     text = payload["text"].strip()
 
     # Check text, e.g. sub commands

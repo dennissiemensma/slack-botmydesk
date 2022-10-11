@@ -71,6 +71,21 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
     return botmydesk_user
 
 
+def validate_botmydesk_user(slack_user_id: str):
+    """Whitelist check."""
+    if not settings.BOTMYDESK_WHITELISTED_SLACK_IDS:
+        return
+
+    if slack_user_id in settings.BOTMYDESK_WHITELISTED_SLACK_IDS:
+        return
+
+    raise EnvironmentError(
+        gettext(
+            "Sorry, you are not whitelisted and I was too lazy to create a decent message. This bot will be public eventually, including for you... :]"
+        )
+    )
+
+
 def apply_user_locale(botmydesk_user: BotMyDeskUser):
     # DEV only: Override locale or use the user's preference.
     locale = config("DEV_FORCE_LOCALE", cast=str, default=botmydesk_user.slack_locale)

@@ -17,7 +17,7 @@ services:
     environment:
       - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
 
-  # Use with "DJANGO_DATABASE_ENGINE=django.db.backends.postgresql" in ".env"
+  # Use with "DJANGO_DATABASE_ENGINE=django.db.backends.postgresql" in .env
   database:
     image: postgres:14
     restart: always
@@ -25,9 +25,9 @@ services:
       - ./docker/postgres:/var/lib/postgresql/
     environment:
       - POSTGRES_DB=botmydesk
-      # @TODO: Choose user and use in ".env" as DJANGO_DATABASE_USER as well
+      # @TODO: Choose user and use in .env as DJANGO_DATABASE_USER as well
       - POSTGRES_USER=
-      # @TODO: Generate password and use in ".env" as DJANGO_DATABASE_PASSWORD as well
+      # @TODO: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use in .env as DJANGO_DATABASE_PASSWORD as well
       - POSTGRES_PASSWORD=
 
   prod_web:

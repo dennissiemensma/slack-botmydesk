@@ -37,12 +37,14 @@ def on_slash_command(payload: dict):
     command = payload["command"]
     botmydesk_logger.info(f"Processing Slack slash command: {command}")
     slack_user_id = payload["user_id"]
-    botmydesk_user = bmd_core.services.get_botmydesk_user(slack_user_id)
 
     try:
         bmd_core.services.validate_botmydesk_user(slack_user_id=slack_user_id)
     except EnvironmentError as error:
         return on_error(error, slack_user_id=slack_user_id)
+
+    botmydesk_user = bmd_core.services.get_botmydesk_user(slack_user_id)
+    bmd_core.services.apply_user_locale(botmydesk_user)
 
     try:
         service_module = {
@@ -69,6 +71,7 @@ def on_interactivity(payload: dict):
         return on_error(error, slack_user_id=slack_user_id)
 
     botmydesk_user = bmd_core.services.get_botmydesk_user(slack_user_id=slack_user_id)
+    bmd_core.services.apply_user_locale(botmydesk_user)
 
     # Handle submits.
     if payload["type"] == "view_submission":

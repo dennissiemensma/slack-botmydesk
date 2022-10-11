@@ -24,6 +24,7 @@ def handle_app_home_opened_event(payload: dict):
         return
 
     botmydesk_user = bmd_core.services.get_botmydesk_user(slack_user_id)
+    bmd_core.services.apply_user_locale(botmydesk_user)
 
     # Always show preferences button
     blocks = [

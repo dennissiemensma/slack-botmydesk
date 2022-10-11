@@ -91,6 +91,8 @@ def apply_user_locale(botmydesk_user: BotMyDeskUser):
     locale = config("DEV_FORCE_LOCALE", cast=str, default=botmydesk_user.slack_locale)
     translation.activate(locale)
 
+    botmydesk_logger.debug(f"Applying user locale: {locale}")
+
 
 def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[list]:
     """
@@ -479,7 +481,7 @@ def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
 
             if current.status() == "checkedIn":
                 report_text = gettext(
-                    "✔️ _I left it as-is, since you're already *checked in.*_"
+                    "✔️ _I left it as-is, since you're already *checked in*._"
                 )
                 break
 

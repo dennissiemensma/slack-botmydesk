@@ -22,7 +22,7 @@ services:
       # TODO: Set DEV_EMAIL_ADDRESS if you develop on a different Slack workspace (and DJANGO_DEBUG = True). Omit or keep empty otherwise.
 #      - DEV_EMAIL_ADDRESS=
       # Enable if you want to always run with Dutch locales, no matter your own Slack user its preferences.
-#      - DEV_LOCALE=nl_NL
+#      - DEV_FORCE_LOCALE=nl_NL
       # Enable to refresh all the time. Only makes sense during session development.
 #      - DEV_BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES=0
       - DJANGO_DEBUG=True

@@ -119,7 +119,7 @@ docker exec -it botmydesk_dev_app poetry run /code/manage.py makemessages --no-w
 ```
 - The source translation (PO) file, e.g. [src/locales/nl/LC_MESSAGES/django.po](src/locales/nl/LC_MESSAGES/django.po), should be updated.
 - Translate any additions or changes with `Poedit` (or whatever program you'd like to use).
-- Run the `dev_app` with env `DEV_LOCALE=nl_NL` to force this locale translation.
+- Run the `dev_app` with env `DEV_FORCE_LOCALE=nl_NL` to force this locale translation.
 
 ### Helpers
 Also:

@@ -522,7 +522,8 @@ def handle_ephemeral_debug_message(botmydesk_user: BotMyDeskUser, *_):
     if not settings.DEBUG:
         return
 
-    title = "BotMyDesk debug message"
+    # Translators: This is a debug message
+    title = gettext("BotMyDesk debug message")
     bmd_core.services.slack_web_client().chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,

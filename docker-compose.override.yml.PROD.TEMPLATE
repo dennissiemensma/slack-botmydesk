@@ -9,6 +9,7 @@ services:
         - BUILD_GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
     restart: always
     depends_on:
+      - database
       - prod_web
     volumes:
      - gunicorn-socket:/run/gunicorn/

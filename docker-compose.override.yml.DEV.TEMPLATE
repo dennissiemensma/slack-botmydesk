@@ -6,8 +6,7 @@ services:
       context: .
       target: dev-app
       dockerfile: Dockerfile
-    depends_on:
-      - database
+    depends_on: [database]
     # Assumes you want socket mode + autoreload during development.
     command: poetry run /code/manage.py dev_socket_mode
     # OR use "runserver" (includes autoreload), to simulate webhook hosting (pre-production) @ http://localhost:8000

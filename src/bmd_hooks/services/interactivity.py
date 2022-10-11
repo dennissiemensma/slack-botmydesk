@@ -125,7 +125,7 @@ def handle_interactive_send_bookmydesk_login_code(
     }
 
     email_address = botmydesk_user.slack_email
-    DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default='')
+    DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default="")
 
     if settings.DEBUG and DEV_EMAIL_ADDRESS:
         email_address = DEV_EMAIL_ADDRESS
@@ -281,7 +281,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
     ]
 
     email_address = botmydesk_user.slack_email
-    DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default='')
+    DEV_EMAIL_ADDRESS = config("DEV_EMAIL_ADDRESS", cast=str, default="")
 
     if settings.DEBUG and DEV_EMAIL_ADDRESS:
         email_address = DEV_EMAIL_ADDRESS

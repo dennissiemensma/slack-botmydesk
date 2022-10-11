@@ -5,6 +5,7 @@ services:
     build:
       context: .
       target: dev-app
+      dockerfile: Dockerfile
     depends_on:
       - database
     # Assumes you want socket mode + autoreload during development.

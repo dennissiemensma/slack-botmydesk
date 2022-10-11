@@ -4,8 +4,10 @@ services:
     build:
       context: .
       target: prod-app
+      dockerfile: Dockerfile
       args:
         - BUILD_GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
+    restart: always
     depends_on:
       - prod_web
     volumes:
@@ -15,8 +17,22 @@ services:
     environment:
       - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
 
+  # Use with "DJANGO_DATABASE_ENGINE=django.db.backends.postgresql" in ".env"
+  database:
+    image: postgres:14
+    restart: always
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/
+    environment:
+      - POSTGRES_DB=botmydesk
+      # @TODO: Choose user and use in ".env" as DJANGO_DATABASE_USER as well
+      - POSTGRES_USER=
+      # @TODO: Generate password and use in ".env" as DJANGO_DATABASE_PASSWORD as well
+      - POSTGRES_PASSWORD=
+
   prod_web:
     image: nginx
+    restart: always
     volumes:
      - ./docker/nginx/templates:/etc/nginx/templates
      - gunicorn-socket:/run/gunicorn/

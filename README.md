@@ -161,14 +161,14 @@ SLACK_BOT_SIGNING_SECRET=
 docker-compose build
 ```
 
-- Before each (re)deploy, make sure to run database migrations first:
-```shell
-docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.py migrate --noinput
-```
-
 - Run:
 ```shell
 docker-compose up -d
+```
+
+- After each (re)deploy, make sure to run database migrations first:
+```shell
+docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.py migrate --noinput
 ```
 
 ----

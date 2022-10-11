@@ -3,7 +3,7 @@ from typing import Optional
 
 from slack_sdk.web import WebClient
 from django.utils import timezone, translation
-from django.utils.translation import gettext
+from django.utils.translation import gettext, ngettext
 from django.contrib.humanize.templatetags import humanize
 from django.conf import settings
 from decouple import config
@@ -242,8 +242,10 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
 
     # Edge-cases, for those wanting to see the world burn.
     if reservation_count > 1:
-        reservation_text += gettext(
-            f", along with {reservation_count-1} other reservation(s)"
+        reservation_text += ngettext(
+            f", along with {reservation_count-1} other reservation",
+            f", along with {reservation_count-1} other reservations",
+            reservation_count,
         )
 
     # This is some assumption, may break in future if statuses change.

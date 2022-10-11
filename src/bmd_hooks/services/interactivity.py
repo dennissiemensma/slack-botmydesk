@@ -154,34 +154,6 @@ def handle_interactive_send_bookmydesk_login_code(
 def handle_interactive_bmd_revoke_botmydesk(
     botmydesk_user: BotMyDeskUser, payload: dict
 ):
-    web_client = bmd_core.services.slack_web_client()
-    view_data = {
-        "type": "modal",
-        "callback_id": "bmd-disconnected",
-        "title": {
-            "type": "plain_text",
-            "text": gettext(f"{settings.BOTMYDESK_NAME} disconnected"),
-        },
-        "blocks": [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": gettext(
-                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n\nBye! 👋"
-                    ),
-                },
-            },
-        ],
-    }
-    # @see https://api.slack.com/surfaces/modals/using#updating_apis
-    result = web_client.views_update(
-        view_id=payload["view"]["id"],
-        hash=payload["view"]["hash"],
-        view=view_data,
-    )
-    result.validate()
-
     try:
         # Logout in background.
         bmd_api_client.client.logout(botmydesk_user)
@@ -192,7 +164,7 @@ def handle_interactive_bmd_revoke_botmydesk(
     botmydesk_user.clear_tokens()
 
     title = gettext(f"{settings.BOTMYDESK_NAME} disconnected 👋")
-    web_client.chat_postMessage(
+    bmd_core.services.slack_web_client().chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
         text=title,
@@ -215,6 +187,8 @@ def handle_interactive_bmd_revoke_botmydesk(
             },
         ],
     ).validate()
+
+    return {"response_action": "clear"}
 
 
 def handle_user_preference_update(botmydesk_user: BotMyDeskUser, action_payload: dict):

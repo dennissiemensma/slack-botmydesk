@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-11 20:00+0000\n"
-"PO-Revision-Date: 2022-10-11 22:10+0200\n"
+"POT-Creation-Date: 2022-10-11 21:00+0000\n"
+"PO-Revision-Date: 2022-10-11 23:01+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -21,24 +21,18 @@ msgid "Home"
 msgstr "Thuis"
 
 msgid "Sorry, you are not whitelisted and I was too lazy to create a decent message. This bot will be public eventually, including for you... :]"
-msgstr ""
+msgstr "Sorry, je bent niet gewhitelist en ik was te lui om een fatsoenlijk bericht te maken. Hoe dan ook, uiteindelijk wordt deze bot vanzelf publiekelijk beschikbaar, ook voor jou... :]"
 
 msgid "Your upcoming BookMyDesk reservations"
 msgstr "Je komende boekingen in BookMyDesk"
 
 #, python-brace-format
 msgid "Sorry, an error occurred while requesting your reservations: ```{error}```"
-msgstr ""
+msgstr "Sorry, fout bij het ophalen van je reserveringen: ```{error}```"
 
 msgid "_No reservations found (or too far away)..._"
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
 
-#| msgid ""
-#| "\n"
-#| "\n"
-#| "\n"
-#| "~{emoji} {reservation_start_text}: {current['from']} to {current['to']}~\n"
-#| "_{current['status']}_"
 msgid ""
 "\n"
 "\n"
@@ -46,6 +40,11 @@ msgid ""
 "{emoji} {reservation_start_text}: {current_from} to {current_to}\n"
 "_{current.status()}_"
 msgstr ""
+"\n"
+"\n"
+"\n"
+"{emoji} {reservation_start_text}: {current_from} tot {current_to}\n"
+"_{current.status()}_"
 
 #, python-brace-format
 msgid ""
@@ -63,35 +62,42 @@ msgstr ""
 
 #, python-brace-format
 msgid "🏡 You have a *home reservation* for {today_text} ({reservation_start} - {reservation_end})"
-msgstr ""
+msgstr "🏡 Je hebt een *thuisreservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
 
 #, python-brace-format
 msgid "🏢 You have an *office reservation* for {today_text} ({reservation_start} - {reservation_end})"
-msgstr ""
+msgstr "🏢 Je hebt een *kantoorreservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
 
 #, python-brace-format
 msgid "🚋 You have an *external reservation* outside home/office for {today_text} ({reservation_start} - {reservation_end})"
-msgstr ""
+msgstr "🚋 Je hebt een *extern/buiten kantoor reservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
 
 #, python-brace-format
-#| msgid "_No reservations found (or too far away)..._"
 msgid "You have *no reservation* yet for {today_text}"
-msgstr ""
+msgstr "Je hebt nog *geen reservering* voor {today_text}"
 
-msgid ", along with {reservation_count-1} other reservation(s)"
-msgstr ""
+msgid ", along with {reservation_count-1} other reservation"
+msgid_plural ", along with {reservation_count-1} other reservations"
+msgstr[0] ", samen met {reservation_count-1} andere reservering"
+msgstr[1] ", samen met {reservation_count-1} andere reserveringen"
 
 msgid ""
 " and you are *checked in*.\n"
 "\n"
 "_Do I even need to do anything at all?_"
 msgstr ""
+" en je bent *ingecheckt*.\n"
+"\n"
+"_Moet ik uberhaupt iets doen?_"
 
 msgid ""
 " and you are *checked out*.\n"
 "\n"
 "_Do I even need to do anything at all?_"
 msgstr ""
+" en je bent *uitgecheckt*.\n"
+"\n"
+"_Moet ik uberhaupt iets doen?_"
 
 msgid ""
 ".\n"
@@ -113,10 +119,12 @@ msgid ""
 "\n"
 "I will book a home spot for you, if you don't have one yet."
 msgstr ""
+"🏡 Je werkt vandaag thuis.\n"
+"\n"
+"ik boek een thuiswerkplek voor je, mocht je deze nog niet hebben."
 
-#| msgid "Yes, disconnect"
 msgid "Yes, continue"
-msgstr ""
+msgstr "Ja, ga door"
 
 msgid "No, wait"
 msgstr "Nee, wacht effe"
@@ -124,43 +132,42 @@ msgstr "Nee, wacht effe"
 msgid "🏢 Working in the office"
 msgstr "🏢 Op kantoor"
 
-#| msgid ""
-#| "_Mark today as *working from the office*. Only checks you in if you already have a reservation._\n"
-#| "\n"
-#| "\n"
 msgid ""
 "🏢 You're working at the office today.\n"
 "\n"
 "This only works if you already have a reservation.\n"
 "I will check you in if you are not already, no matter what time your reservation is."
 msgstr ""
+"🏢 Je werkt vandaag op kantoor.\n"
+"\n"
+"Dit werkt alleen als je al een plek daar geboekt had.\n"
+"Ik check je in dat geval in, ongeacht het tijdstip."
 
 msgid "🚋 Working externally"
 msgstr "🚋 Extern werken"
 
-#| msgid ""
-#| "_Mark today as *working outside the office* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n"
-#| "\n"
-#| "\n"
 msgid ""
 "🚋 You're working externally.\n"
 "\n"
 "I will book an 'external' spot for you, if you don't have one yet, and check you in as well."
 msgstr ""
+"🚋 Je werkt vandaag buiten de deur.\n"
+"\n"
+"Ik boek een \"Externe\" plek voor je, mits je deze nog niet hebt. En ik check je tevens in."
 
 msgid "❌ Not working"
 msgstr "❌ Niet aan het werk"
 
-#| msgid ""
-#| "❌ *Not working*\n"
-#| "\n"
-#| "_I will cancel your reservations for today. If you were already checked in, I'll check you out as well._"
 msgid ""
 "❌ You're not working today or you're already done.\n"
 "\n"
 "I will delete your pending reservations for today (if any).\n"
 "Also, if you were already checked in, I'll check you out now."
 msgstr ""
+"❌ Je werkt niet (meer) vandaag of je bent klaar.\n"
+"\n"
+"Mocht je nog openstaande reserveringen hebben dan verwijder ik die voor je.\n"
+"En als je al ingecheckt was, check ik je uit."
 
 msgid ""
 "🏡 _You requested me to book you for working at home._\n"
@@ -168,19 +175,22 @@ msgid ""
 "\n"
 "TODO"
 msgstr ""
+"🏡 _Je hebt me verzocht om een thuiswerkplek voor je te boeken._\n"
+"\n"
+"\n"
+"TODO"
 
 msgid "Sorry, not yet implemented 🧑‍💻"
 msgstr "Sorry, nog niet werkend 🧑‍💻"
 
-#| msgid "_No reservations found (or too far away)..._"
 msgid "⚠️ No office reservation found for this day. Please book an office seat and check-in anyway."
-msgstr ""
+msgstr "⚠️ Geen kantoorreservering gevonden voor deze dag. Boek een plek en check dan ook direct in."
 
 msgid "✔️ _I left it as-is, since you're already *checked in*._"
-msgstr "✔️ _Ik heb het gelaten voor wat het is, gezien je al *ingechecked* bent._"
+msgstr "✔️ _Ik heb het gelaten voor wat het is, gezien je al *ingecheckt* bent._"
 
 msgid "⚠️ _I did nothing, as you seem to be *checked out* already?_"
-msgstr ""
+msgstr "⚠️ _Ik heb niets gedaan, want je lijkt al *uitgecheckt*?_"
 
 #, python-brace-format
 msgid ""
@@ -192,10 +202,10 @@ msgstr ""
 
 #, python-brace-format
 msgid "✅ _I checked you in at {location}_"
-msgstr "✅ _Ik heb je ingechecked op {location}_"
+msgstr "✅ _Ik heb je ingecheckt op {location}_"
 
 msgid "⚠️ _Unexpected status, **I ignored your request to make sure not breaking anything**!_"
-msgstr ""
+msgstr "⚠️ _Onverwachte status, **Ik heb je verzoek genegeerd om zeker niets stuk te maken**!_"
 
 #, python-brace-format
 msgid ""
@@ -204,13 +214,16 @@ msgid ""
 "\n"
 "{report_text}"
 msgstr ""
+"🏢 _Je hebt me verzocht om je in te checken op kantoor._\n"
+"\n"
+"\n"
+"{report_text}"
 
 msgid "✋ Sorry, not supported at this time"
 msgstr "✋ Sorry, (nog) niet ondersteund"
 
-#| msgid "_No reservations found (or too far away)..._"
 msgid "✔️ No reservations found anyway"
-msgstr ""
+msgstr "✔️ Geen reserveringen gevonden"
 
 #, python-brace-format
 msgid ""
@@ -219,12 +232,18 @@ msgid ""
 "\n"
 "• *{current_from} to {current_to}* (*{location}*)"
 msgstr ""
+"\n"
+"\n"
+"\n"
+"• *{current_from} tot {current_to}* (*{location}*)"
 
 #, python-brace-format
 msgid ""
 "{current_reservation_text}\n"
 "\t\t ✔️ _I left it as-is ({current_status})_"
 msgstr ""
+"{current_reservation_text}\n"
+"\t\t ✔️ _Ik heb deze gelaten voor wat het is({current_status})_"
 
 #, python-brace-format
 msgid ""
@@ -232,12 +251,17 @@ msgid ""
 "\t\t ⚠️ *Failed to check you out*\n"
 " ```{error}```"
 msgstr ""
+"{current_reservation_text}\n"
+"\t\t ⚠️ *Fout bij uitchecken*\n"
+" ```{error}```"
 
 #, python-brace-format
 msgid ""
 "{current_reservation_text}\n"
 "\t\t ✅ _I checked you out_"
 msgstr ""
+"{current_reservation_text}\n"
+"\t\t ✅ _Ik heb je uitgecheckt_"
 
 #, python-brace-format
 msgid ""
@@ -245,18 +269,25 @@ msgid ""
 "\t\t ⚠️ *Failed to delete your reservation*\n"
 " ```{error}```"
 msgstr ""
+"{current_reservation_text}\n"
+"\t\t ⚠️ *Fout bij verwijderen van je reservering*\n"
+" ```{error}```"
 
 #, python-brace-format
 msgid ""
 "{current_reservation_text}\n"
 "\t\t ✅ _I deleted your reservation_"
 msgstr ""
+"{current_reservation_text}\n"
+"\t\t ✅ _Ik heb je reservering verwijderd_"
 
 #, python-brace-format
 msgid ""
 "{current_reservation_text}\n"
 "\t\t ⚠️ _Unexpected status, **left untouched**!_"
 msgstr ""
+"{current_reservation_text}\n"
+"\t\t ⚠️ _Onvoorziene status, **gelaten voor wat het is**!_"
 
 #, python-brace-format
 msgid ""
@@ -265,6 +296,10 @@ msgid ""
 "\n"
 "{report_text}"
 msgstr ""
+"❌ _Je hebt me verzocht je reserveringen te annuleren._\n"
+"\n"
+"\n"
+"{report_text}"
 
 #, python-brace-format
 msgid "{today_text} update"
@@ -275,21 +310,20 @@ msgstr "✋ Sorry, je moet me eerst koppelen."
 
 #, python-brace-format
 msgid "{settings.BOTMYDESK_NAME}: Unexpected error"
-msgstr ""
+msgstr "{settings.BOTMYDESK_NAME}: Onvoorziene fout"
 
 msgid "I'm not sure what to do, sorry! 🤷‍♀"
 msgstr "Ik weet niet wat ik moet doen, sorry! 🤷‍♀"
 
 #, python-brace-format
-#| msgid ""
-#| "_Please tell my creator that the following failed_:\n"
-#| "\n"
-#| "```{error}```"
 msgid ""
 "_Please tell my creator that the following happened_:\n"
 "\n"
 "```{error}```"
 msgstr ""
+"_Vertel mijn maker dat het volgende is gebeurd_:\n"
+"\n"
+"```{error}```"
 
 #, python-brace-format
 msgid ""
@@ -310,22 +344,18 @@ msgid "⚙️ {settings.BOTMYDESK_NAME} preferences"
 msgstr "⚙️ {settings.BOTMYDESK_NAME}-voorkeuren"
 
 msgid "_Refreshing your reservations..._"
-msgstr ""
+msgstr "_Jouw reserveringen aan het verversen..._"
 
 #, python-brace-format
 msgid "Hi {botmydesk_user.slack_name} 👋"
 msgstr "Hoi {botmydesk_user.slack_name} 👋"
 
 #, python-brace-format
-#| msgid ""
-#| "My name is BotMyDesk, I'm an unofficial Slack bot for BookMyDesk.\n"
-#| "\n"
-#| "I can remind you to check-in at the office or at home. Making life a bit easier for you!"
 msgid "My name is {settings.BOTMYDESK_NAME}, I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
-msgstr ""
+msgstr "Mijn naam is {settings.BOTMYDESK_NAME}, ik ben een onofficiële Slack bot voor BookMyDesk. Ik kan je helpen met herinneren om te boeken of in te checken, om je leven net iets makkelijker te maken!"
 
 msgid "Click the preferences button above to link your BookMyDesk account to me."
-msgstr ""
+msgstr "Klik op de voorkeuren-knop hierboven om je BookMyDesk-account aan mij te koppelen."
 
 #, python-brace-format
 msgid "Connecting {settings.BOTMYDESK_NAME}"
@@ -343,29 +373,14 @@ msgstr "Verifieer logincode"
 
 #, python-brace-format
 msgid "Sorry, failed to request BookMyDesk login code: `{error}`"
-msgstr ""
-
-#, python-brace-format
-msgid "{settings.BOTMYDESK_NAME} disconnected"
-msgstr "{settings.BOTMYDESK_NAME} gekoppeld"
-
-#, python-brace-format
-#| msgid ""
-#| "I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again or the button to the right.\n"
-#| "\n"
-#| "Bye! 👋"
-msgid ""
-"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n"
-"\n"
-"Bye! 👋"
-msgstr ""
+msgstr "Sorry, fout bij aanvragen BookMyDesk-inlogcode: `{error}`"
 
 #, python-brace-format
 msgid "{settings.BOTMYDESK_NAME} disconnected 👋"
 msgstr "{settings.BOTMYDESK_NAME} ontkoppeld 👋"
 
 msgid "I've disconnected from your BookMyDesk-account. Bye!"
-msgstr ""
+msgstr "Ik ben ontkoppeld van je BookMyDesk-account. Doei!"
 
 msgid "Error validating your login code. You can try it another time or restart this flow to have a new code sent to you."
 msgstr "Fout bij het valideren van je logincode. Je kunt het nogmaals proberen of deze flow opnieuw doorlopen om een nieuwe code te ontvangen."
@@ -375,12 +390,9 @@ msgid "{settings.BOTMYDESK_NAME} connected 👏"
 msgstr "{settings.BOTMYDESK_NAME} gekoppeld 👏"
 
 msgid "Great! You've connected me to your BookMyDesk-account. Check out your preferences by clicking the button below, or by going to the 'Home' tab of this bot."
-msgstr ""
+msgstr "Top! Je hebt me gekoppeld aan je BookMyDesk-account. Stel je voorkeuren in door op de knop hieronder te klikken, of naar de 'Home\" tab van deze bot te gaan."
 
 #, python-brace-format
-#| msgid ""
-#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
-#| "\n"
 msgid "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_STATUS}`*\n"
 msgstr ""
 
@@ -390,10 +402,6 @@ msgid ""
 "\n"
 msgstr ""
 
-#| msgid ""
-#| "\n"
-#| "*You can use the following commands at any moment, without having to wait for my notification(s) first:*\n"
-#| "\n"
 msgid ""
 "\n"
 "You can use the following commands at any moment, without having to wait for my notification(s) first.\n"
@@ -401,9 +409,6 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-#| msgid ""
-#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
-#| "\n"
 msgid "🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* \n"
 msgstr ""
 
@@ -417,16 +422,9 @@ msgstr ""
 "\n"
 
 #, python-brace-format
-#| msgid ""
-#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
-#| "\n"
 msgid "🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`*\n"
 msgstr ""
 
-#| msgid ""
-#| "_Mark today as *working from the office*. Only checks you in if you already have a reservation._\n"
-#| "\n"
-#| "\n"
 msgid ""
 "_Mark today as *working from the office*. Only works if you already have a reservation. I will check you in though._\n"
 "\n"
@@ -434,16 +432,9 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-#| msgid ""
-#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
-#| "\n"
 msgid "🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* \n"
 msgstr ""
 
-#| msgid ""
-#| "_Mark today as *working outside the office* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n"
-#| "\n"
-#| "\n"
 msgid ""
 "_Mark today as *working externally* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n"
 "\n"
@@ -451,16 +442,9 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-#| msgid ""
-#| "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_SETTINGS}`*\n"
-#| "\n"
 msgid "❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* \n"
 msgstr ""
 
-#| msgid ""
-#| "_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n"
-#| "\n"
-#| "\n"
 msgid ""
 "_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n"
 " ⚠️ _Care, will be applied instantly without confirmation._\n"
@@ -480,23 +464,21 @@ msgstr "{settings.BOTMYDESK_NAME} help"
 msgid "Connecting BookMyDesk to {settings.BOTMYDESK_NAME}"
 msgstr "BookMyDesk koppelen met {settings.BOTMYDESK_NAME}"
 
-#| msgid "First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.email}*."
 msgid "First, you will need to authorize me to access your BookMyDesk-account, presuming it's your Slack email address."
-msgstr ""
+msgstr "Allereerst zul je me toegang moeten geven tot je BookMyDesk-account, er vanuitgaande dat deze overeenkomt met je Slack-emailadres."
 
 msgid "Connect"
 msgstr "Koppel"
 
 #, python-brace-format
-#| msgid ""
-#| "Request BookMyDesk login code for *{botmydesk_user.email}*?\n"
-#| "\n"
-#| "_You can enter it on the next screen._"
 msgid ""
 "Request BookMyDesk login code by email for *{botmydesk_user.slack_email}*?\n"
 "\n"
 "_You can enter the code on the next screen._"
 msgstr ""
+"Vraag een BookMyDesk-inlogcode aan per e-mail voor *{botmydesk_user.slack_email}*?\n"
+"\n"
+"_Je kunt de inlogcode op het volgende scherm invoeren._"
 
 msgid "Yes, email it"
 msgstr "Ja, verstuur"
@@ -532,13 +514,13 @@ msgid "No, notify me"
 msgstr "Nee, stuur notificatie"
 
 msgid "Select the days to receive a Slack reminder on for your BookMyDesk status:"
-msgstr ""
+msgstr "Geef aan op welke werkdagen je een herinnering via Slack wilt voor je BookMyDesk-status:"
 
 msgid "Notify you on *mondays*?"
 msgstr "Notificatie op *maandagen*?"
 
 msgid "Select an item"
-msgstr ""
+msgstr "Selecteer een optie"
 
 msgid "Notify you on *tuesdays*?"
 msgstr "Notificatie op *dinsdagen*?"
@@ -553,10 +535,10 @@ msgid "Notify you on *fridays*?"
 msgstr "Notificatie op *vrijdagen*?"
 
 msgid "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
-msgstr ""
+msgstr "Echter, zal ik je *niet storen* wanneer je al iets geboekt hebt/ingecheckt bent op een dag?"
 
 msgid "Skip notification when booked/checked in?"
-msgstr "Sla notificatie over wanneer al geboekt/ingechecked?"
+msgstr "Sla notificatie over wanneer al geboekt/ingecheckt?"
 
 #, python-brace-format
 msgid "_Connected to BookMyDesk account of *{full_name}*_"
@@ -581,5 +563,6 @@ msgstr "Ja, ontkoppel"
 msgid "Nevermind, keep connected"
 msgstr "Laat maar, blijf gekoppeld"
 
+#. Translators: This is a debug message
 msgid "BotMyDesk debug message"
-msgstr ""
+msgstr "BotMyDesk debug bericht"

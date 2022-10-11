@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-08 20:56+0000\n"
-"PO-Revision-Date: 2022-08-23 23:02+0200\n"
+"POT-Creation-Date: 2022-10-11 19:48+0000\n"
+"PO-Revision-Date: 2022-10-11 21:56+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -19,6 +19,9 @@ msgstr ""
 
 msgid "Home"
 msgstr "Thuis"
+
+msgid "Sorry, you are not whitelisted and I was too lazy to create a decent message. This bot will be public eventually, including for you... :]"
+msgstr ""
 
 msgid "Your upcoming BookMyDesk reservations"
 msgstr "Je komende boekingen in BookMyDesk"
@@ -50,13 +53,7 @@ msgstr ""
 "✔️ ~{reservation_start_text}: {current['from']} tot {current['to']}~\n"
 "_{current['status']}_"
 
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "\n"
-#| "\n"
-#| "\n"
-#| "{emoji} {reservation_start_text} from {current['from']} to {current['to']}\n"
-#| "_{natural_time_until_start} at *{location}*_"
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -67,8 +64,8 @@ msgstr ""
 "\n"
 "\n"
 "\n"
-"{emoji} {reservation_start_text} van {current['from']} tot {current['to']}\n"
-"_{natural_time_until_start} op *{location}*_"
+"{emoji} *{reservation_start_text}* van {current_from} tot {current_to}\n"
+"_Over zo'n {natural_time_until_start} op *{location}*_"
 
 #, python-brace-format
 msgid "🏡 You have a *home reservation* for {today_text} ({reservation_start} - {reservation_end})"
@@ -107,9 +104,12 @@ msgid ""
 "\n"
 "_Where are you today?_"
 msgstr ""
+".\n"
+"\n"
+"_Waar ben je vandaag?_"
 
 msgid "🏡 Working home"
-msgstr ""
+msgstr "🏡 Thuiswerken"
 
 msgid "Are you sure?"
 msgstr "Weet je het zeker?"
@@ -134,10 +134,10 @@ msgid "Yes, continue"
 msgstr "Ja, ontkoppel"
 
 msgid "No, wait"
-msgstr ""
+msgstr "Nee, wacht effe"
 
 msgid "🏢 Working in the office"
-msgstr ""
+msgstr "🏢 Op kantoor"
 
 #, fuzzy
 #| msgid ""
@@ -155,7 +155,7 @@ msgstr ""
 "\n"
 
 msgid "🚋 Working externally"
-msgstr ""
+msgstr "🚋 Extern werken"
 
 #, fuzzy
 #| msgid ""
@@ -172,7 +172,7 @@ msgstr ""
 "\n"
 
 msgid "❌ Not working"
-msgstr ""
+msgstr "❌ Niet aan het werk"
 
 #, fuzzy
 #| msgid ""
@@ -295,10 +295,10 @@ msgstr ""
 
 #, python-brace-format
 msgid "{today_text} update"
-msgstr ""
+msgstr "{today_text} update"
 
 msgid "✋ Sorry, you will need to connect me first."
-msgstr ""
+msgstr "✋ Sorry, je moet me eerst koppelen."
 
 #, python-brace-format
 msgid "{settings.BOTMYDESK_NAME}: Unexpected error"
@@ -313,30 +313,38 @@ msgstr "Ik weet niet wat ik moet doen, sorry! 🤷‍♀"
 #| "\n"
 #| "```{error}```"
 msgid ""
-"_Please tell my creator that the following failed_:\n"
+"_Please tell my creator that the following happened_:\n"
 "\n"
-"```{error_trace}```"
+"```{error}```"
 msgstr ""
 "_Vertel mijn maker dat het volgende faalde_:\n"
 "\n"
 "```{error}```"
 
 #, python-brace-format
+msgid ""
+"_Triggered by_:\n"
+"\n"
+"```{error_trace}```"
+msgstr ""
+"_Veroorzaakt door_:\n"
+"\n"
+"```{error_trace}```"
+
+#, python-brace-format
 msgid "_Report to <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 msgstr "_Rapporteer aan <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 
-#, fuzzy, python-brace-format
-#| msgid "⚙️ BotMyDesk preferences"
+#, python-brace-format
 msgid "⚙️ {settings.BOTMYDESK_NAME} preferences"
-msgstr "⚙️ BotMyDesk-voorkeuren"
+msgstr "⚙️ {settings.BOTMYDESK_NAME}-voorkeuren"
 
 msgid "_Refreshing your reservations..._"
 msgstr ""
 
-#, fuzzy, python-brace-format
-#| msgid "Hi {botmydesk_user.name}"
+#, python-brace-format
 msgid "Hi {botmydesk_user.slack_name} 👋"
-msgstr "Hoi {botmydesk_user.name}"
+msgstr "Hoi {botmydesk_user.slack_name} 👋"
 
 #, fuzzy, python-brace-format
 #| msgid ""
@@ -349,17 +357,16 @@ msgstr ""
 "\n"
 "Ik kan je herinneringen sturen om in te checken op kantoor of thuis. Maakt je leven wellicht net wat makkelijker!"
 
-msgid "Click the Preferences button above to link your BookMyDesk account to me."
+msgid "Click the preferences button above to link your BookMyDesk account to me."
 msgstr ""
 
 #, python-brace-format
 msgid "Connecting {settings.BOTMYDESK_NAME}"
-msgstr ""
+msgstr "{settings.BOTMYDESK_NAME} koppelen"
 
-#, fuzzy, python-brace-format
-#| msgid "Check your mailbox for *{botmydesk_user.email}*. Enter the BookMyDesk login code you've received."
+#, python-brace-format
 msgid "Check your mailbox for *{botmydesk_user.slack_email}*. Enter the BookMyDesk login code you've received."
-msgstr "Controleer je mailbox voor *{botmydesk_user.email}*. Vul de BookMyDesk logincode in die je hebt ontvangen."
+msgstr "Controleer je mailbox voor *{botmydesk_user.slack_email}*. Vul de BookMyDesk-logincode in die je hebt ontvangen."
 
 msgid "Login code"
 msgstr "Logincode"
@@ -373,7 +380,7 @@ msgstr ""
 
 #, python-brace-format
 msgid "{settings.BOTMYDESK_NAME} disconnected"
-msgstr ""
+msgstr "{settings.BOTMYDESK_NAME} gekoppeld"
 
 #, fuzzy, python-brace-format
 #| msgid ""
@@ -389,17 +396,21 @@ msgstr ""
 "\n"
 "Doei! 👋"
 
+#, python-brace-format
+msgid "{settings.BOTMYDESK_NAME} disconnected 👋"
+msgstr "{settings.BOTMYDESK_NAME} ontkoppeld 👋"
+
+msgid "I've disconnected from your BookMyDesk-account. Bye!"
+msgstr ""
+
 msgid "Error validating your login code. You can try it another time or restart this flow to have a new code sent to you."
 msgstr "Fout bij het valideren van je logincode. Je kunt het nogmaals proberen of deze flow opnieuw doorlopen om een nieuwe code te ontvangen."
 
 #, python-brace-format
-msgid "{settings.BOTMYDESK_NAME} connected"
-msgstr ""
+msgid "{settings.BOTMYDESK_NAME} connected 👏"
+msgstr "{settings.BOTMYDESK_NAME} gekoppeld 👏"
 
-msgid "Great! You've connected me to your BookMyDesk-account 👏"
-msgstr ""
-
-msgid "Check out your preferences by clicking the button below, or by going to the 'Home' tab of this bot."
+msgid "Great! You've connected me to your BookMyDesk-account. Check out your preferences by clicking the button below, or by going to the 'Home' tab of this bot."
 msgstr ""
 
 #, fuzzy, python-brace-format
@@ -525,11 +536,11 @@ msgstr "_More commando's zijn beschikbaar zodra je je account koppelt door *`{se
 
 #, python-brace-format
 msgid "{settings.BOTMYDESK_NAME} help"
-msgstr ""
+msgstr "{settings.BOTMYDESK_NAME} help"
 
 #, python-brace-format
 msgid "Connecting BookMyDesk to {settings.BOTMYDESK_NAME}"
-msgstr ""
+msgstr "BookMyDesk koppelen met {settings.BOTMYDESK_NAME}"
 
 #, fuzzy
 #| msgid "First, you will need to authorize me to access your BookMyDesk-account, presuming it's *{botmydesk_user.email}*."
@@ -553,76 +564,74 @@ msgstr ""
 "\n"
 "_Je kunt deze op het volgende scherm invoeren._"
 
-#, fuzzy
-#| msgid "Yes, send it"
 msgid "Yes, email it"
 msgstr "Ja, verstuur"
 
 msgid "No, hold on"
 msgstr "Nee, wacht even"
 
-#, fuzzy
-#| msgid "_You can disconnect me later at any time by running `{settings.SLACK_SLASHCOMMAND_BMD}` again._"
 msgid "_You can disconnect me later at any time by accessing these preferences again._"
-msgstr "_Je kunt me later op elk moment ontkoppelen door weer `{settings.SLACK_SLASHCOMMAND_BMD}` te typen._"
+msgstr "_Je kunt me later op elk moment ontkoppelen via deze voorkeuren._"
 
 msgid "_Loading your preferences..._"
-msgstr ""
+msgstr "_Je voorkeuren worden geladen..._"
 
 msgid "No"
-msgstr ""
+msgstr "Nee"
+
+msgid "Around 7:00"
+msgstr "Rond 7:00"
 
 msgid "Around 8:00"
-msgstr ""
+msgstr "Rond 8:00"
+
+msgid "Around 8:30"
+msgstr "Rond 8:30"
 
 msgid "Around 9:00"
-msgstr ""
+msgstr "Rond 9:00"
 
-#, fuzzy
-#| msgid "Yes, disconnect"
-msgid "Yes, don't bother"
-msgstr "Ja, ontkoppel"
+msgid "Yes, skip"
+msgstr "Ja, sla over"
 
-msgid "No, always notify"
-msgstr ""
+msgid "No, notify me"
+msgstr "Nee, stuur notificatie"
 
-msgid "Select the days to receive a Slack reminder on:"
+msgid "Select the days to receive a Slack reminder on for your BookMyDesk status:"
 msgstr ""
 
 msgid "Notify you on *mondays*?"
-msgstr ""
+msgstr "Notificatie op **maandagen**?"
 
 msgid "Select an item"
 msgstr ""
 
 msgid "Notify you on *tuesdays*?"
-msgstr ""
+msgstr "Notificatie op **dinsdagen**?"
 
 msgid "Notify you on *wednesdays*?"
-msgstr ""
+msgstr "Notificatie op **woensdagen**?"
 
 msgid "Notify you on *thursdays*?"
-msgstr ""
+msgstr "Notificatie op **donderdagen**?"
 
 msgid "Notify you on *fridays*?"
+msgstr "Notificatie op **vrijdagen**?"
+
+msgid "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
 msgstr ""
 
-msgid "However, should I not *not bother you* when you already seem to have booked and checked in for the days above?"
-msgstr ""
+msgid "Skip notification when booked/checked in?"
+msgstr "Sla notificatie over wanneer al geboekt/ingechecked?"
 
 #, python-brace-format
 msgid "_Connected to BookMyDesk account of *{full_name}*_"
-msgstr ""
+msgstr "_Verbonden met BookMyDesk-account van *{full_name}*_"
 
 #, python-brace-format
 msgid "Disconnect {settings.BOTMYDESK_NAME}"
-msgstr ""
+msgstr "Ontkoppel {settings.BOTMYDESK_NAME}"
 
-#, fuzzy
-#| msgid ""
-#| "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n"
-#| "\n"
-#| "*Revoke my access to your account in BookMyDesk?*"
 msgid ""
 "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n"
 "\n"
@@ -630,7 +639,7 @@ msgid ""
 msgstr ""
 "Dit ontkoppelt met van je BookMyDesk-account en zal je niet meer lastig vallen.\n"
 "\n"
-"*Mijn toegang tot BookMyDesk intrekken?*"
+"*Mijn toegang tot je BookMyDesk-account intrekken?*"
 
 msgid "Yes, disconnect"
 msgstr "Ja, ontkoppel"

@@ -191,7 +191,7 @@ def handle_interactive_bmd_revoke_botmydesk(
     # Clear session data. For now, we're not deleting the user to keep their preferences.
     botmydesk_user.clear_tokens()
 
-    title = gettext(f"{settings.BOTMYDESK_NAME} disconnected")
+    title = gettext(f"{settings.BOTMYDESK_NAME} disconnected 👋")
     web_client.chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
@@ -209,7 +209,7 @@ def handle_interactive_bmd_revoke_botmydesk(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        f"I've disconnected from your BookMyDesk-account. You can reconnect me in the future by running `{settings.SLACK_SLASHCOMMAND_BMD}` again.\n\nBye! 👋"
+                        f"I've disconnected from your BookMyDesk-account. Bye!"
                     ),
                 },
             },
@@ -307,7 +307,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
         bookmydesk_refresh_token=login_result.refresh_token(),
     )
 
-    title = gettext(f"{settings.BOTMYDESK_NAME} connected")
+    title = gettext(f"{settings.BOTMYDESK_NAME} connected 👏")
     bmd_core.services.slack_web_client().chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
@@ -325,16 +325,7 @@ def handle_interactive_bmd_authorize_login_code_submit(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        "Great! You've connected me to your BookMyDesk-account 👏"
-                    ),
-                },
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": gettext(
-                        "Check out your preferences by clicking the button below, or by going to the 'Home' tab of this bot."
+                        "Great! You've connected me to your BookMyDesk-account. Check out your preferences by clicking the button below, or by going to the 'Home' tab of this bot."
                     ),
                 },
             },

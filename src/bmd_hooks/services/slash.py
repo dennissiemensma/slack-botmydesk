@@ -319,14 +319,14 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
     smart_notifications_enabled_option = {
         "text": {
             "type": "plain_text",
-            "text": gettext("Don't spam me"),
+            "text": gettext("Yes, skip"),
         },
         "value": "1",
     }
     smart_notifications_disabled_option = {
         "text": {
             "type": "plain_text",
-            "text": gettext("Always notify"),
+            "text": gettext("No, notify me"),
         },
         "value": "0",
     }
@@ -343,7 +343,9 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext("Select the days to receive a Slack reminder on:"),
+                    "text": gettext(
+                        "Select the days to receive a Slack reminder on for your BookMyDesk status:"
+                    ),
                 },
             },
             {
@@ -440,6 +442,13 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                         "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
                     ),
                 },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": gettext("Skip notification when booked/checked in?"),
+                },
                 "accessory": {
                     "action_id": "dont_bug_me_when_not_needed",
                     "type": "static_select",
@@ -525,40 +534,6 @@ def handle_ephemeral_debug_message(botmydesk_user: BotMyDeskUser, *_):
                     "type": "plain_text",
                     "text": title,
                 },
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": gettext(
-                        "Great! You've connected me to your BookMyDesk-account 👏"
-                    ),
-                },
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": gettext(
-                        "Check out your preferences by clicking the button below, or by going to the 'Home' tab of this bot."
-                    ),
-                },
-            },
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "emoji": True,
-                            "text": gettext(
-                                f"⚙️ {settings.BOTMYDESK_NAME} preferences"
-                            ),
-                        },
-                        "value": "open_preferences",
-                    },
-                ],
             },
         ],
     ).validate()

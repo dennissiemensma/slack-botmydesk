@@ -209,7 +209,7 @@ def handle_interactive_bmd_revoke_botmydesk(
                 "text": {
                     "type": "mrkdwn",
                     "text": gettext(
-                        f"I've disconnected from your BookMyDesk-account. Bye!"
+                        "I've disconnected from your BookMyDesk-account. Bye!"
                     ),
                 },
             },

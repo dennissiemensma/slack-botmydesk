@@ -119,6 +119,12 @@ docker exec -it botmydesk_dev_app poetry run /code/manage.py makemessages --no-w
 ```
 - The source translation (PO) file, e.g. [src/locales/nl/LC_MESSAGES/django.po](src/locales/nl/LC_MESSAGES/django.po), should be updated.
 - Translate any additions or changes with `Poedit` (or whatever program you'd like to use).
+- Run the `dev_app` with env `DEV_LOCALE=nl_NL` to force this locale translation.
+
+### Helpers
+Also:
+- Run the `dev_app` with env `DEV_EMAIL_ADDRESS=your@mail.address` to force that mail address being used for login. *E.g. when your Slack dev account has no BookMyDesk account.*
+- Run the `dev_app` with env `DEV_BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES=0` to force a BookMyDesk refresh token call every time.
 
 
 ----
@@ -204,6 +210,7 @@ app_home_opened
 
 ----
 
+- Do **NOT** run multiple instances of either the web app or the background worker. They are currently **prone to race conditions**! 
 - Live logs:
 ```shell
 docker-compose logs -f

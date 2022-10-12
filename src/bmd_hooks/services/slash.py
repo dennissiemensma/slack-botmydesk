@@ -63,7 +63,7 @@ def handle_slash_command_help(botmydesk_user: BotMyDeskUser, *_):
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": (f"{settings.BOTMYDESK_NAME} help"),
+                "text": f"{settings.BOTMYDESK_NAME} help",
             },
         },
         {
@@ -91,7 +91,7 @@ def handle_slash_command_help(botmydesk_user: BotMyDeskUser, *_):
     bmd_core.services.slack_web_client().chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=(f"{settings.BOTMYDESK_NAME} help"),
+        text=f"{settings.BOTMYDESK_NAME} help",
         blocks=blocks,
     ).validate()
 

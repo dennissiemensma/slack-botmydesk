@@ -56,6 +56,7 @@ def on_interactive_block_action(
                 "thursday_notification_at": handle_user_preference_update,
                 "friday_notification_at": handle_user_preference_update,
                 "dont_bug_me_when_not_needed": handle_user_preference_update,
+                "preferred_locale": handle_user_preference_update,
             }[action_id]
         except KeyError:
             raise NotImplementedError(f"Unknown action ID: {action_id}")
@@ -201,12 +202,10 @@ def handle_user_preference_update(botmydesk_user: BotMyDeskUser, action_payload:
     if selected_option_value == "-":
         selected_option_value = None
 
-    if action_id == "dont_bug_me_when_not_needed":
-        botmydesk_user.update(
-            prefer_only_notifications_when_needed=selected_option_value  # Auto-convert to bool
-        )
+    if action_id == "preferred_locale":
+        botmydesk_user.update(preferred_locale=selected_option_value)
         botmydesk_logger.info(
-            f"(@{botmydesk_user.slack_user_id}: Updated 'prefer_only_notifications_when_needed' to {selected_option_value}"
+            f"(@{botmydesk_user.slack_user_id}: Updated 'preferred_locale' to {selected_option_value}"
         )
     elif action_id == "monday_notification_at":
         botmydesk_user.update(
@@ -242,6 +241,13 @@ def handle_user_preference_update(botmydesk_user: BotMyDeskUser, action_payload:
         )
         botmydesk_logger.info(
             f"(@{botmydesk_user.slack_user_id}: Updated 'preferred_notification_time_on_fridays' to {selected_option_value}"
+        )
+    elif action_id == "dont_bug_me_when_not_needed":
+        botmydesk_user.update(
+            prefer_only_notifications_when_needed=selected_option_value  # Auto-convert to bool
+        )
+        botmydesk_logger.info(
+            f"(@{botmydesk_user.slack_user_id}: Updated 'prefer_only_notifications_when_needed' to {selected_option_value}"
         )
     else:
         raise NotImplementedError(f"No handle_user_preference_update() for {action_id}")

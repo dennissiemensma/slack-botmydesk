@@ -6,7 +6,6 @@ from django.utils import timezone, translation
 from django.utils.translation import gettext, ngettext
 from django.contrib.humanize.templatetags import humanize
 from django.conf import settings
-from decouple import config
 
 from bmd_core.models import BotMyDeskUser
 from bmd_api_client.exceptions import BookMyDeskException
@@ -41,7 +40,6 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
 
     email_address = users_info_result.get("user")["profile"]["email"]
     first_name = users_info_result.get("user")["profile"]["first_name"]
-    locale = users_info_result.get("user")["locale"]
     tz = users_info_result.get("user")["tz"]
 
     next_profile_update = timezone.now() + timezone.timedelta(hours=1)
@@ -53,7 +51,6 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
             slack_user_id=slack_user_id,
             slack_email=email_address,
             slack_name=first_name,
-            slack_locale=locale,
             slack_tz=tz,
             next_slack_profile_update=next_profile_update,
         )
@@ -63,7 +60,6 @@ def get_botmydesk_user(slack_user_id: str) -> BotMyDeskUser:
         botmydesk_user.update(
             slack_email=email_address,
             slack_name=first_name,
-            slack_locale=locale,
             slack_tz=tz,
             next_slack_profile_update=next_profile_update,
         )
@@ -87,11 +83,8 @@ def validate_botmydesk_user(slack_user_id: str):
 
 
 def apply_user_locale(botmydesk_user: BotMyDeskUser):
-    # DEV only: Override locale or use the user's preference.
-    locale = config("DEV_FORCE_LOCALE", cast=str, default=botmydesk_user.slack_locale)
-    translation.activate(locale)
-
-    botmydesk_logger.debug(f"Applying user locale: {locale}")
+    botmydesk_logger.debug(f"Applying user locale: {botmydesk_user.preferred_locale}")
+    translation.activate(botmydesk_user.preferred_locale)
 
 
 def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[list]:

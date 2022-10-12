@@ -331,6 +331,27 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
         "value": "0",
     }
 
+    dutch_locale_option = {
+        "text": {
+            "type": "plain_text",
+            "text": gettext("Dutch"),
+        },
+        "value": BotMyDeskUser.DUTCH_LOCALE,
+    }
+    english_locale_option = {
+        "text": {
+            "type": "plain_text",
+            "text": gettext("English"),
+        },
+        "value": BotMyDeskUser.ENGLISH_LOCALE,
+    }
+
+    initial_locale = (
+        dutch_locale_option
+        if botmydesk_user.preferred_locale == BotMyDeskUser.DUTCH_LOCALE
+        else english_locale_option
+    )
+
     view_data = {
         "type": "modal",
         "callback_id": "bmd-authorized-welcome",
@@ -339,6 +360,26 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
             "text": title,
         },
         "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": gettext("Preferred language:"),
+                },
+                "accessory": {
+                    "action_id": "preferred_locale",
+                    "type": "static_select",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": gettext("Select an item"),
+                    },
+                    "options": (
+                        dutch_locale_option,
+                        english_locale_option,
+                    ),
+                    "initial_option": initial_locale,
+                },
+            },
             {
                 "type": "section",
                 "text": {

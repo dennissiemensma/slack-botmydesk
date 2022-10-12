@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-11 21:00+0000\n"
-"PO-Revision-Date: 2022-10-11 23:01+0200\n"
+"POT-Creation-Date: 2022-10-12 21:35+0000\n"
+"PO-Revision-Date: 2022-10-12 23:35+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -393,74 +393,6 @@ msgid "Great! You've connected me to your BookMyDesk-account. Check out your pre
 msgstr "Top! Je hebt me gekoppeld aan je BookMyDesk-account. Stel je voorkeuren in door op de knop hieronder te klikken, of naar de 'Home\" tab van deze bot te gaan."
 
 #, python-brace-format
-msgid "*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_STATUS}`*\n"
-msgstr ""
-
-msgid ""
-"_Show your BookMyDesk status today. Allows you to choose what to book for you today. Similar to notifications sent by BotMyDesk._\n"
-"\n"
-"\n"
-msgstr ""
-
-msgid ""
-"\n"
-"You can use the following commands at any moment, without having to wait for my notification(s) first.\n"
-"\n"
-msgstr ""
-
-#, python-brace-format
-msgid "🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* \n"
-msgstr ""
-
-msgid ""
-"_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n"
-"\n"
-"\n"
-msgstr ""
-"_Markeer vandaag als *thuiswerken*. Boekt een thuisplek voor je, mocht je dat nog niet gedaan hebben. Geen check-in vereist._\n"
-"\n"
-"\n"
-
-#, python-brace-format
-msgid "🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`*\n"
-msgstr ""
-
-msgid ""
-"_Mark today as *working from the office*. Only works if you already have a reservation. I will check you in though._\n"
-"\n"
-"\n"
-msgstr ""
-
-#, python-brace-format
-msgid "🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* \n"
-msgstr ""
-
-msgid ""
-"_Mark today as *working externally* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n"
-"\n"
-"\n"
-msgstr ""
-
-#, python-brace-format
-msgid "❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* \n"
-msgstr ""
-
-msgid ""
-"_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n"
-" ⚠️ _Care, will be applied instantly without confirmation._\n"
-"\n"
-"\n"
-msgstr ""
-
-#, python-brace-format
-msgid "_More commands will be available after you've connected your account by typing *`{settings.SLACK_SLASHCOMMAND_BMD}`*_."
-msgstr "_More commando's zijn beschikbaar zodra je je account koppelt door *`{settings.SLACK_SLASHCOMMAND_BMD}`* te typen_."
-
-#, python-brace-format
-msgid "{settings.BOTMYDESK_NAME} help"
-msgstr "{settings.BOTMYDESK_NAME} help"
-
-#, python-brace-format
 msgid "Connecting BookMyDesk to {settings.BOTMYDESK_NAME}"
 msgstr "BookMyDesk koppelen met {settings.BOTMYDESK_NAME}"
 
@@ -513,14 +445,23 @@ msgstr "Ja, sla over"
 msgid "No, notify me"
 msgstr "Nee, stuur notificatie"
 
+msgid "Dutch"
+msgstr "Nederlands"
+
+msgid "English"
+msgstr "Engels"
+
+msgid "Preferred language:"
+msgstr "Voorkeurstaal:"
+
+msgid "Select an item"
+msgstr "Selecteer een optie"
+
 msgid "Select the days to receive a Slack reminder on for your BookMyDesk status:"
 msgstr "Geef aan op welke werkdagen je een herinnering via Slack wilt voor je BookMyDesk-status:"
 
 msgid "Notify you on *mondays*?"
 msgstr "Notificatie op *maandagen*?"
-
-msgid "Select an item"
-msgstr "Selecteer een optie"
 
 msgid "Notify you on *tuesdays*?"
 msgstr "Notificatie op *dinsdagen*?"

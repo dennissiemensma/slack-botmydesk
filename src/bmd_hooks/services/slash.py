@@ -44,50 +44,26 @@ def handle_slash_command_help(botmydesk_user: BotMyDeskUser, *_):
     help_text = ""
 
     if botmydesk_user.has_authorized_bot():
-        help_text += gettext(
-            f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_STATUS}`*\n"
-        )
-        help_text += gettext(
-            "_Show your BookMyDesk status today. Allows you to choose what to book for you today. Similar to notifications sent by BotMyDesk._\n\n\n"
-        )
-        help_text += gettext(
-            "\nYou can use the following commands at any moment, without having to wait for my notification(s) first.\n\n"
-        )
-        help_text += gettext(
-            f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* \n"
-        )
-        help_text += gettext(
-            "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n\n\n"
-        )
-        help_text += gettext(
-            f"🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`*\n"
-        )
-        help_text += gettext(
-            "_Mark today as *working from the office*. Only works if you already have a reservation. I will check you in though._\n\n\n"
-        )
-        help_text += gettext(
-            f"🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* \n"
-        )
-        help_text += gettext(
-            "_Mark today as *working externally* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n\n\n"
-        )
-        help_text += gettext(
-            f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* \n"
-        )
-        help_text += gettext(
-            "_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n ⚠️ _Care, will be applied instantly without confirmation._\n\n\n"
-        )
+        help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_STATUS}`*\n"
+        help_text += "_Show your BookMyDesk status today. Allows you to choose what to book for you today. Similar to notifications sent by BotMyDesk._\n\n\n"
+        help_text += "\nYou can use the following commands at any moment, without having to wait for my notification(s) first.\n\n"
+        help_text += f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* \n"
+        help_text += "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n\n\n"
+        help_text += f"🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`*\n"
+        help_text += "_Mark today as *working from the office*. Only works if you already have a reservation. I will check you in though._\n\n\n"
+        help_text += f"🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* \n"
+        help_text += "_Mark today as *working externally* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n\n\n"
+        help_text += f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* \n"
+        help_text += "_*Removes* any pending reservation you have for today or checks you out (if you were checked in already)._\n ⚠️ _Care, will be applied instantly without confirmation._\n\n\n"
     else:
-        help_text += gettext(
-            f"_More commands will be available after you've connected your account by typing *`{settings.SLACK_SLASHCOMMAND_BMD}`*_."
-        )
+        help_text += f"_More commands will be available after you've connected your account by typing *`{settings.SLACK_SLASHCOMMAND_BMD}`*_."
 
     blocks = [
         {
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": gettext(f"{settings.BOTMYDESK_NAME} help"),
+                "text": (f"{settings.BOTMYDESK_NAME} help"),
             },
         },
         {
@@ -115,7 +91,7 @@ def handle_slash_command_help(botmydesk_user: BotMyDeskUser, *_):
     bmd_core.services.slack_web_client().chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
-        text=gettext(f"{settings.BOTMYDESK_NAME} help"),
+        text=(f"{settings.BOTMYDESK_NAME} help"),
         blocks=blocks,
     ).validate()
 

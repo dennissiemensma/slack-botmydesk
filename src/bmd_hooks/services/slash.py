@@ -27,7 +27,7 @@ def handle_slash_command(botmydesk_user: BotMyDeskUser, payload: dict):
             settings.SLACK_SLASHCOMMAND_BMD_DEBUGP: handle_ephemeral_debug_message,
             settings.SLACK_SLASHCOMMAND_BMD_HELP: handle_slash_command_help,
             settings.SLACK_SLASHCOMMAND_BMD_SETTINGS: handle_preferences_gui,
-            settings.SLACK_SLASHCOMMAND_BMD_STATUS: bmd_core.services.gui_status_notification,
+            settings.SLACK_SLASHCOMMAND_BMD_STATUS: handle_status_notification,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME: bmd_core.services.handle_user_working_home_today,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE: bmd_core.services.handle_user_working_in_office_today,
             settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY: bmd_core.services.handle_user_working_externally_today,
@@ -531,6 +531,17 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
         view_id=initial_view_result["view"]["id"],
         hash=initial_view_result["view"]["hash"],
         view=view_data,
+    ).validate()
+
+
+def handle_status_notification(botmydesk_user: BotMyDeskUser, *_):
+    """Send status notification."""
+    title = gettext("Your BookMyDesk status")
+    bmd_core.services.slack_web_client().chat_postEphemeral(
+        channel=botmydesk_user.slack_user_id,
+        user=botmydesk_user.slack_user_id,
+        text=title,
+        blocks=bmd_core.services.gui_status_notification(botmydesk_user),
     ).validate()
 
 

@@ -87,16 +87,16 @@ def handle_interactive_send_bookmydesk_login_code(
         "callback_id": "bmd-modal-authorize-login-code",
         "title": {
             "type": "plain_text",
-            "text": gettext(f"Connecting {settings.BOTMYDESK_NAME}"),
+            "text": gettext("Connecting") + f" {settings.BOTMYDESK_NAME}",
         },
         "blocks": [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext(
-                        f"Check your mailbox for *{botmydesk_user.slack_email}*. Enter the BookMyDesk login code you've received."
-                    ),
+                    "text": gettext("Check your mailbox for")
+                    + f" *{botmydesk_user.slack_email}*."
+                    + gettext("Enter the BookMyDesk login code you've received."),
                 },
             },
             {
@@ -140,7 +140,8 @@ def handle_interactive_send_bookmydesk_login_code(
         web_client.chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
-            text=gettext(f"Sorry, failed to request BookMyDesk login code: `{error}`"),
+            text=gettext("Sorry, failed to request BookMyDesk login code")
+            + f": `{error}`",
         ).validate()
 
         return
@@ -164,7 +165,7 @@ def handle_interactive_bmd_revoke_botmydesk(
     # Clear session data. For now, we're not deleting the user to keep their preferences.
     botmydesk_user.clear_tokens()
 
-    title = gettext(f"{settings.BOTMYDESK_NAME} disconnected 👋")
+    title = f"{settings.BOTMYDESK_NAME} " + gettext("disconnected 👋")
     bmd_core.services.slack_web_client().chat_postMessage(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,
@@ -317,9 +318,8 @@ def handle_interactive_bmd_authorize_login_code_submit(
                         "text": {
                             "type": "plain_text",
                             "emoji": True,
-                            "text": gettext(
-                                f"⚙️ {settings.BOTMYDESK_NAME} preferences"
-                            ),
+                            "text": f"⚙️ {settings.BOTMYDESK_NAME} "
+                            + gettext("preferences"),
                         },
                         "value": "open_preferences",
                     },

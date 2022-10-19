@@ -36,7 +36,8 @@ def handle_app_home_opened_event(payload: dict):
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": gettext(f"⚙️ {settings.BOTMYDESK_NAME} preferences"),
+                        "text": f"⚙️ {settings.BOTMYDESK_NAME} "
+                        + gettext("preferences"),
                     },
                     "value": "open_preferences",
                 },
@@ -79,8 +80,10 @@ def handle_app_home_opened_event(payload: dict):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": gettext(
-                            f"My name is {settings.BOTMYDESK_NAME}, I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
+                        "text": gettext("My name is")
+                        + f" {settings.BOTMYDESK_NAME}, "
+                        + gettext(
+                            "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
                         ),
                     },
                 },

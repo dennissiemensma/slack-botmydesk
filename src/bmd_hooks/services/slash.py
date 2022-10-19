@@ -106,7 +106,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
             "callback_id": "bmd-unauthorized-welcome",
             "title": {
                 "type": "plain_text",
-                "text": gettext(f"Hi {botmydesk_user.slack_name} 👋"),
+                "text": gettext("Hi") + f"{botmydesk_user.slack_name} 👋",
             },
             "blocks": [
                 {"type": "divider"},
@@ -114,9 +114,8 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                     "type": "header",
                     "text": {
                         "type": "plain_text",
-                        "text": gettext(
-                            f"Connecting BookMyDesk to {settings.BOTMYDESK_NAME}"
-                        ),
+                        "text": gettext("Connecting BookMyDesk to")
+                        + f" {settings.BOTMYDESK_NAME}",
                     },
                 },
                 {
@@ -147,7 +146,11 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                                 "text": {
                                     "type": "mrkdwn",
                                     "text": gettext(
-                                        f"Request BookMyDesk login code by email for *{botmydesk_user.slack_email}*?\n\n_You can enter the code on the next screen._"
+                                        "Request BookMyDesk login code by email for"
+                                    )
+                                    + f" *{botmydesk_user.slack_email}*?\n\n"
+                                    + gettext(
+                                        "_You can enter the code on the next screen._"
                                     ),
                                 },
                                 "confirm": {
@@ -183,7 +186,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
     # Check status.
     profile = bmd_api_client.client.me_v3(botmydesk_user)
 
-    title = gettext(f"⚙️ {settings.BOTMYDESK_NAME} preferences")
+    title = f"⚙️ {settings.BOTMYDESK_NAME} " + gettext("preferences")
     view_data = {
         "type": "modal",
         "callback_id": "bmd-authorized-welcome",
@@ -484,9 +487,8 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": gettext(
-                        f"_Connected to BookMyDesk account of *{full_name}*_"
-                    ),
+                    "text": gettext("_Connected to BookMyDesk account of")
+                    + f" *{full_name}*_",
                 },
             },
             {
@@ -497,7 +499,8 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                         "style": "danger",
                         "text": {
                             "type": "plain_text",
-                            "text": gettext(f"Disconnect {settings.BOTMYDESK_NAME}"),
+                            "text": gettext("Disconnect")
+                            + f" {settings.BOTMYDESK_NAME}",
                             "emoji": True,
                         },
                         "confirm": {

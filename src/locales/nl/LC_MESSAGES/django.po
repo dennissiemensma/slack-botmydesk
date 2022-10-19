@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-19 21:28+0000\n"
-"PO-Revision-Date: 2022-10-19 23:29+0200\n"
+"POT-Creation-Date: 2022-10-19 22:00+0000\n"
+"PO-Revision-Date: 2022-10-20 00:03+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -313,33 +313,18 @@ msgstr "{settings.BOTMYDESK_NAME}: Onvoorziene fout"
 msgid "I'm not sure what to do, sorry! 🤷‍♀"
 msgstr "Ik weet niet wat ik moet doen, sorry! 🤷‍♀"
 
-#, python-brace-format
-msgid ""
-"_Please tell my creator that the following happened_:\n"
-"\n"
-"```{error}```"
-msgstr ""
-"_Vertel mijn maker dat het volgende is gebeurd_:\n"
-"\n"
-"```{error}```"
+msgid "_Please tell my creator that the following happened_"
+msgstr "_Vertel mijn maker dat het volgende is gebeurd_"
 
-#, python-brace-format
-msgid ""
-"_Triggered by_:\n"
-"\n"
-"```{error_trace}```"
-msgstr ""
-"_Veroorzaakt door_:\n"
-"\n"
-"```{error_trace}```"
+msgid "_Triggered by_"
+msgstr "_Veroorzaakt door_"
 
 #, python-brace-format
 msgid "_Report to <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 msgstr "_Rapporteer aan <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 
-#, python-brace-format
-msgid "⚙️ {settings.BOTMYDESK_NAME} preferences"
-msgstr "⚙️ {settings.BOTMYDESK_NAME}-voorkeuren"
+msgid "preferences"
+msgstr "voorkeuren"
 
 msgid "_Refreshing your reservations..._"
 msgstr "_Jouw reserveringen aan het verversen..._"
@@ -348,20 +333,23 @@ msgstr "_Jouw reserveringen aan het verversen..._"
 msgid "Hi {botmydesk_user.slack_name} 👋"
 msgstr "Hoi {botmydesk_user.slack_name} 👋"
 
-#, python-brace-format
-msgid "My name is {settings.BOTMYDESK_NAME}, I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
-msgstr "Mijn naam is {settings.BOTMYDESK_NAME}, ik ben een onofficiële Slack bot voor BookMyDesk. Ik kan je helpen met herinneren om te boeken of in te checken, om je leven net iets makkelijker te maken!"
+msgid "My name is"
+msgstr "Mijn naam is"
+
+msgid "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
+msgstr "ik ben een onofficiële Slack-bot voor BookMyDesk. Ik kan je helpen met herinneren om te boeken of je inchecken, om je leven net iets makkelijker te maken!"
 
 msgid "Click the preferences button above to link your BookMyDesk account to me."
 msgstr "Klik op de voorkeuren-knop hierboven om je BookMyDesk-account aan mij te koppelen."
 
-#, python-brace-format
-msgid "Connecting {settings.BOTMYDESK_NAME}"
-msgstr "{settings.BOTMYDESK_NAME} koppelen"
+msgid "Connecting"
+msgstr "Koppelen"
 
-#, python-brace-format
-msgid "Check your mailbox for *{botmydesk_user.slack_email}*. Enter the BookMyDesk login code you've received."
-msgstr "Controleer je mailbox voor *{botmydesk_user.slack_email}*. Vul de BookMyDesk-logincode in die je hebt ontvangen."
+msgid "Check your mailbox for"
+msgstr "Controleer je mailbox voor"
+
+msgid "Enter the BookMyDesk login code you've received."
+msgstr "Voer de ookMyDesk-inlogcode in die je ontvangen hebt."
 
 msgid "Login code"
 msgstr "Logincode"
@@ -369,13 +357,11 @@ msgstr "Logincode"
 msgid "Verify login code"
 msgstr "Verifieer logincode"
 
-#, python-brace-format
-msgid "Sorry, failed to request BookMyDesk login code: `{error}`"
-msgstr "Sorry, fout bij aanvragen BookMyDesk-inlogcode: `{error}`"
+msgid "Sorry, failed to request BookMyDesk login code"
+msgstr "Sorry, fout bij aanvragen BookMyDesk-inlogcode"
 
-#, python-brace-format
-msgid "{settings.BOTMYDESK_NAME} disconnected 👋"
-msgstr "{settings.BOTMYDESK_NAME} ontkoppeld 👋"
+msgid "disconnected 👋"
+msgstr "ontkoppeld 👋"
 
 msgid "I've disconnected from your BookMyDesk-account. Bye!"
 msgstr "Ik ben ontkoppeld van je BookMyDesk-account. Doei!"
@@ -390,9 +376,11 @@ msgstr "{settings.BOTMYDESK_NAME} gekoppeld 👏"
 msgid "Great! You've connected me to your BookMyDesk-account. Check out your preferences by clicking the button below, or by going to the 'Home' tab of this bot."
 msgstr "Top! Je hebt me gekoppeld aan je BookMyDesk-account. Stel je voorkeuren in door op de knop hieronder te klikken, of naar de 'Home\" tab van deze bot te gaan."
 
-#, python-brace-format
-msgid "Connecting BookMyDesk to {settings.BOTMYDESK_NAME}"
-msgstr "BookMyDesk koppelen met {settings.BOTMYDESK_NAME}"
+msgid "Hi"
+msgstr "Hoi"
+
+msgid "Connecting BookMyDesk to"
+msgstr "BookMyDesk koppelen met"
 
 msgid "First, you will need to authorize me to access your BookMyDesk-account, presuming it's your Slack email address."
 msgstr "Allereerst zul je me toegang moeten geven tot je BookMyDesk-account, er vanuitgaande dat deze overeenkomt met je Slack-emailadres."
@@ -400,15 +388,11 @@ msgstr "Allereerst zul je me toegang moeten geven tot je BookMyDesk-account, er 
 msgid "Connect"
 msgstr "Koppel"
 
-#, python-brace-format
-msgid ""
-"Request BookMyDesk login code by email for *{botmydesk_user.slack_email}*?\n"
-"\n"
-"_You can enter the code on the next screen._"
-msgstr ""
-"Vraag een BookMyDesk-inlogcode aan per e-mail voor *{botmydesk_user.slack_email}*?\n"
-"\n"
-"_Je kunt de inlogcode op het volgende scherm invoeren._"
+msgid "Request BookMyDesk login code by email for"
+msgstr "Vraag BookMyDesk-inlogcode per e-mail aan voor"
+
+msgid "_You can enter the code on the next screen._"
+msgstr "_Je kunt de code op het volgende scherm invullen._"
 
 msgid "Yes, email it"
 msgstr "Ja, verstuur"
@@ -479,13 +463,11 @@ msgstr "Echter, zal ik je *niet storen* wanneer je al iets geboekt hebt/ingechec
 msgid "Skip notification when booked/checked in?"
 msgstr "Sla notificatie over wanneer al geboekt/ingecheckt?"
 
-#, python-brace-format
-msgid "_Connected to BookMyDesk account of *{full_name}*_"
-msgstr "_Verbonden met BookMyDesk-account van *{full_name}*_"
+msgid "_Connected to BookMyDesk account of"
+msgstr "_Verbonden met BookMyDesk-account van"
 
-#, python-brace-format
-msgid "Disconnect {settings.BOTMYDESK_NAME}"
-msgstr "Ontkoppel {settings.BOTMYDESK_NAME}"
+msgid "Disconnect"
+msgstr "Ontkoppel"
 
 msgid ""
 "This will log me out of your BookMyDesk-account and I won't bother you anymore.\n"
@@ -508,6 +490,39 @@ msgstr "Je BookMyDesk-status"
 #. Translators: This is a debug message
 msgid "BotMyDesk debug message"
 msgstr "BotMyDesk debug bericht"
+
+#~ msgid ""
+#~ "_Triggered by_:\n"
+#~ "\n"
+#~ "```{error_trace}```"
+#~ msgstr ""
+#~ "_Veroorzaakt door_:\n"
+#~ "\n"
+#~ "```{error_trace}```"
+
+#~ msgid "⚙️ {settings.BOTMYDESK_NAME} preferences"
+#~ msgstr "⚙️ {settings.BOTMYDESK_NAME}-voorkeuren"
+
+#~ msgid "Connecting {settings.BOTMYDESK_NAME}"
+#~ msgstr "{settings.BOTMYDESK_NAME} koppelen"
+
+#~ msgid "Check your mailbox for *{botmydesk_user.slack_email}*. Enter the BookMyDesk login code you've received."
+#~ msgstr "Controleer je mailbox voor *{botmydesk_user.slack_email}*. Vul de BookMyDesk-logincode in die je hebt ontvangen."
+
+#~ msgid "{settings.BOTMYDESK_NAME} disconnected 👋"
+#~ msgstr "{settings.BOTMYDESK_NAME} ontkoppeld 👋"
+
+#~ msgid ""
+#~ "Request BookMyDesk login code by email for *{botmydesk_user.slack_email}*?\n"
+#~ "\n"
+#~ "_You can enter the code on the next screen._"
+#~ msgstr ""
+#~ "Vraag een BookMyDesk-inlogcode aan per e-mail voor *{botmydesk_user.slack_email}*?\n"
+#~ "\n"
+#~ "_Je kunt de inlogcode op het volgende scherm invoeren._"
+
+#~ msgid "Disconnect {settings.BOTMYDESK_NAME}"
+#~ msgstr "Ontkoppel {settings.BOTMYDESK_NAME}"
 
 #~ msgid ""
 #~ "\n"

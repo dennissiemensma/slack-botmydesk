@@ -35,6 +35,8 @@ COPY src/poetry.lock src/pyproject.toml /code/
 RUN poetry install --only main
 COPY src/ /code/
 
+RUN poetry run /code/manage.py compilemessages
+
 #ENTRYPOINT poetry run gunicorn --log-level debug --bind unix:$BUILD_GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
 ENTRYPOINT poetry run gunicorn --bind unix:$GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
 

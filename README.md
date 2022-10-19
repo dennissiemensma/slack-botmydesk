@@ -173,11 +173,6 @@ docker-compose up -d
 docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.py migrate --noinput
 ```
 
-- And consider rebuilding the compiled translations (if they changed):
-```shell
-docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.py compilemessages
-```
-
 ----
 
 Your bot should now be ready to receive requests. 

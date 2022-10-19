@@ -1,6 +1,9 @@
 # Slack: BotMyDesk
 _This project is NOT officially affiliated with BookMyDesk in any way!_
 
+## Notes
+- When using the default container setup: Python locales may not work well when switching to a non-English locale.
+
 ## Setup
 ### Creating your Slack app
 - Go to: https://api.slack.com/apps

@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             model_name="botmydeskuser",
             name="preferred_locale",
             field=models.CharField(
-                choices=[("nl", "nl"), ("en", "en")], default="nl", max_length=16
+                choices=[("en", "en"), ("nl", "nl")], default="en", max_length=16
             ),
         ),
     ]

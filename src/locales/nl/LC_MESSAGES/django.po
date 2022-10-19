@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-12 21:35+0000\n"
-"PO-Revision-Date: 2022-10-12 23:35+0200\n"
+"POT-Creation-Date: 2022-10-19 19:07+0000\n"
+"PO-Revision-Date: 2022-10-19 21:10+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -60,53 +60,50 @@ msgstr ""
 "{emoji} *{reservation_start_text}* van {current_from} tot {current_to}\n"
 "_Over zo'n {natural_time_until_start} op *{location}*_"
 
-#, python-brace-format
-msgid "🏡 You have a *home reservation* for {today_text} ({reservation_start} - {reservation_end})"
-msgstr "🏡 Je hebt een *thuisreservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
+msgid "🏡 You seem to have a *home reservation* for"
+msgstr "Je lijkt nog *geen reservering* te hebben voor"
+
+msgid "🏢 You seem to have an *office reservation* for"
+msgstr "🏢 Je lijkt een *kantoorreservering* te hebben voor"
+
+msgid "🚋 You seem to have an *external reservation* outside home/office for"
+msgstr "🚋 Je lijkt een *extern/buiten kantoor reservering* te hebben voor"
+
+msgid "You seem to have *no reservation* (yet) for"
+msgstr "Je lijkt (nog) *geen reservering* te hebben voor"
 
 #, python-brace-format
-msgid "🏢 You have an *office reservation* for {today_text} ({reservation_start} - {reservation_end})"
-msgstr "🏢 Je hebt een *kantoorreservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
-
-#, python-brace-format
-msgid "🚋 You have an *external reservation* outside home/office for {today_text} ({reservation_start} - {reservation_end})"
-msgstr "🚋 Je hebt een *extern/buiten kantoor reservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
-
-#, python-brace-format
-msgid "You have *no reservation* yet for {today_text}"
-msgstr "Je hebt nog *geen reservering* voor {today_text}"
-
-msgid ", along with {reservation_count-1} other reservation"
-msgid_plural ", along with {reservation_count-1} other reservations"
-msgstr[0] ", samen met {reservation_count-1} andere reservering"
-msgstr[1] ", samen met {reservation_count-1} andere reserveringen"
+msgid ", along with {other_count} other reservation"
+msgid_plural ", along with {other_count} other reservations"
+msgstr[0] ", samen met {other_count} andere reservering"
+msgstr[1] ", samen met {other_count} andere reserveringen"
 
 msgid ""
 " and you are *checked in*.\n"
 "\n"
-"_Do I even need to do anything at all?_"
+"_I can only check you out if you'd like..._"
 msgstr ""
 " en je bent *ingecheckt*.\n"
 "\n"
-"_Moet ik uberhaupt iets doen?_"
+"_Ik kan je alleen nog uitchecken als je dat wilt..._"
 
 msgid ""
 " and you are *checked out*.\n"
 "\n"
-"_Do I even need to do anything at all?_"
+"_There is nothing I can do for you (for now)..._"
 msgstr ""
 " en je bent *uitgecheckt*.\n"
 "\n"
-"_Moet ik uberhaupt iets doen?_"
+"_Voor nu kan ik niets meer voor je doen..._"
 
 msgid ""
 ".\n"
 "\n"
-"_Where are you today?_"
+"_Are you working today? If so, where?_"
 msgstr ""
 ".\n"
 "\n"
-"_Waar ben je vandaag?_"
+"_Werk je vandaag? Zo ja, waar?_"
 
 msgid "🏡 Working home"
 msgstr "🏡 Thuiswerken"
@@ -445,8 +442,8 @@ msgstr "Ja, sla over"
 msgid "No, notify me"
 msgstr "Nee, stuur notificatie"
 
-msgid "Dutch"
-msgstr "Nederlands"
+msgid "Dutch (partially broken)"
+msgstr "Nederlands (deels defect)"
 
 msgid "English"
 msgstr "Engels"
@@ -504,6 +501,27 @@ msgstr "Ja, ontkoppel"
 msgid "Nevermind, keep connected"
 msgstr "Laat maar, blijf gekoppeld"
 
+msgid "Your BookMyDesk status"
+msgstr "Je BookMyDesk-status"
+
 #. Translators: This is a debug message
 msgid "BotMyDesk debug message"
 msgstr "BotMyDesk debug bericht"
+
+#~ msgid "🏡 You have a *home reservation* for {today_text} ({reservation_start} - {reservation_end})"
+#~ msgstr "🏡 Je hebt een *thuisreservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
+
+#~ msgid "🏢 You have an *office reservation* for {today_text} ({reservation_start} - {reservation_end})"
+#~ msgstr "🏢 Je hebt een *kantoorreservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
+
+#~ msgid ""
+#~ ".\n"
+#~ "\n"
+#~ "_Where are you today?_"
+#~ msgstr ""
+#~ ".\n"
+#~ "\n"
+#~ "_Waar ben je vandaag?_"
+
+#~ msgid "Dutch"
+#~ msgstr "Nederlands"

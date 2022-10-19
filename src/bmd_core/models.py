@@ -12,11 +12,11 @@ class BotMyDeskSlackUserManager(models.Manager):
 
 
 class BotMyDeskUser(ModelUpdateMixin, models.Model):
-    DUTCH_LOCALE = "nl"
     ENGLISH_LOCALE = "en"
+    DUTCH_LOCALE = "nl"
     LOCALE_CHOICES = (
-        (DUTCH_LOCALE, DUTCH_LOCALE),
         (ENGLISH_LOCALE, ENGLISH_LOCALE),
+        (DUTCH_LOCALE, DUTCH_LOCALE),
     )
 
     objects = BotMyDeskSlackUserManager()
@@ -42,7 +42,7 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
 
     # User preferences
     preferred_locale = models.CharField(
-        max_length=16, choices=LOCALE_CHOICES, default=DUTCH_LOCALE
+        max_length=16, choices=LOCALE_CHOICES, default=ENGLISH_LOCALE
     )
     preferred_notification_time_on_mondays = models.TimeField(null=True, default=None)
     preferred_notification_time_on_tuesdays = models.TimeField(null=True, default=None)

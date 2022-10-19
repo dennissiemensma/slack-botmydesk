@@ -7,17 +7,19 @@ ENV PYTHONUNBUFFERED=1
 ENV VIRTUAL_ENV=/opt/venv
 WORKDIR /code
 
-RUN apk add \
+RUN apk add --update \
     mariadb-dev \
     py3-mysqlclient \
     python3-dev \
     musl-dev \
     postgresql-dev \
     build-base \
+    musl-locales \
+    musl-locales-lang \
     gettext
-RUN python3 -m venv $VIRTUAL_ENV
 
 # Credits to: https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
+RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN python3 -m pip install --upgrade pip && pip3 install poetry

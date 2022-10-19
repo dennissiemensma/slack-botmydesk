@@ -1,3 +1,4 @@
+import locale
 import logging
 from typing import Optional
 
@@ -84,7 +85,12 @@ def validate_botmydesk_user(slack_user_id: str):
 
 def apply_user_locale(botmydesk_user: BotMyDeskUser):
     botmydesk_logger.debug(f"Applying user locale: {botmydesk_user.preferred_locale}")
+
+    # Django gettext strings.
     translation.activate(botmydesk_user.preferred_locale)
+
+    # Python (e.g. date formatters).
+    locale.setlocale(locale.LC_TIME, botmydesk_user.preferred_locale)
 
 
 def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[list]:
@@ -219,39 +225,47 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
             has_home_reservation = True
 
     if has_home_reservation:
-        reservation_text = gettext(
-            f"🏡 You have a *home reservation* for {today_text} ({reservation_start} - {reservation_end})"
+        reservation_text = (
+            gettext("🏡 You seem to have a *home reservation* for")
+            + f" {today_text} ({reservation_start} - {reservation_end})"
         )
     elif has_office_reservation:
-        reservation_text = gettext(
-            f"🏢 You have an *office reservation* for {today_text} ({reservation_start} - {reservation_end})"
+        reservation_text = (
+            gettext("🏢 You seem to have an *office reservation* for")
+            + f" {today_text} ({reservation_start} - {reservation_end})"
         )
     elif has_external_reservation:
-        reservation_text = gettext(
-            f"🚋 You have an *external reservation* outside home/office for {today_text} ({reservation_start} - {reservation_end})"
+        reservation_text = (
+            gettext(
+                "🚋 You seem to have an *external reservation* outside home/office for"
+            )
+            + f" {today_text} ({reservation_start} - {reservation_end})"
         )
     else:
-        reservation_text = gettext(f"You have *no reservation* yet for {today_text}")
+        reservation_text = (
+            gettext("You seem to have *no reservation* (yet) for") + f" {today_text}"
+        )
 
     # Edge-cases, for those wanting to see the world burn.
     if reservation_count > 1:
+        other_count = reservation_count - 1
         reservation_text += ngettext(
-            f", along with {reservation_count-1} other reservation",
-            f", along with {reservation_count-1} other reservations",
+            f", along with {other_count} other reservation",
+            f", along with {other_count} other reservations",
             reservation_count,
         )
 
     # This is some assumption, may break in future if statuses change.
     if checked_in:
         reservation_text += gettext(
-            " and you are *checked in*.\n\n_Do I even need to do anything at all?_"
+            " and you are *checked in*.\n\n_I can only check you out if you'd like..._"
         )
     elif checked_out:
         reservation_text += gettext(
-            " and you are *checked out*.\n\n_Do I even need to do anything at all?_"
+            " and you are *checked out*.\n\n_There is nothing I can do for you (for now)..._"
         )
     else:
-        reservation_text += gettext(".\n\n_Where are you today?_")
+        reservation_text += gettext(".\n\n_Are you working today? If so, where?_")
 
     blocks = [
         {

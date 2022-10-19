@@ -118,9 +118,8 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
         result = slack_web_client().chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
             user=botmydesk_user.slack_user_id,
-            text=gettext(
-                f"Sorry, an error occurred while requesting your reservations: ```{error}```"
-            ),
+            text=gettext("Sorry, an error occurred while requesting your reservations")
+            + f": ```{error}```",
         )
         result.validate()
         return
@@ -160,9 +159,12 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
             emoji = current.emoji_shortcut()
             location = current.location_name_shortcut()
 
-            reservations_text += gettext(
-                f"\n\n\n{emoji} *{reservation_start_text}* from {current_from} to {current_to}\n_In about {natural_time_until_start} at *{location}*_"
-            )
+            # Hack for gettext, alternatively concat.
+            text_from = gettext("from")
+            text_to = gettext("to")
+            text_at = gettext("at")
+            text_in_about = gettext("In about")
+            reservations_text += f"\n\n\n{emoji} *{reservation_start_text}* {text_from} {current_from} {text_to} {current_to}\n_{text_in_about} {natural_time_until_start} {text_at} *{location}*_"
 
     return [
         {

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-19 19:07+0000\n"
-"PO-Revision-Date: 2022-10-19 21:10+0200\n"
+"POT-Creation-Date: 2022-10-19 21:28+0000\n"
+"PO-Revision-Date: 2022-10-19 23:29+0200\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -26,9 +26,8 @@ msgstr "Sorry, je bent niet gewhitelist en ik was te lui om een fatsoenlijk beri
 msgid "Your upcoming BookMyDesk reservations"
 msgstr "Je komende boekingen in BookMyDesk"
 
-#, python-brace-format
-msgid "Sorry, an error occurred while requesting your reservations: ```{error}```"
-msgstr "Sorry, fout bij het ophalen van je reserveringen: ```{error}```"
+msgid "Sorry, an error occurred while requesting your reservations"
+msgstr "Sorry, fout bij het ophalen van je reserveringen"
 
 msgid "_No reservations found (or too far away)..._"
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
@@ -46,19 +45,17 @@ msgstr ""
 "{emoji} {reservation_start_text}: {current_from} tot {current_to}\n"
 "_{current.status()}_"
 
-#, python-brace-format
-msgid ""
-"\n"
-"\n"
-"\n"
-"{emoji} *{reservation_start_text}* from {current_from} to {current_to}\n"
-"_In about {natural_time_until_start} at *{location}*_"
-msgstr ""
-"\n"
-"\n"
-"\n"
-"{emoji} *{reservation_start_text}* van {current_from} tot {current_to}\n"
-"_Over zo'n {natural_time_until_start} op *{location}*_"
+msgid "from"
+msgstr "van"
+
+msgid "to"
+msgstr "tot"
+
+msgid "at"
+msgstr "op"
+
+msgid "In about"
+msgstr "Over"
 
 msgid "🏡 You seem to have a *home reservation* for"
 msgstr "Je lijkt nog *geen reservering* te hebben voor"
@@ -179,6 +176,10 @@ msgstr ""
 
 msgid "Sorry, not yet implemented 🧑‍💻"
 msgstr "Sorry, nog niet werkend 🧑‍💻"
+
+#, python-brace-format
+msgid "Sorry, an error occurred while requesting your reservations: ```{error}```"
+msgstr "Sorry, fout bij het ophalen van je reserveringen: ```{error}```"
 
 msgid "⚠️ No office reservation found for this day. Please book an office seat and check-in anyway."
 msgstr "⚠️ Geen kantoorreservering gevonden voor deze dag. Boek een plek en check dan ook direct in."
@@ -507,6 +508,19 @@ msgstr "Je BookMyDesk-status"
 #. Translators: This is a debug message
 msgid "BotMyDesk debug message"
 msgstr "BotMyDesk debug bericht"
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "\n"
+#~ "{emoji} *{reservation_start_text}* from {current_from} to {current_to}\n"
+#~ "_In about {natural_time_until_start} at *{location}*_"
+#~ msgstr ""
+#~ "\n"
+#~ "\n"
+#~ "\n"
+#~ "{emoji} *{reservation_start_text}* van {current_from} tot {current_to}\n"
+#~ "_Over zo'n {natural_time_until_start} op *{location}*_"
 
 #~ msgid "🏡 You have a *home reservation* for {today_text} ({reservation_start} - {reservation_end})"
 #~ msgstr "🏡 Je hebt een *thuisreservering* staan voor {today_text} ({reservation_start} - {reservation_end})"

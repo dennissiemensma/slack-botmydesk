@@ -137,6 +137,10 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
             current_from = current.checked_in_time() or current.from_time()
             current_to = current.checked_out_time() or current.to_time()
 
+            # Exclude visitors or proxies.
+            if current.type() == "visitor" or not current.is_created_by_same_user():
+                continue
+
             if current.status() in ("checkedIn", "checkedOut", "cancelled", "expired"):
                 if current.status() in ("cancelled", "expired"):
                     emoji = "❌ "
@@ -150,10 +154,6 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
 
             # Skip weird ones.
             if current.status() != "reserved":
-                continue
-
-            # Exclude visitors:
-            if current.type() == "visitor":
                 continue
 
             emoji = current.emoji_shortcut()
@@ -204,7 +204,7 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
 
     # Very shallow assertions.
     for current in reservations_result.reservations():
-        if current.type() == "visitor":
+        if current.type() == "visitor" or not current.is_created_by_same_user():
             continue
 
         reservation_count += 1

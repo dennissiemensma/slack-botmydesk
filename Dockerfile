@@ -26,7 +26,7 @@ RUN python3 -m pip install --upgrade pip && pip3 install poetry
 
 
 
-### Production.
+### Production app.
 FROM base-app AS prod-app
 ARG BUILD_GUNICORN_SOCKET
 ENV GUNICORN_SOCKET=$BUILD_GUNICORN_SOCKET
@@ -35,8 +35,17 @@ COPY src/poetry.lock src/pyproject.toml /code/
 RUN poetry install --only main
 COPY src/ /code/
 
-#ENTRYPOINT poetry run gunicorn --log-level debug --bind unix:$BUILD_GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
 ENTRYPOINT poetry run gunicorn --bind unix:$GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
+
+
+### Production task scheduler.
+FROM prod-app AS prod-app-scheduler
+ENTRYPOINT poetry run celery -l INFO -A botmydesk beat
+
+
+### Production task worker.
+FROM prod-app AS prod-app-worker
+ENTRYPOINT poetry run celery -l INFO -A botmydesk worker
 
 
 
@@ -45,6 +54,4 @@ FROM base-app AS dev-app
 
 COPY src/poetry.lock src/pyproject.toml /code/
 RUN poetry install
-
-#ENTRYPOINT poetry run /code/manage.py dev_socket_mode
-#ENTRYPOINT poetry run /code/manage.py runserver 0.0.0.0:8000
+# No ENTRYPOINT, run manually instead (e.g. docker-compose file).

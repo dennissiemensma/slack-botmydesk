@@ -31,8 +31,7 @@ services:
   app_task_scheduler:
     build:
       context: .
-      target: prod-app
-    command: poetry run celery -A botmydesk beat -l INFO
+      target: prod-app-scheduler
     restart: always
     depends_on:
       - database
@@ -45,8 +44,7 @@ services:
   app_task_worker:
     build:
       context: .
-      target: prod-app
-    command: poetry run celery -A botmydesk worker -l INFO
+      target: prod-app-worker
     restart: always
     depends_on:
       - database

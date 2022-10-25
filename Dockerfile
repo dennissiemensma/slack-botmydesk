@@ -40,12 +40,12 @@ ENTRYPOINT poetry run gunicorn --bind unix:$GUNICORN_SOCKET --workers 1 --max-re
 
 ### Production task scheduler.
 FROM prod-app AS prod-app-scheduler
-ENTRYPOINT poetry run celery -l INFO -A botmydesk beat
+ENTRYPOINT poetry run celery -A botmydesk beat -l INFO
 
 
 ### Production task worker.
 FROM prod-app AS prod-app-worker
-ENTRYPOINT poetry run celery -l INFO -A botmydesk worker
+ENTRYPOINT poetry run celery -A botmydesk worker -l INFO
 
 
 

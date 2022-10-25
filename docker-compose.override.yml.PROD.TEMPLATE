@@ -57,7 +57,8 @@ services:
     env_file:
       - .env
 
-  # Use with "DJANGO_DATABASE_ENGINE=django.db.backends.postgresql" in .env
+  # @TODO: Choose user and use in .env as DJANGO_DATABASE_USER value
+  # @TODO: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use in .env as DJANGO_DATABASE_PASSWORD value
   database:
     image: postgres:14
     restart: always
@@ -65,8 +66,6 @@ services:
       - ./docker/postgres:/var/lib/postgresql/
     networks:
       - botmydesk-internal
-    # @TODO: Choose user and use in .env as DJANGO_DATABASE_USER value
-    # @TODO: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use in .env as DJANGO_DATABASE_PASSWORD value
 
   queue_broker:  # Required for background processing
     image: rabbitmq

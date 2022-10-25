@@ -28,7 +28,17 @@ services:
     environment:
       - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
 
-  app_task_scheduler:
+  # @TODO: Choose user and use in .env as DJANGO_DATABASE_USER value
+  # @TODO: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use in .env as DJANGO_DATABASE_PASSWORD value
+  database:
+    image: postgres:14
+    restart: always
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/
+    networks:
+      - botmydesk-internal
+
+  app_task_scheduler:  # Required for background processing
     build:
       context: .
       target: prod-app-scheduler
@@ -41,7 +51,7 @@ services:
     env_file:
       - .env
 
-  app_task_worker:
+  app_task_worker:  # Required for background processing
     build:
       context: .
       target: prod-app-worker
@@ -54,16 +64,6 @@ services:
       - botmydesk-internal
     env_file:
       - .env
-
-  # @TODO: Choose user and use in .env as DJANGO_DATABASE_USER value
-  # @TODO: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use in .env as DJANGO_DATABASE_PASSWORD value
-  database:
-    image: postgres:14
-    restart: always
-    volumes:
-      - ./docker/postgres:/var/lib/postgresql/
-    networks:
-      - botmydesk-internal
 
   queue_broker:  # Required for background processing
     image: rabbitmq

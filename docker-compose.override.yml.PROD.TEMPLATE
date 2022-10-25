@@ -82,6 +82,7 @@ services:
 #    networks:  #  @TODO required or does volume suffice?
 #      - botmydesk-internal
     ports:
-     - "80:80"
+    # @TODO: Check whether you need to map port 80, 443 or (like below) 8000 for another proxy in front of this one...
+     - "8000:80"
     environment:
      - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket

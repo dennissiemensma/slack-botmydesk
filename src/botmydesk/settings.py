@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_beat",
     "bmd_core",
     "bmd_hooks",
 ]
@@ -115,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = config("DJANGO_TIMEZONE")
 
 USE_I18N = True
 
@@ -214,3 +215,15 @@ SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME = "home"
 SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE = "office"
 SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY = "extern"
 SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED = "clear"
+
+# Celery
+# https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html#django-first-steps
+CELERY_BROKER_URL = config("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = None
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
+# Celery Beat
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"

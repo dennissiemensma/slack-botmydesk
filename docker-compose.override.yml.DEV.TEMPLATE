@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - database
+      - queue_broker
     # Assumes you want socket mode + autoreload during development.
     command: poetry run /code/manage.py dev_socket_mode
     # OR use "runserver" (includes autoreload), to simulate webhook hosting (pre-production) @ http://localhost:8000
@@ -34,6 +35,8 @@ services:
       - DJANGO_DATABASE_NAME=botmydesk
       # https://docs.djangoproject.com/en/4.1/ref/settings/#allowed-hosts
       - DJANGO_ALLOWED_HOST=localhost
+      # https://docs.celeryq.dev/en/stable/userguide/configuration.html#configuration
+      - CELERY_BROKER_URL=amqp://guest:guest@queue_broker:5672//
 
 # TODO: Choose your DB
 ### Option 1 ###
@@ -47,6 +50,9 @@ services:
 #    #    - DJANGO_DATABASE_NAME=botmydesk
 #    image: mysql:8
 #    restart: always
+## Only enable me if you need to connect to the DB with a SQL tool
+##    ports:
+##      - '3306:3306'
 #    volumes:
 #      - ./docker/mysql:/var/lib/mysql/
 #    environment:
@@ -54,8 +60,7 @@ services:
 #     - MYSQL_USER=devuser
 #     - MYSQL_PASSWORD=devpasswd
 #     - MYSQL_ROOT_PASSWORD=rootpasswd
-#    ports:
-#      - '3306:3306'
+
 
 ### Option 2 ###
 #  database:
@@ -68,11 +73,16 @@ services:
 #    #    - DJANGO_DATABASE_NAME=botmydesk
 #    image: postgres:14
 #    restart: always
+## Only enable me if you need to connect to the DB with a SQL tool
+##    ports:
+##      - '5432:5432'
 #    volumes:
 #      - ./docker/postgres:/var/lib/postgresql/
 #    environment:
 #      - POSTGRES_DB=botmydesk
 #      - POSTGRES_USER=devuser
 #      - POSTGRES_PASSWORD=devpasswd
-#    ports:
-#      - '5432:5432'
+
+  queue_broker:  # Required for background processing
+    image: rabbitmq
+    restart: always

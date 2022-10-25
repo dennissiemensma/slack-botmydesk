@@ -245,7 +245,16 @@ app_home_opened
 
 ----
 
-- Do **NOT** run multiple instances of either the web app or the background worker. They are currently **prone to race conditions**! 
+- Do **NOT** run multiple instances of either the web app or the background worker. They are currently **prone to race conditions**!
+
+- The following processes should run:
+```shell
+# Task scheduler (DO NOT RUN MULTIPLE!)
+poetry run celery -A botmydesk beat -l INFO
+# Task worker
+poetry run celery -A botmydesk worker -l INFO
+```
+
 - Live logs:
 ```shell
 docker-compose logs -f

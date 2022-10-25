@@ -1,4 +1,11 @@
 version: "3.7"
+
+volumes:
+  gunicorn-socket: ~
+
+networks:
+  botmydesk-internal: { }
+
 services:
   app:
     build:
@@ -10,13 +17,45 @@ services:
     restart: always
     depends_on:
       - database
+      - queue_broker
       - prod_web
     volumes:
      - gunicorn-socket:/run/gunicorn/
+    networks:
+      - botmydesk-internal
     env_file:
       - .env
     environment:
       - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
+
+  app_task_scheduler:
+    build:
+      context: .
+      target: prod-app
+    command: poetry run celery -A botmydesk beat -l INFO
+    restart: always
+    depends_on:
+      - database
+      - queue_broker
+    networks:
+      - botmydesk-internal
+    env_file:
+      - .env
+
+  app_task_worker:
+    build:
+      context: .
+      target: prod-app
+    command: poetry run celery -A botmydesk worker -l INFO
+    restart: always
+    depends_on:
+      - database
+      - queue_broker
+      - app_task_scheduler
+    networks:
+      - botmydesk-internal
+    env_file:
+      - .env
 
   # Use with "DJANGO_DATABASE_ENGINE=django.db.backends.postgresql" in .env
   database:
@@ -24,12 +63,16 @@ services:
     restart: always
     volumes:
       - ./docker/postgres:/var/lib/postgresql/
-    environment:
-      - POSTGRES_DB=botmydesk
-      # @TODO: Choose user and use in .env as DJANGO_DATABASE_USER as well
-      - POSTGRES_USER=
-      # @TODO: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use in .env as DJANGO_DATABASE_PASSWORD as well
-      - POSTGRES_PASSWORD=
+    networks:
+      - botmydesk-internal
+    # @TODO: Choose user and use in .env as DJANGO_DATABASE_USER value
+    # @TODO: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use in .env as DJANGO_DATABASE_PASSWORD value
+
+  queue_broker:  # Required for background processing
+    image: rabbitmq
+    restart: always
+    networks:
+      - botmydesk-internal
 
   prod_web:
     image: nginx
@@ -37,10 +80,9 @@ services:
     volumes:
      - ./docker/nginx/templates:/etc/nginx/templates
      - gunicorn-socket:/run/gunicorn/
+#    networks:  #  @TODO required or does volume suffice?
+#      - botmydesk-internal
     ports:
      - "80:80"
     environment:
      - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
-
-volumes:
-  gunicorn-socket: ~

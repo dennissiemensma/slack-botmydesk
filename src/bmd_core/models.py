@@ -7,6 +7,10 @@ from bmd_core.mixins import ModelUpdateMixin
 
 
 class BotMyDeskSlackUserManager(models.Manager):
+    def with_session(self):
+        """Returns users with any session."""
+        return self.filter(bookmydesk_refresh_token__isnull=False)
+
     def by_slack_id(self, slack_user_id: str):
         return self.get(slack_user_id=slack_user_id)
 

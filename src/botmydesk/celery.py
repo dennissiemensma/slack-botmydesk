@@ -23,4 +23,8 @@ app.conf.beat_schedule = {
         "task": "bmd_core.tasks.refresh_all_bookmydesk_sessions",
         "schedule": crontab(hour=0, minute=0),
     },
+    "sync-botmydesk-app-homes": {
+        "task": "bmd_core.tasks.sync_botmydesk_app_homes",
+        "schedule": crontab(hour="*/4", minute=5),
+    },
 }

@@ -48,7 +48,7 @@ def handle_app_home_opened_event(payload: dict):
     if botmydesk_user.has_authorized_bot():
         # Clear on update.
         bmd_core.services.slack_web_client().views_publish(
-            user_id=payload["event"]["user"],
+            user_id=slack_user_id,
             view={
                 "type": "home",
                 "blocks": [
@@ -100,7 +100,7 @@ def handle_app_home_opened_event(payload: dict):
         )
 
     bmd_core.services.slack_web_client().views_publish(
-        user_id=payload["event"]["user"],
+        user_id=slack_user_id,
         view={
             "type": "home",
             "blocks": blocks,

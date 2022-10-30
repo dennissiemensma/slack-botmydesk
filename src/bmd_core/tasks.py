@@ -3,7 +3,7 @@ from celery import Celery
 
 from bmd_core.models import BotMyDeskUser
 import bmd_api_client.client
-import bmd_hooks.services.event
+import bmd_core.services
 
 
 botmydesk_logger = logging.getLogger("botmydesk")
@@ -29,12 +29,4 @@ def sync_botmydesk_app_homes():
         botmydesk_logger.info(
             f"Performing periodic app home update for @{current.slack_user_id} ({current.slack_email})"
         )
-        # Cheap workaround.
-        bmd_hooks.services.event.handle_app_home_opened_event(
-            {
-                "event": {
-                    "user": current.slack_user_id,
-                    "tab": "home",
-                }
-            }
-        )
+        bmd_core.services.update_user_app_home(botmydesk_user=current)

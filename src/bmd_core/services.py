@@ -675,6 +675,91 @@ def handle_user_not_working_today(botmydesk_user: BotMyDeskUser, payload):
     _post_handle_report_update(botmydesk_user, message_to_user, payload)
 
 
+def update_user_app_home(botmydesk_user: BotMyDeskUser):
+    apply_user_locale(botmydesk_user)
+
+    # Always show preferences button
+    blocks = [
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": f"⚙️ {settings.BOTMYDESK_NAME} "
+                        + gettext("preferences"),
+                    },
+                    "value": "open_preferences",
+                },
+            ],
+        }
+    ]
+
+    if botmydesk_user.has_authorized_bot():
+        # Clear on update.
+        slack_web_client().views_publish(
+            user_id=botmydesk_user.slack_user_id,
+            view={
+                "type": "home",
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": gettext("_Refreshing your reservations..._"),
+                        },
+                    },
+                ],
+            },
+        ).validate()
+
+        blocks.extend(gui_status_notification(botmydesk_user))
+        blocks.extend([{"type": "divider"}])
+        blocks.extend(gui_list_upcoming_reservations(botmydesk_user))
+    else:
+        blocks.extend(
+            [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": gettext(f"Hi {botmydesk_user.slack_name} 👋"),
+                    },
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": gettext("My name is")
+                        + f" {settings.BOTMYDESK_NAME}, "
+                        + gettext(
+                            "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
+                        ),
+                    },
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": gettext(
+                            "Click the preferences button above to link your BookMyDesk account to me."
+                        ),
+                    },
+                },
+            ]
+        )
+
+    slack_web_client().views_publish(
+        user_id=botmydesk_user.slack_user_id,
+        view={
+            "type": "home",
+            "blocks": blocks,
+        },
+    ).validate()
+
+
 def _post_handle_report_update(
     botmydesk_user: BotMyDeskUser,
     message_to_user: str,

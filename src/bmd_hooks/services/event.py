@@ -24,6 +24,12 @@ def handle_app_home_opened_event(payload: dict):
         return
 
     botmydesk_user = bmd_core.services.get_botmydesk_user(slack_user_id)
+
+    if botmydesk_user.has_authorized_bot():
+        # Do not trigger for known users.
+        return
+
+    # New or unauthorized bot users. Give them a welcome.
     bmd_core.services.apply_user_locale(botmydesk_user)
 
     # Always show preferences button
@@ -42,65 +48,38 @@ def handle_app_home_opened_event(payload: dict):
                     "value": "open_preferences",
                 },
             ],
-        }
+        },
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": gettext(f"Hi {botmydesk_user.slack_name} 👋"),
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": gettext("My name is")
+                + f" {settings.BOTMYDESK_NAME}, "
+                + gettext(
+                    "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
+                ),
+            },
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": gettext(
+                    "Click the preferences button above to link your BookMyDesk account to me."
+                ),
+            },
+        },
     ]
 
-    if botmydesk_user.has_authorized_bot():
-        # Clear on update.
-        bmd_core.services.slack_web_client().views_publish(
-            user_id=slack_user_id,
-            view={
-                "type": "home",
-                "blocks": [
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": gettext("_Refreshing your reservations..._"),
-                        },
-                    },
-                ],
-            },
-        ).validate()
-
-        blocks.extend(bmd_core.services.gui_status_notification(botmydesk_user))
-        blocks.extend([{"type": "divider"}])
-        blocks.extend(bmd_core.services.gui_list_upcoming_reservations(botmydesk_user))
-    else:
-        blocks.extend(
-            [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": gettext(f"Hi {botmydesk_user.slack_name} 👋"),
-                    },
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": gettext("My name is")
-                        + f" {settings.BOTMYDESK_NAME}, "
-                        + gettext(
-                            "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
-                        ),
-                    },
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": gettext(
-                            "Click the preferences button above to link your BookMyDesk account to me."
-                        ),
-                    },
-                },
-            ]
-        )
-
     bmd_core.services.slack_web_client().views_publish(
-        user_id=slack_user_id,
+        user_id=botmydesk_user.slack_user_id,
         view={
             "type": "home",
             "blocks": blocks,

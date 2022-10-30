@@ -456,6 +456,8 @@ def handle_user_working_home_today(botmydesk_user: BotMyDeskUser, payload):
         text=gettext("Sorry, not yet implemented 🧑‍💻"),
     ).validate()
 
+    update_user_app_home(botmydesk_user=botmydesk_user)
+
 
 def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
     if not botmydesk_user.has_authorized_bot():
@@ -520,6 +522,8 @@ def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
                 "⚠️ _Unexpected status, **I ignored your request to make sure not breaking anything**!_"
             )
             break
+
+    update_user_app_home(botmydesk_user=botmydesk_user)
 
     message_to_user = gettext(
         f"🏢 _You requested me to check you in for the office._\n\n\n{report_text}"
@@ -590,6 +594,8 @@ def handle_user_working_externally_today(botmydesk_user: BotMyDeskUser, payload)
         user=botmydesk_user.slack_user_id,
         text=gettext("Sorry, not yet implemented 🧑‍💻"),
     ).validate()
+
+    update_user_app_home(botmydesk_user=botmydesk_user)
 
 
 def handle_user_not_working_today(botmydesk_user: BotMyDeskUser, payload):
@@ -668,6 +674,8 @@ def handle_user_not_working_today(botmydesk_user: BotMyDeskUser, payload):
                 report_text += gettext(
                     f"{current_reservation_text}\n\t\t ⚠️ _Unexpected status, **left untouched**!_"
                 )
+
+    update_user_app_home(botmydesk_user=botmydesk_user)
 
     message_to_user = gettext(
         f"❌ _You requested me to clear your reservations._\n\n\n{report_text}"

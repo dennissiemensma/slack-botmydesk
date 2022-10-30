@@ -98,7 +98,7 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
     :return: Slack blocks GUI elements
     """
     if not botmydesk_user.has_authorized_bot():
-        return unauthorized_reply_shortcut(botmydesk_user)
+        return _unauthorized_reply_shortcut(botmydesk_user)
 
     title = gettext("Your upcoming BookMyDesk reservations")
     start = timezone.localtime(
@@ -191,7 +191,7 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
     :return: Slack blocks GUI elements
     """
     if not botmydesk_user.has_authorized_bot():
-        return unauthorized_reply_shortcut(botmydesk_user)
+        return _unauthorized_reply_shortcut(botmydesk_user)
 
     today_text = timezone.localtime(
         timezone.now(), timezone=botmydesk_user.user_tz_instance()
@@ -442,7 +442,7 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
 
 def handle_user_working_home_today(botmydesk_user: BotMyDeskUser, payload):
     if not botmydesk_user.has_authorized_bot():
-        return unauthorized_reply_shortcut(botmydesk_user)
+        return _unauthorized_reply_shortcut(botmydesk_user)
 
     message_to_user = gettext(
         "🏡 _You requested me to book you for working at home._\n\n\nTODO"
@@ -459,7 +459,7 @@ def handle_user_working_home_today(botmydesk_user: BotMyDeskUser, payload):
 
 def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
     if not botmydesk_user.has_authorized_bot():
-        return unauthorized_reply_shortcut(botmydesk_user)
+        return _unauthorized_reply_shortcut(botmydesk_user)
 
     try:
         reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
@@ -529,7 +529,7 @@ def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
 
 def handle_user_working_externally_today(botmydesk_user: BotMyDeskUser, payload):
     if not botmydesk_user.has_authorized_bot():
-        return unauthorized_reply_shortcut(botmydesk_user)
+        return _unauthorized_reply_shortcut(botmydesk_user)
 
     # Only when required/supported.
     if not settings.BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME:
@@ -595,7 +595,7 @@ def handle_user_working_externally_today(botmydesk_user: BotMyDeskUser, payload)
 def handle_user_not_working_today(botmydesk_user: BotMyDeskUser, payload):
     """Fetches your reservations of the current day and cancels them all, when applicable."""
     if not botmydesk_user.has_authorized_bot():
-        return unauthorized_reply_shortcut(botmydesk_user)
+        return _unauthorized_reply_shortcut(botmydesk_user)
 
     try:
         reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
@@ -719,7 +719,7 @@ def _post_handle_report_update(
         pass
 
 
-def unauthorized_reply_shortcut(botmydesk_user: BotMyDeskUser):
+def _unauthorized_reply_shortcut(botmydesk_user: BotMyDeskUser):
     slack_web_client().chat_postEphemeral(
         channel=botmydesk_user.slack_user_id,
         user=botmydesk_user.slack_user_id,

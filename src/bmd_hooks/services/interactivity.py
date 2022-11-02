@@ -328,4 +328,6 @@ def handle_interactive_bmd_authorize_login_code_submit(
         ],
     ).validate()
 
+    bmd_core.services.update_user_app_home(botmydesk_user=botmydesk_user)
+
     return {"response_action": "clear"}

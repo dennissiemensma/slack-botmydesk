@@ -63,18 +63,17 @@ def dispatch_botmydesk_notifications():
 
             # @TODO: Take current_botmydesk_user.prefer_only_notifications_when_needed into account as well
 
+            blocks = bmd_core.services.gui_status_notification(
+                current_botmydesk_user
+            )
+
             title = gettext("Your BookMyDesk status")
             bmd_core.services.slack_web_client().chat_postEphemeral(
                 channel=current_botmydesk_user.slack_user_id,
                 user=current_botmydesk_user.slack_user_id,
                 text=title,
-                blocks=bmd_core.services.gui_status_notification(
-                    current_botmydesk_user
-                ),
+                blocks=blocks,
             ).validate()
-            bmd_core.services.gui_status_notification(
-                botmydesk_user=current_botmydesk_user
-            )
 
             # Only update here, since this is (for now) the only origin for automated notifications
             current_botmydesk_user.touch_last_notification_sent()

@@ -46,6 +46,7 @@ services:
     depends_on:
       - database
       - queue_broker
+      - app
     networks:
       - botmydesk-internal
     env_file:
@@ -60,6 +61,7 @@ services:
       - database
       - queue_broker
       - app_task_scheduler
+      - app
     networks:
       - botmydesk-internal
     env_file:

@@ -8,8 +8,6 @@ ENV VIRTUAL_ENV=/opt/venv
 WORKDIR /code
 
 RUN apk add --update \
-    mariadb-dev \
-    py3-mysqlclient \
     python3-dev \
     musl-dev \
     postgresql-dev \

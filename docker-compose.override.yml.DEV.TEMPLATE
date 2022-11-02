@@ -24,10 +24,9 @@ services:
 #      - DEV_EMAIL_ADDRESS=
       # Enable to refresh all the time. Only makes sense during session development.
 #      - DEV_BOOKMYDESK_ACCESS_TOKEN_EXPIRY_MINUTES=0
-      # TODO: Choose your DB engine. See below for quick options. More engines are available but not recommended. See Django docs for details.
-      - DJANGO_DATABASE_ENGINE=django.db.backends.mysql
+      - DJANGO_DATABASE_ENGINE=django.db.backends.postgresql
       - DJANGO_DATABASE_HOST=database
-      - DJANGO_DATABASE_PORT=3306
+      - DJANGO_DATABASE_PORT=5432
       - DJANGO_DATABASE_USER=devuser
       - DJANGO_DATABASE_PASSWORD=devpasswd
       - DJANGO_DATABASE_NAME=botmydesk
@@ -36,50 +35,18 @@ services:
       # https://docs.celeryq.dev/en/stable/userguide/configuration.html#configuration
       - CELERY_BROKER_URL=amqp://guest:guest@queue_broker:5672//
 
-# TODO: Choose your DB
-### Option 1 ###
-#  database:
-#    # Use with "app" environment:
-#    #    - DJANGO_DATABASE_ENGINE=django.db.backends.mysql
-#    #    - DJANGO_DATABASE_HOST=database
-#    #    - DJANGO_DATABASE_PORT=3306
-#    #    - DJANGO_DATABASE_USER=devuser
-#    #    - DJANGO_DATABASE_PASSWORD=devpasswd
-#    #    - DJANGO_DATABASE_NAME=botmydesk
-#    image: mysql:8
-#    restart: always
-## Only enable me if you need to connect to the DB with a SQL tool
-##    ports:
-##      - '3306:3306'
-#    volumes:
-#      - ./docker/mysql:/var/lib/mysql/
-#    environment:
-#     - MYSQL_DATABASE=botmydesk
-#     - MYSQL_USER=devuser
-#     - MYSQL_PASSWORD=devpasswd
-#     - MYSQL_ROOT_PASSWORD=rootpasswd
-
-
-### Option 2 ###
-#  database:
-#    # Use with "app" environment:
-#    #    - DJANGO_DATABASE_ENGINE=django.db.backends.postgresql
-#    #    - DJANGO_DATABASE_HOST=database
-#    #    - DJANGO_DATABASE_PORT=5432
-#    #    - DJANGO_DATABASE_USER=devuser
-#    #    - DJANGO_DATABASE_PASSWORD=devpasswd
-#    #    - DJANGO_DATABASE_NAME=botmydesk
-#    image: postgres:14
-#    restart: always
-## Only enable me if you need to connect to the DB with a SQL tool
-##    ports:
-##      - '5432:5432'
-#    volumes:
-#      - ./docker/postgres:/var/lib/postgresql/
-#    environment:
-#      - POSTGRES_DB=botmydesk
-#      - POSTGRES_USER=devuser
-#      - POSTGRES_PASSWORD=devpasswd
+  database:
+    image: postgres:14
+    restart: always
+    ## Only enable me if you need to connect to the DB with a SQL tool
+#    ports:
+#      - '5432:5432'
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/
+    environment:
+      - POSTGRES_DB=botmydesk
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=devpasswd
 
   queue_broker:  # Required for background processing
     image: rabbitmq

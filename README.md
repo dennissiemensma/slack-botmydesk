@@ -242,9 +242,9 @@ app_home_opened
 - The following processes should run:
 ```shell
 # Task scheduler (DO NOT RUN MULTIPLE!)
-poetry run celery -A botmydesk beat -l INFO
+poetry run celery -A botmydesk beat
 # Task worker
-poetry run celery -A botmydesk worker -l INFO
+poetry run celery -A botmydesk worker
 ```
 
 - Live logs:

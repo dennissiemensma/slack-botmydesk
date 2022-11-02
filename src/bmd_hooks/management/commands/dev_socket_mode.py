@@ -42,9 +42,6 @@ class Command(BaseCommand):
         # Establish a WebSocket connection to the Socket Mode servers
         socket_mode_client.connect()
 
-        # # Set as active. @TODO move to signals/listeners for running app
-        # web_client.users_setPresence(presence='auto').validate()
-
         # Just not to stop this process
         from threading import Event
 

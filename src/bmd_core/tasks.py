@@ -12,6 +12,12 @@ botmydesk_logger = logging.getLogger("botmydesk")
 app = Celery()
 
 
+@app.on_after_configure.connect
+def on_after_configure(sender, **kwargs):
+    print("Updating BotMyDesk presence on Slack")
+    bmd_core.services.slack_web_client().users_setPresence(presence="auto").validate()
+
+
 @app.task
 def refresh_all_bookmydesk_sessions():
     """Triggers a profile call for very user, causing a token/user update in the API client and persists it."""

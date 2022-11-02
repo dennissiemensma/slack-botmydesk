@@ -29,7 +29,6 @@ app.conf.beat_schedule = {
     },
     "dispatch-botmydesk-notifications": {
         "task": "bmd_core.tasks.dispatch_botmydesk_notifications",
-        "schedule": crontab(day_of_week='mon-fri', hour="7,8,9", minute='*/30'),
+        "schedule": crontab(day_of_week="mon-fri", hour="7,8,9", minute="*/30"),
     },
-
 }

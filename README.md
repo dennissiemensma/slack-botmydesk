@@ -168,15 +168,7 @@ docker-compose build
 docker-compose up -d
 ```
 
-- After each (re)deploy, make sure to run database migrations first:
-```shell
-docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.py migrate --noinput
-```
-
-- And consider rebuilding the compiled translations (if they changed):
-```shell
-docker-compose -f docker-compose.override.yml exec app poetry run /code/manage.py compilemessages
-```
+- Note that the prod app container _should_ perform some administrative tasks, such as DB migrations.
 
 ----
 

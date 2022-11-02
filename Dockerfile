@@ -34,7 +34,9 @@ COPY src/poetry.lock src/pyproject.toml /code/
 RUN poetry install --only main
 COPY src/ /code/
 
-ENTRYPOINT poetry run gunicorn --bind unix:$GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
+ENTRYPOINT poetry run /code/manage.py migrate --noinput ; \
+           poetry run /code/manage.py compilemessages ; \
+           poetry run gunicorn --bind unix:$GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
 
 
 ### Production task scheduler.

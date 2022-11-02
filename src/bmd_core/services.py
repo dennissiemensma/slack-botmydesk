@@ -723,8 +723,6 @@ def update_user_app_home(botmydesk_user: BotMyDeskUser):
             },
         ).validate()
 
-        blocks.extend(gui_status_notification(botmydesk_user))
-        blocks.extend([{"type": "divider"}])
         blocks.extend(gui_list_upcoming_reservations(botmydesk_user))
     else:
         blocks.extend(

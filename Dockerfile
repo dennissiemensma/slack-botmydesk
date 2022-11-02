@@ -54,6 +54,8 @@ ENTRYPOINT poetry run celery -A botmydesk worker -l INFO
 
 ### Development.
 FROM base-app AS dev-app
+ENV DJANGO_SECRET_KEY=development
+ENV DJANGO_DEBUG=True
 
 COPY src/poetry.lock src/pyproject.toml /code/
 RUN poetry install

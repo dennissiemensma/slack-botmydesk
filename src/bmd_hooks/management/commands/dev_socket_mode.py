@@ -18,11 +18,11 @@ botmydesk_logger = logging.getLogger("botmydesk")
 class Command(BaseCommand):
     """Based on socket client sample in Slack docs."""
 
-    help = "Dev only when configured using Socket Mode! Reloads on local file change."
+    help = "DEV ONLY: Run when configured using Socket Mode! Process reloads on any local file change."
 
     def handle(self, **options):
         if not settings.DEBUG:
-            raise CommandError("Socket client only supported in DEBUG mode")
+            raise CommandError("Only supported in DEBUG mode")
 
         # This ensures we have a file watcher locally.
         run_with_reloader(self._run)

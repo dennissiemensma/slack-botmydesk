@@ -1,17 +1,57 @@
 import zoneinfo
 
 from django.db import models
+from django.db.models import QuerySet, Q
 from django.utils import timezone
 
 from bmd_core.mixins import ModelUpdateMixin
 
 
 class BotMyDeskSlackUserManager(models.Manager):
-    def with_session(self):
+    def with_session(self) -> QuerySet:
         """Returns users with any session."""
         return self.filter(bookmydesk_refresh_token__isnull=False)
 
-    def by_slack_id(self, slack_user_id: str):
+    def eligible_for_notification(self, user_timezone: str) -> QuerySet:
+        """Specifically checks for users eligible in the given timezone."""
+        local_now = timezone.localtime(timezone.now(), zoneinfo.ZoneInfo(user_timezone))
+
+        preferred_notification_time_field = {
+            0: "preferred_notification_time_on_mondays",
+            1: "preferred_notification_time_on_tuesdays",
+            2: "preferred_notification_time_on_wednesdays",
+            3: "preferred_notification_time_on_thursdays",
+            4: "preferred_notification_time_on_fridays",
+            5: None,  # Maybe if we ever have users working in the weekends.
+            6: None,  # Maybe if we ever have users working in the weekends.
+        }[local_now.weekday()]
+
+        # Non-working days affect none.
+        if preferred_notification_time_field is None:
+            return self.none()
+
+        local_midnight = local_now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        return (
+            self.with_session()
+            .filter(
+                # Notification not yet sent today (or at all)? Prevent duplicate notifications.
+                Q(last_notification_sent__isnull=True)
+                | Q(last_notification_sent__lte=local_midnight)
+            )
+            .filter(
+                # Only select users in given timezone.
+                slack_tz=user_timezone,
+                **{
+                    # Has notification pref set at all for current day?
+                    f"{preferred_notification_time_field}__isnull": False,
+                    # And notification pref passed? Only process when applicable.
+                    f"{preferred_notification_time_field}__lte": local_now.time(),
+                },
+            )
+        )
+
+    def by_slack_id(self, slack_user_id: str) -> "BotMyDeskUser":
         return self.get(slack_user_id=slack_user_id)
 
 
@@ -25,19 +65,17 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
 
     objects = BotMyDeskSlackUserManager()
 
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # @TDO later
     created_at = models.DateTimeField(auto_now=True)
-    next_background_run = models.DateTimeField(
-        db_index=True, auto_now=True
-    )  # Background processing schedule.
 
     # Slack data.
     slack_user_id = models.CharField(db_index=True, unique=True, max_length=255)
     slack_email = models.EmailField(max_length=255)
     slack_name = models.CharField(max_length=255)
-    slack_tz = models.CharField(max_length=64)
+    slack_tz = models.CharField(max_length=64, db_index=True)
     next_slack_profile_update = models.DateTimeField(
         auto_now=True
-    )  # Whenever WE update profile info here.
+    )  # Whenever we update profile info here.
 
     # BMD data
     bookmydesk_access_token = models.CharField(null=True, default=None, max_length=255)
@@ -56,6 +94,9 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
     preferred_notification_time_on_thursdays = models.TimeField(null=True, default=None)
     preferred_notification_time_on_fridays = models.TimeField(null=True, default=None)
     prefer_only_notifications_when_needed = models.BooleanField(default=True)
+    last_notification_sent = models.DateTimeField(
+        null=True, default=None, db_index=True
+    )
 
     def has_authorized_bot(self) -> bool:
         """Whether the bot is authorized for this user (has session)."""
@@ -81,3 +122,6 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
             bookmydesk_access_token_expires_at=None,
             bookmydesk_refresh_token=None,
         )
+
+    def touch_last_notification_sent(self):
+        self.last_notification_sent = timezone.now()

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-19 22:00+0000\n"
-"PO-Revision-Date: 2022-10-20 00:03+0200\n"
+"POT-Creation-Date: 2022-11-03 22:18+0000\n"
+"PO-Revision-Date: 2022-11-03 23:19+0100\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -299,12 +299,34 @@ msgstr ""
 "\n"
 "{report_text}"
 
+msgid "preferences"
+msgstr "voorkeuren"
+
+msgid "_Refreshing your reservations..._"
+msgstr "_Jouw reserveringen aan het verversen..._"
+
+#, python-brace-format
+msgid "Hi {botmydesk_user.slack_name} 👋"
+msgstr "Hoi {botmydesk_user.slack_name} 👋"
+
+msgid "My name is"
+msgstr "Mijn naam is"
+
+msgid "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
+msgstr "Ik ben een onofficiële Slack-bot voor BookMyDesk. Ik kan je helpen met inchecken, om je leven net iets makkelijker te maken!"
+
+msgid "Click the preferences button above to link your BookMyDesk account to me."
+msgstr "Klik op de voorkeuren-knop hierboven om je BookMyDesk-account aan mij te koppelen."
+
 #, python-brace-format
 msgid "{today_text} update"
 msgstr "{today_text} update"
 
 msgid "✋ Sorry, you will need to connect me first."
 msgstr "✋ Sorry, je moet me eerst koppelen."
+
+msgid "Your BookMyDesk status"
+msgstr "Je BookMyDesk-status"
 
 #, python-brace-format
 msgid "{settings.BOTMYDESK_NAME}: Unexpected error"
@@ -322,25 +344,6 @@ msgstr "_Veroorzaakt door_"
 #, python-brace-format
 msgid "_Report to <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 msgstr "_Rapporteer aan <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
-
-msgid "preferences"
-msgstr "voorkeuren"
-
-msgid "_Refreshing your reservations..._"
-msgstr "_Jouw reserveringen aan het verversen..._"
-
-#, python-brace-format
-msgid "Hi {botmydesk_user.slack_name} 👋"
-msgstr "Hoi {botmydesk_user.slack_name} 👋"
-
-msgid "My name is"
-msgstr "Mijn naam is"
-
-msgid "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
-msgstr "ik ben een onofficiële Slack-bot voor BookMyDesk. Ik kan je helpen met herinneren om te boeken of je inchecken, om je leven net iets makkelijker te maken!"
-
-msgid "Click the preferences button above to link your BookMyDesk account to me."
-msgstr "Klik op de voorkeuren-knop hierboven om je BookMyDesk-account aan mij te koppelen."
 
 msgid "Connecting"
 msgstr "Koppelen"
@@ -427,8 +430,8 @@ msgstr "Ja, sla over"
 msgid "No, notify me"
 msgstr "Nee, stuur notificatie"
 
-msgid "Dutch (partially broken)"
-msgstr "Nederlands (deels defect)"
+msgid "Dutch (locales broken)"
+msgstr "Nederlands (locals defect)"
 
 msgid "English"
 msgstr "Engels"
@@ -457,12 +460,6 @@ msgstr "Notificatie op *donderdagen*?"
 msgid "Notify you on *fridays*?"
 msgstr "Notificatie op *vrijdagen*?"
 
-msgid "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
-msgstr "Echter, zal ik je *niet storen* wanneer je al iets geboekt hebt/ingecheckt bent op een dag?"
-
-msgid "Skip notification when booked/checked in?"
-msgstr "Sla notificatie over wanneer al geboekt/ingecheckt?"
-
 msgid "_Connected to BookMyDesk account of"
 msgstr "_Verbonden met BookMyDesk-account van"
 
@@ -484,12 +481,15 @@ msgstr "Ja, ontkoppel"
 msgid "Nevermind, keep connected"
 msgstr "Laat maar, blijf gekoppeld"
 
-msgid "Your BookMyDesk status"
-msgstr "Je BookMyDesk-status"
-
 #. Translators: This is a debug message
 msgid "BotMyDesk debug message"
 msgstr "BotMyDesk debug bericht"
+
+#~ msgid "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
+#~ msgstr "Echter, zal ik je *niet storen* wanneer je al iets geboekt hebt/ingecheckt bent op een dag?"
+
+#~ msgid "Skip notification when booked/checked in?"
+#~ msgstr "Sla notificatie over wanneer al geboekt/ingecheckt?"
 
 #~ msgid ""
 #~ "_Triggered by_:\n"

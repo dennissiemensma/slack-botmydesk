@@ -313,7 +313,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
     dutch_locale_option = {
         "text": {
             "type": "plain_text",
-            "text": gettext("Dutch (partially broken)"),
+            "text": gettext("Dutch (locales broken)"),
         },
         "value": BotMyDeskUser.DUTCH_LOCALE,
     }

@@ -5,10 +5,10 @@ import bmd_core.tasks
 
 
 class Command(BaseCommand):
-    help = "DEV ONLY: Runs tasks manually"
+    help = "DEV ONLY: Runs a task manually"
 
     def handle(self, **options):
         if not settings.DEBUG:
             raise CommandError("Only supported in DEBUG mode")
 
-        bmd_core.tasks.dispatch_botmydesk_notifications()
+        bmd_core.tasks.purge_old_messages()

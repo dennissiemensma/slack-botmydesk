@@ -18,6 +18,7 @@ commands
 chat:write
 im:read
 im:write
+im:history
 users:read
 users:read.email
 users:write

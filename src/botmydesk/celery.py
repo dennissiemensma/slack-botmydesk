@@ -31,4 +31,8 @@ app.conf.beat_schedule = {
         "task": "bmd_core.tasks.dispatch_botmydesk_notifications",
         "schedule": crontab(hour="*", minute="*/30"),
     },
+    "purge-old-messages": {
+        "task": "bmd_core.tasks.purge_old_messages",
+        "schedule": crontab(hour="*", minute="0"),
+    },
 }

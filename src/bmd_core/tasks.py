@@ -1,6 +1,7 @@
 import logging
 
 from celery import Celery
+from django.utils import timezone
 from django.utils.translation import gettext
 
 from bmd_core.models import BotMyDeskUser
@@ -76,3 +77,36 @@ def dispatch_botmydesk_notifications():
             # Only update here, since this is (for now) the only origin for automated notifications
             current_botmydesk_user.touch_last_notification_sent()
             current_botmydesk_user.save()
+
+
+@app.task
+def purge_old_messages():
+    """Eventually delete messages."""
+    max_age_in_hours = 12
+    web_client = bmd_core.services.slack_web_client()
+
+    conversations_list_result = web_client.conversations_list(types=["im"])
+    conversations_list_result.validate()
+
+    for current_channel in conversations_list_result["channels"]:
+        conversations_history_result = web_client.conversations_history(
+            channel=current_channel["id"]
+        )
+        conversations_history_result.validate()
+
+        for current_message in conversations_history_result["messages"]:
+            timestamp = int(round(float(current_message["ts"]), 0))
+            message_created_at = timezone.datetime.fromtimestamp(timestamp)
+            message_created_at = timezone.make_aware(message_created_at)
+
+            if message_created_at > timezone.now() - timezone.timedelta(
+                hours=max_age_in_hours
+            ):
+                continue
+
+            botmydesk_logger.info(
+                f"Purging old message for {current_channel['id']} (created {message_created_at})"
+            )
+            web_client.chat_delete(
+                channel=current_channel["id"], ts=current_message["ts"]
+            ).validate()

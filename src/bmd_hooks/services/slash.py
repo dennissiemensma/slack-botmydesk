@@ -453,17 +453,17 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                     "initial_option": initial_friday_preference,
                 },
             },
-            {"type": "divider"},
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": gettext(
-                        "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
-                    ),
-                },
-            },
             # @TODO Implement dont_bug_me_when_not_needed some day
+            # {"type": "divider"},
+            # {
+            #     "type": "section",
+            #     "text": {
+            #         "type": "mrkdwn",
+            #         "text": gettext(
+            #             "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
+            #         ),
+            #     },
+            # },
             # {
             #     "type": "section",
             #     "text": {

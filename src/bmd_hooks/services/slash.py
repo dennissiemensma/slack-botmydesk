@@ -463,25 +463,26 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
                     ),
                 },
             },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": gettext("Skip notification when booked/checked in?"),
-                },
-                "accessory": {
-                    "action_id": "dont_bug_me_when_not_needed",
-                    "type": "static_select",
-                    "placeholder": {"type": "plain_text", "text": "Select an item"},
-                    "options": [
-                        smart_notifications_enabled_option,
-                        smart_notifications_disabled_option,
-                    ],
-                    "initial_option": smart_notifications_enabled_option
-                    if botmydesk_user.prefer_only_notifications_when_needed
-                    else smart_notifications_disabled_option,
-                },
-            },
+            # @TODO Implement dont_bug_me_when_not_needed some day
+            # {
+            #     "type": "section",
+            #     "text": {
+            #         "type": "mrkdwn",
+            #         "text": gettext("Skip notification when booked/checked in?"),
+            #     },
+            #     "accessory": {
+            #         "action_id": "dont_bug_me_when_not_needed",
+            #         "type": "static_select",
+            #         "placeholder": {"type": "plain_text", "text": "Select an item"},
+            #         "options": [
+            #             smart_notifications_enabled_option,
+            #             smart_notifications_disabled_option,
+            #         ],
+            #         "initial_option": smart_notifications_enabled_option
+            #         if botmydesk_user.prefer_only_notifications_when_needed
+            #         else smart_notifications_disabled_option,
+            #     },
+            # },
             {"type": "divider"},
             {
                 "type": "section",

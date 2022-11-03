@@ -54,8 +54,8 @@ class Reservation(JsonResponseHolder):
     def id(self) -> str:
         return self._response["id"]
 
-    def is_created_by_same_user(self) -> bool:
-        return self._response["user"]["id"] == self._response["createdByUserId"]
+    def owner_id(self) -> str:
+        return self._response["user"]["id"]
 
     def date_start(self) -> timezone.datetime:
         return timezone.datetime.fromisoformat(self._response["dateStart"])
@@ -133,8 +133,6 @@ class TokenLoginResult(JsonResponseHolder):
 
 
 class V3BookMyDeskProfileResult(JsonResponseHolder):
-    # def email(self) -> str:
-    #     return self._response['email']
     def id(self) -> str:
         return self._response["id"]
 

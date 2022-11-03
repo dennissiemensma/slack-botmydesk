@@ -125,6 +125,7 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
         return
 
     reservations_text = gettext("_No reservations found (or too far away)..._")
+    profile = bmd_api_client.client.me_v3(botmydesk_user=botmydesk_user)
 
     if reservations_result.reservations():
         reservations_text = ""
@@ -137,8 +138,11 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
             current_from = current.checked_in_time() or current.from_time()
             current_to = current.checked_out_time() or current.to_time()
 
-            # Exclude visitors or proxies.
-            if current.type() == "visitor" or not current.is_created_by_same_user():
+            if current.owner_id() != profile.id():
+                # Ignore delegates
+                continue
+
+            if current.type() == "visitor":
                 continue
 
             if current.status() in ("checkedIn", "checkedOut", "cancelled", "expired"):
@@ -202,10 +206,12 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
     checked_in = checked_out = False
     reservation_start = reservation_end = None
 
+    profile = bmd_api_client.client.me_v3(botmydesk_user=botmydesk_user)
+
     # Very shallow assertions.
     for current in reservations_result.reservations():
-        # Exclude delegated reservations
-        if not current.is_created_by_same_user():
+        if current.owner_id() != profile.id():
+            # Ignore delegates
             continue
 
         if current.type() == "visitor":
@@ -469,6 +475,7 @@ def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
 
     try:
         reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
+        profile = bmd_api_client.client.me_v3(botmydesk_user=botmydesk_user)
     except BookMyDeskException as error:
         slack_web_client().chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
@@ -486,8 +493,8 @@ def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
 
     if reservations_result.reservations():
         for current in reservations_result.reservations():
-            # Exclude delegated reservations
-            if not current.is_created_by_same_user():
+            if current.owner_id() != profile.id():
+                # Ignore delegates
                 continue
 
             # Ignore everything we're not interested in. E.g. visitors or home reservations.
@@ -613,6 +620,7 @@ def handle_user_not_working_today(botmydesk_user: BotMyDeskUser, payload):
 
     try:
         reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
+        profile = bmd_api_client.client.me_v3(botmydesk_user=botmydesk_user)
     except BookMyDeskException as error:
         slack_web_client().chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
@@ -630,8 +638,8 @@ def handle_user_not_working_today(botmydesk_user: BotMyDeskUser, payload):
         report_text = ""
 
         for current in reservations_result.reservations():
-            # Exclude delegated reservations
-            if not current.is_created_by_same_user():
+            if current.owner_id() != profile.id():
+                # Ignore delegates
                 continue
 
             location = current.location_name_shortcut()

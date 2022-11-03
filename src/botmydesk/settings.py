@@ -157,12 +157,12 @@ LOGGING = {
     "loggers": {
         "botmydesk": {
             "handlers": ["console"],
-            "level": "ERROR",
+            "level": "INFO",
             "propagate": True,
         },
         "bookmydesk_client": {
             "handlers": ["console"],
-            "level": "ERROR",
+            "level": "INFO",
             " propagate": False,
         },
         "django.db": {

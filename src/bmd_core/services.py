@@ -204,7 +204,11 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
 
     # Very shallow assertions.
     for current in reservations_result.reservations():
-        if current.type() == "visitor" or not current.is_created_by_same_user():
+        # Exclude delegated reservations
+        if not current.is_created_by_same_user():
+            continue
+
+        if current.type() == "visitor":
             continue
 
         reservation_count += 1
@@ -482,6 +486,10 @@ def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
 
     if reservations_result.reservations():
         for current in reservations_result.reservations():
+            # Exclude delegated reservations
+            if not current.is_created_by_same_user():
+                continue
+
             # Ignore everything we're not interested in. E.g. visitors or home reservations.
             if current.seat() is None or current.type() != "normal":
                 continue
@@ -622,6 +630,10 @@ def handle_user_not_working_today(botmydesk_user: BotMyDeskUser, payload):
         report_text = ""
 
         for current in reservations_result.reservations():
+            # Exclude delegated reservations
+            if not current.is_created_by_same_user():
+                continue
+
             location = current.location_name_shortcut()
 
             current_reservation_id = current.id()

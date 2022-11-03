@@ -42,13 +42,13 @@ ENTRYPOINT poetry run /code/manage.py migrate --noinput ; \
 ### Production task scheduler.
 FROM prod-app AS prod-app-scheduler
 ENV DJANGO_DEBUG=False
-ENTRYPOINT poetry run celery -A botmydesk beat -l ERROR
+ENTRYPOINT poetry run celery -A botmydesk beat -l INFO
 
 
 ### Production task worker.
 FROM prod-app AS prod-app-worker
 ENV DJANGO_DEBUG=False
-ENTRYPOINT poetry run celery -A botmydesk worker -l ERROR
+ENTRYPOINT poetry run celery -A botmydesk worker -l INFO
 
 
 

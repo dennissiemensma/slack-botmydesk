@@ -497,7 +497,7 @@ def handle_user_working_home_today(botmydesk_user: BotMyDeskUser, payload):
                 start=local_start,
                 end=local_start.replace(hour=23, minute=59),
             )
-        except BookMyDeskException as error:
+        except BookMyDeskException:
             report_text = gettext(
                 "⚠️ Failed to book you for working at home. Please try manually."
             )

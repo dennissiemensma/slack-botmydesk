@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
-"PO-Revision-Date: 2022-11-06 21:42+0100\n"
+"POT-Creation-Date: 2022-11-06 21:33+0000\n"
+"PO-Revision-Date: 2022-11-06 22:34+0100\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -164,23 +164,30 @@ msgstr ""
 "Mocht je nog openstaande reserveringen hebben dan verwijder ik die voor je.\n"
 "En als je al ingecheckt was, check ik je uit."
 
+#, python-brace-format
+msgid "Sorry, an error occurred while requesting your reservations: ```{error}```"
+msgstr "Sorry, fout bij het ophalen van je reserveringen: ```{error}```"
+
+msgid "✔️ _I left it as-is, since you already *booked a home spot*._"
+msgstr "✔️ _Ik heb het gelaten voor wat het is, gezien je al een *thuiswerkplek hebt geboekt*._"
+
+msgid "⚠️ Failed to book you for working at home. Please try manually."
+msgstr "⚠️ Niet gelukt om een thuiswerkplek voor je te reserveren, probeer het handmatig."
+
+msgid "✔️ _I booked you a home spot._"
+msgstr "✔️ _Thuiswerkplek voor je geboekt._"
+
+#, python-brace-format
 msgid ""
 "🏡 _You requested me to book you for working at home._\n"
 "\n"
 "\n"
-"TODO"
+"{report_text}"
 msgstr ""
 "🏡 _Je hebt me verzocht om een thuiswerkplek voor je te boeken._\n"
 "\n"
 "\n"
-"TODO"
-
-msgid "Sorry, not yet implemented 🧑‍💻"
-msgstr "Sorry, nog niet werkend 🧑‍💻"
-
-#, python-brace-format
-msgid "Sorry, an error occurred while requesting your reservations: ```{error}```"
-msgstr "Sorry, fout bij het ophalen van je reserveringen: ```{error}```"
+"{report_text}"
 
 msgid "⚠️ No office reservation found for this day. Please book an office seat and check-in anyway."
 msgstr "⚠️ Geen kantoorreservering gevonden voor deze dag. Boek een plek en check dan ook direct in."
@@ -220,6 +227,9 @@ msgstr ""
 
 msgid "✋ Sorry, not supported at this time"
 msgstr "✋ Sorry, (nog) niet ondersteund"
+
+msgid "Sorry, not yet implemented 🧑‍💻"
+msgstr "Sorry, nog niet werkend 🧑‍💻"
 
 msgid "✔️ No reservations found anyway"
 msgstr "✔️ Geen reserveringen gevonden"

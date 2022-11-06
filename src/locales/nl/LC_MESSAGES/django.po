@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-03 22:18+0000\n"
-"PO-Revision-Date: 2022-11-03 23:19+0100\n"
+"POT-Creation-Date: 2022-11-06 20:23+0000\n"
+"PO-Revision-Date: 2022-11-06 21:24+0100\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -23,8 +23,8 @@ msgstr "Thuis"
 msgid "Sorry, you are not whitelisted and I was too lazy to create a decent message. This bot will be public eventually, including for you... :]"
 msgstr "Sorry, je bent niet gewhitelist en ik was te lui om een fatsoenlijk bericht te maken. Hoe dan ook, uiteindelijk wordt deze bot vanzelf publiekelijk beschikbaar, ook voor jou... :]"
 
-msgid "Your upcoming BookMyDesk reservations"
-msgstr "Je komende boekingen in BookMyDesk"
+msgid "Upcoming BookMyDesk reservations"
+msgstr "Komende boekingen in BookMyDesk"
 
 msgid "Sorry, an error occurred while requesting your reservations"
 msgstr "Sorry, fout bij het ophalen van je reserveringen"
@@ -32,30 +32,31 @@ msgstr "Sorry, fout bij het ophalen van je reserveringen"
 msgid "_No reservations found (or too far away)..._"
 msgstr "_Geen boekingen gevonden (of te ver vooruit)..._"
 
+msgid "Checked in"
+msgstr "Ingecheckt"
+
+msgid "Checked out"
+msgstr "Uitgecheckt"
+
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
 "\n"
-"{emoji} {reservation_start_text}: {current_from} to {current_to}\n"
-"_{current.status()}_"
+"{emoji} {reservation_start_text}: {current_from} - {current_to}\n"
+"_{status_text}_"
 msgstr ""
 "\n"
 "\n"
 "\n"
-"{emoji} {reservation_start_text}: {current_from} tot {current_to}\n"
-"_{current.status()}_"
+"{emoji} {reservation_start_text}: {current_from} - {current_to}\n"
+"_{status_text}_"
 
 msgid "from"
 msgstr "van"
 
 msgid "to"
 msgstr "tot"
-
-msgid "at"
-msgstr "op"
-
-msgid "In about"
-msgstr "Over"
 
 msgid "🏡 You seem to have a *home reservation* for"
 msgstr "Je lijkt nog *geen reservering* te hebben voor"
@@ -406,6 +407,9 @@ msgstr "Nee, wacht even"
 msgid "_You can disconnect me later at any time by accessing these preferences again._"
 msgstr "_Je kunt me later op elk moment ontkoppelen via deze voorkeuren._"
 
+msgid "Preferences"
+msgstr "Voorkeuren"
+
 msgid "_Loading your preferences..._"
 msgstr "_Je voorkeuren worden geladen..._"
 
@@ -423,12 +427,6 @@ msgstr "Rond 8:30"
 
 msgid "Around 9:00"
 msgstr "Rond 9:00"
-
-msgid "Yes, skip"
-msgstr "Ja, sla over"
-
-msgid "No, notify me"
-msgstr "Nee, stuur notificatie"
 
 msgid "Dutch (locales broken)"
 msgstr "Nederlands (locals defect)"
@@ -484,6 +482,18 @@ msgstr "Laat maar, blijf gekoppeld"
 #. Translators: This is a debug message
 msgid "BotMyDesk debug message"
 msgstr "BotMyDesk debug bericht"
+
+#~ msgid "at"
+#~ msgstr "op"
+
+#~ msgid "In about"
+#~ msgstr "Over"
+
+#~ msgid "Yes, skip"
+#~ msgstr "Ja, sla over"
+
+#~ msgid "No, notify me"
+#~ msgstr "Nee, stuur notificatie"
 
 #~ msgid "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
 #~ msgstr "Echter, zal ik je *niet storen* wanneer je al iets geboekt hebt/ingecheckt bent op een dag?"

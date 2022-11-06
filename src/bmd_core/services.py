@@ -100,7 +100,7 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
     if not botmydesk_user.has_authorized_bot():
         return _unauthorized_reply_shortcut(botmydesk_user)
 
-    title = gettext("Your upcoming BookMyDesk reservations")
+    title = gettext("Upcoming BookMyDesk reservations")
     start = timezone.localtime(
         timezone.now(), timezone=botmydesk_user.user_tz_instance()
     )
@@ -110,8 +110,8 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
             botmydesk_user,
             **{
                 "from": start.date(),
-                "to": (start + timezone.timedelta(days=28)).date(),
-                "take": 25,
+                "to": (start + timezone.timedelta(days=7)).date(),
+                "take": 50,
             },
         )
     except BookMyDeskException as error:
@@ -133,7 +133,6 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
         for current in reservations_result.reservations():
             reservation_start = current.date_start()
             reservation_start_text = reservation_start.strftime("%A %-d %B")
-            natural_time_until_start = humanize.naturaltime(reservation_start)
 
             current_from = current.checked_in_time() or current.from_time()
             current_to = current.checked_out_time() or current.to_time()
@@ -151,8 +150,15 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
                 else:
                     emoji = "✔️"
 
+                if current.status() == "checkedIn":
+                    status_text = gettext("Checked in")
+                elif current.status() == "checkedOut":
+                    status_text = gettext("Checked out")
+                else:
+                    status_text = ""
+
                 reservations_text += gettext(
-                    f"\n\n\n{emoji} {reservation_start_text}: {current_from} to {current_to}\n_{current.status()}_"
+                    f"\n\n\n{emoji} {reservation_start_text}: {current_from} - {current_to}\n_{status_text}_"
                 )
                 continue
 
@@ -166,9 +172,7 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
             # Hack for gettext, alternatively concat.
             text_from = gettext("from")
             text_to = gettext("to")
-            text_at = gettext("at")
-            text_in_about = gettext("In about")
-            reservations_text += f"\n\n\n{emoji} *{reservation_start_text}* {text_from} {current_from} {text_to} {current_to}\n_{text_in_about} {natural_time_until_start} {text_at} *{location}*_"
+            reservations_text += f"\n\n\n{emoji} *{reservation_start_text}*\n_{location}, {text_from} {current_from} {text_to} {current_to}_"
 
     return [
         {

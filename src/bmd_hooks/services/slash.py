@@ -295,20 +295,20 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
         or disabled_option
     )
 
-    smart_notifications_enabled_option = {
-        "text": {
-            "type": "plain_text",
-            "text": gettext("Yes, skip"),
-        },
-        "value": "1",
-    }
-    smart_notifications_disabled_option = {
-        "text": {
-            "type": "plain_text",
-            "text": gettext("No, notify me"),
-        },
-        "value": "0",
-    }
+    # smart_notifications_enabled_option = {
+    #     "text": {
+    #         "type": "plain_text",
+    #         "text": gettext("Yes, skip"),
+    #     },
+    #     "value": "1",
+    # }
+    # smart_notifications_disabled_option = {
+    #     "text": {
+    #         "type": "plain_text",
+    #         "text": gettext("No, notify me"),
+    #     },
+    #     "value": "0",
+    # }
 
     dutch_locale_option = {
         "text": {

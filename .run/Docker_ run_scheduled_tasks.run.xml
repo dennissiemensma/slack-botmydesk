@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Docker: Dev: Run tasks" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="docker exec -it botmydesk_dev_app poetry run /code/manage.py dev_run_tasks" />
+  <configuration default="false" name="Docker: run_scheduled_tasks" type="ShConfigurationType">
+    <option name="SCRIPT_TEXT" value="docker exec -it botmydesk_dev_app poetry run /code/manage.py run_scheduled_tasks" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />

@@ -709,75 +709,79 @@ def handle_user_not_working_today(botmydesk_user: BotMyDeskUser, payload):
 def update_user_app_home(botmydesk_user: BotMyDeskUser):
     apply_user_locale(botmydesk_user)
 
-    # Always show preferences button
-    blocks = [
-        {
-            "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": "⚙️ " + gettext("Preferences"),
-                    },
-                    "value": "open_preferences",
-                },
-            ],
-        }
-    ]
-
     if botmydesk_user.has_authorized_bot():
-        # Clear on update.
-        slack_web_client().views_publish(
-            user_id=botmydesk_user.slack_user_id,
-            view={
-                "type": "home",
-                "blocks": [
+        blocks = [
+            {
+                "type": "actions",
+                "elements": [
                     {
-                        "type": "section",
+                        "type": "button",
+                        "style": "primary",
                         "text": {
-                            "type": "mrkdwn",
-                            "text": gettext("_Refreshing your reservations..._"),
+                            "type": "plain_text",
+                            "emoji": True,
+                            "text": "⚙️ " + gettext("Preferences"),
                         },
+                        "value": "open_preferences",
+                    },
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "emoji": True,
+                            "text": "💬️ " + gettext("Notification test"),
+                        },
+                        "value": "status_notification",
+                    },
+                ],
+            }
+        ]
+        blocks.extend(gui_list_upcoming_reservations(botmydesk_user))
+    else:
+        blocks = [
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "text": {
+                            "type": "plain_text",
+                            "emoji": True,
+                            "text": "🔗️ " + gettext("Link BookMyDesk"),
+                        },
+                        "value": "open_preferences",
                     },
                 ],
             },
-        ).validate()
-
-        blocks.extend(gui_list_upcoming_reservations(botmydesk_user))
-    else:
-        blocks.extend(
-            [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": gettext(f"Hi {botmydesk_user.slack_name} 👋"),
-                    },
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": gettext(f"Hi {botmydesk_user.slack_name} 👋"),
                 },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": gettext("My name is")
-                        + f" {settings.BOTMYDESK_NAME}, "
-                        + gettext(
-                            "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
-                        ),
-                    },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": gettext("My name is")
+                    + f" {settings.BOTMYDESK_NAME}, "
+                    + gettext(
+                        "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
+                    ),
                 },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": gettext(
-                            "Click the preferences button above to link your BookMyDesk account to me."
-                        ),
-                    },
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": gettext(
+                        "Click the button above to link your BookMyDesk account."
+                    ),
                 },
-            ]
-        )
+            },
+        ]
 
     slack_web_client().views_publish(
         user_id=botmydesk_user.slack_user_id,

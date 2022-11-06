@@ -36,6 +36,7 @@ def on_interactive_block_action(
             service_module = {
                 "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
                 "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
+                "status_notification": bmd_hooks.services.slash.handle_status_notification,  # Alias
                 "open_preferences": bmd_hooks.services.slash.handle_preferences_gui,  # Alias
                 "mark_working_from_home_today": bmd_core.services.handle_user_working_home_today,
                 "mark_working_at_the_office_today": bmd_core.services.handle_user_working_in_office_today,

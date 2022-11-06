@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-06 20:23+0000\n"
-"PO-Revision-Date: 2022-11-06 21:24+0100\n"
+"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"PO-Revision-Date: 2022-11-06 21:42+0100\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -300,11 +300,14 @@ msgstr ""
 "\n"
 "{report_text}"
 
-msgid "preferences"
-msgstr "voorkeuren"
+msgid "Preferences"
+msgstr "Voorkeuren"
 
-msgid "_Refreshing your reservations..._"
-msgstr "_Jouw reserveringen aan het verversen..._"
+msgid "Notification test"
+msgstr "Notificatietest"
+
+msgid "Link BookMyDesk"
+msgstr "Koppel BookMyDesk"
 
 #, python-brace-format
 msgid "Hi {botmydesk_user.slack_name} 👋"
@@ -316,8 +319,8 @@ msgstr "Mijn naam is"
 msgid "I'm an unofficial Slack bot for BookMyDesk. I can remind you to check-in at the office or at home. Making life a bit easier for you!"
 msgstr "Ik ben een onofficiële Slack-bot voor BookMyDesk. Ik kan je helpen met inchecken, om je leven net iets makkelijker te maken!"
 
-msgid "Click the preferences button above to link your BookMyDesk account to me."
-msgstr "Klik op de voorkeuren-knop hierboven om je BookMyDesk-account aan mij te koppelen."
+msgid "Click the button above to link your BookMyDesk account."
+msgstr "Klik op de knop hierboven om je BookMyDesk-account te koppelen."
 
 #, python-brace-format
 msgid "{today_text} update"
@@ -345,6 +348,12 @@ msgstr "_Veroorzaakt door_"
 #, python-brace-format
 msgid "_Report to <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
 msgstr "_Rapporteer aan <{settings.BOTMYDESK_OWNER_SLACK_ID}>_ 🤨"
+
+msgid "preferences"
+msgstr "voorkeuren"
+
+msgid "Click the preferences button above to link your BookMyDesk account to me."
+msgstr "Klik op de voorkeuren-knop hierboven om je BookMyDesk-account aan mij te koppelen."
 
 msgid "Connecting"
 msgstr "Koppelen"
@@ -406,9 +415,6 @@ msgstr "Nee, wacht even"
 
 msgid "_You can disconnect me later at any time by accessing these preferences again._"
 msgstr "_Je kunt me later op elk moment ontkoppelen via deze voorkeuren._"
-
-msgid "Preferences"
-msgstr "Voorkeuren"
 
 msgid "_Loading your preferences..._"
 msgstr "_Je voorkeuren worden geladen..._"
@@ -482,6 +488,9 @@ msgstr "Laat maar, blijf gekoppeld"
 #. Translators: This is a debug message
 msgid "BotMyDesk debug message"
 msgstr "BotMyDesk debug bericht"
+
+#~ msgid "_Refreshing your reservations..._"
+#~ msgstr "_Jouw reserveringen aan het verversen..._"
 
 #~ msgid "at"
 #~ msgstr "op"

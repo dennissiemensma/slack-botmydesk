@@ -719,7 +719,7 @@ def update_user_app_home(botmydesk_user: BotMyDeskUser):
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": "⚙️ " + gettext("preferences"),
+                        "text": "⚙️ " + gettext("Preferences"),
                     },
                     "value": "open_preferences",
                 },

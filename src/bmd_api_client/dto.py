@@ -47,7 +47,7 @@ class Seat(JsonResponseHolder):
         return self._response["id"]
 
     def map_name(self) -> str:
-        return self._response["map"]["name"]
+        return self._response["map"]["name"] or "-"
 
 
 class Reservation(JsonResponseHolder):
@@ -90,6 +90,9 @@ class Reservation(JsonResponseHolder):
         return self._response["type"]
 
     def seat(self) -> Optional[Seat]:
+        if self._response["seat"] is None:
+            return None
+
         try:
             return Seat(self._response["seat"])
         except KeyError:
@@ -157,4 +160,7 @@ class V3CompanyExtendedResult(JsonResponseHolder):
 
 class V3ReservationsResult(JsonResponseHolder):
     def reservations(self) -> List[Reservation]:
-        return [Reservation(x) for x in self._response["items"]]
+        return [Reservation(x) for x in self._response["result"]["items"]]
+
+    def result_count(self) -> int:
+        return self._response["result"]["total"]

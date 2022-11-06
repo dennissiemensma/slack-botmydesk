@@ -1,4 +1,5 @@
 import logging
+import zoneinfo
 from pprint import pformat
 
 from django.conf import settings
@@ -213,12 +214,13 @@ def list_reservations_v3(
     )
     parameters = {
         "companyId": profile.first_company_id(),
+        "userId": profile.id(),  # Skips delegates
         "includeAnonymous": "true",
         "from": today.date(),
         "to": (
             today + timezone.timedelta(days=1)
         ).date(),  # Yes, kinda sucks and ambiguous
-        "take": 30,  # Limit, default 10
+        "take": 50,  # Limit, default 10
     }
     parameters.update(override_parameters)
 
@@ -245,7 +247,48 @@ def list_reservations_v3(
         )
         raise BookMyDeskException(response.content)
 
-    return V3ReservationsResult(response.json()["result"])
+    return V3ReservationsResult(response.json())
+
+
+def create_reservation_v3(
+    botmydesk_user: BotMyDeskUser,
+    reservation_type: str,
+    start: timezone.datetime,
+    end: timezone.datetime,
+):
+    """Creates a new reservation."""
+    if botmydesk_user.access_token_expired():
+        refresh_session(botmydesk_user)
+        botmydesk_user.refresh_from_db()
+
+    # UTC, just to be sure as we do not know the API input validation used.
+    utc = zoneinfo.ZoneInfo("UTC")
+
+    profile = me_v3(botmydesk_user=botmydesk_user)
+    response = requests.post(
+        url=f"{settings.BOOKMYDESK_API_URL}/v3/reservation",
+        json={
+            "dateStart": timezone.localtime(start, timezone=utc).isoformat(),
+            "dateEnd": timezone.localtime(end, timezone=utc).isoformat(),
+            "type": reservation_type,
+            "userId": profile.id(),
+        },
+        headers={
+            "User-Agent": settings.BOTMYDESK_USER_AGENT,
+            "Authorization": f"Bearer {botmydesk_user.bookmydesk_access_token}",
+        },
+    )
+    bookmydesk_client_logger.info(
+        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
+    )
+
+    if response.status_code != 200:
+        bookmydesk_client_logger.error(
+            f"FAILED to create reservation of {botmydesk_user.slack_email} (HTTP {response.status_code}): {response.content}"
+        )
+        raise BookMyDeskException(response.content)
+
+    # @TODO return ID in DTO
 
 
 def reservation_check_in_out(

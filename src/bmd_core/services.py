@@ -457,19 +457,56 @@ def handle_user_working_home_today(botmydesk_user: BotMyDeskUser, payload):
     if not botmydesk_user.has_authorized_bot():
         return _unauthorized_reply_shortcut(botmydesk_user)
 
-    message_to_user = gettext(
-        "🏡 _You requested me to book you for working at home._\n\n\nTODO"
-    )
-    _post_handle_report_update(botmydesk_user, message_to_user, payload)
+    try:
+        home_reservations_result = bmd_api_client.client.list_reservations_v3(
+            botmydesk_user, type="home"
+        )
+        profile = bmd_api_client.client.me_v3(botmydesk_user=botmydesk_user)
+    except BookMyDeskException as error:
+        slack_web_client().chat_postEphemeral(
+            channel=botmydesk_user.slack_user_id,
+            user=botmydesk_user.slack_user_id,
+            text=gettext(
+                f"Sorry, an error occurred while requesting your reservations: ```{error}```"
+            ),
+        ).validate()
+        return
 
-    # @TODO: Implement
-    slack_web_client().chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=gettext("Sorry, not yet implemented 🧑‍💻"),
-    ).validate()
+    found_home_reservation = False
+    report_text = gettext(
+        "⚠️ Failed to book you for working at home. Please try manually."
+    )
+
+    for current in home_reservations_result.reservations():
+        if current.owner_id() != profile.id():
+            # Ignore delegates
+            continue
+
+        found_home_reservation = True
+        break
+
+    if found_home_reservation:
+        report_text = gettext(
+            "✔️ _I left it as-is, since you already *booked a home spot*._"
+        )
+    else:
+        local_start = timezone.localtime(
+            timezone.now(), timezone=botmydesk_user.user_tz_instance()
+        )
+        bmd_api_client.client.create_reservation_v3(
+            botmydesk_user=botmydesk_user,
+            reservation_type="home",
+            start=local_start,
+            end=local_start.replace(hour=23, minute=59),
+        )
+        report_text = gettext("✔️ _I booked you home spot._")
 
     update_user_app_home(botmydesk_user=botmydesk_user)
+
+    message_to_user = gettext(
+        f"🏡 _You requested me to book you for working at home._\n\n\n{report_text}"
+    )
+    _post_handle_report_update(botmydesk_user, message_to_user, payload)
 
 
 def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):

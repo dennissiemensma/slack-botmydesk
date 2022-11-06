@@ -5,7 +5,6 @@ from typing import Optional
 from slack_sdk.web import WebClient
 from django.utils import timezone, translation
 from django.utils.translation import gettext, ngettext
-from django.contrib.humanize.templatetags import humanize
 from django.conf import settings
 
 from bmd_core.models import BotMyDeskUser
@@ -720,8 +719,7 @@ def update_user_app_home(botmydesk_user: BotMyDeskUser):
                     "text": {
                         "type": "plain_text",
                         "emoji": True,
-                        "text": f"⚙️ {settings.BOTMYDESK_NAME} "
-                        + gettext("preferences"),
+                        "text": "⚙️ " + gettext("preferences"),
                     },
                     "value": "open_preferences",
                 },

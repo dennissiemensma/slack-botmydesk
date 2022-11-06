@@ -186,7 +186,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
     # Check status.
     profile = bmd_api_client.client.me_v3(botmydesk_user)
 
-    title = f"⚙️ " + gettext("Preferences")
+    title = "⚙️ " + gettext("Preferences")
     view_data = {
         "type": "modal",
         "callback_id": "bmd-authorized-welcome",

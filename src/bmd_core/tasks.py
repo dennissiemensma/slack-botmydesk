@@ -3,6 +3,7 @@ import logging
 from celery import Celery
 from django.utils import timezone
 from django.utils.translation import gettext
+from slack_sdk.errors import SlackApiError
 
 from bmd_core.models import BotMyDeskUser
 import bmd_api_client.client
@@ -107,6 +108,12 @@ def purge_old_messages():
             botmydesk_logger.info(
                 f"Purging old message for {current_channel['id']} (created {message_created_at})"
             )
-            web_client.chat_delete(
-                channel=current_channel["id"], ts=current_message["ts"]
-            ).validate()
+
+            try:
+                web_client.chat_delete(
+                    channel=current_channel["id"], ts=current_message["ts"]
+                ).validate()
+            except SlackApiError as error:
+                botmydesk_logger.error(
+                    f"Error deleting message: {current_message}\n\n{error}"
+                )

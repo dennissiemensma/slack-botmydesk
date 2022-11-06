@@ -255,8 +255,8 @@ def create_reservation_v3(
     reservation_type: str,
     start: timezone.datetime,
     end: timezone.datetime,
-):
-    """Creates a new reservation."""
+) -> str:
+    """Creates a new reservation. Returns the ID of it when created successful."""
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
@@ -281,6 +281,11 @@ def create_reservation_v3(
     bookmydesk_client_logger.info(
         "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
     )
+    bookmydesk_client_logger.debug(
+        "(%s) Response:\n%s",
+        botmydesk_user.slack_email,
+        pformat(response.json(), indent=2),
+    )
 
     if response.status_code != 200:
         bookmydesk_client_logger.error(
@@ -288,7 +293,7 @@ def create_reservation_v3(
         )
         raise BookMyDeskException(response.content)
 
-    # @TODO return ID in DTO
+    return response.json()["result"]["reservation"]["id"]
 
 
 def reservation_check_in_out(

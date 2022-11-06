@@ -473,9 +473,6 @@ def handle_user_working_home_today(botmydesk_user: BotMyDeskUser, payload):
         return
 
     found_home_reservation = False
-    report_text = gettext(
-        "⚠️ Failed to book you for working at home. Please try manually."
-    )
 
     for current in home_reservations_result.reservations():
         if current.owner_id() != profile.id():
@@ -493,13 +490,19 @@ def handle_user_working_home_today(botmydesk_user: BotMyDeskUser, payload):
         local_start = timezone.localtime(
             timezone.now(), timezone=botmydesk_user.user_tz_instance()
         )
-        bmd_api_client.client.create_reservation_v3(
-            botmydesk_user=botmydesk_user,
-            reservation_type="home",
-            start=local_start,
-            end=local_start.replace(hour=23, minute=59),
-        )
-        report_text = gettext("✔️ _I booked you home spot._")
+        try:
+            bmd_api_client.client.create_reservation_v3(
+                botmydesk_user=botmydesk_user,
+                reservation_type="home",
+                start=local_start,
+                end=local_start.replace(hour=23, minute=59),
+            )
+        except BookMyDeskException as error:
+            report_text = gettext(
+                "⚠️ Failed to book you for working at home. Please try manually."
+            )
+        else:
+            report_text = gettext("✔️ _I booked you a home spot._")
 
     update_user_app_home(botmydesk_user=botmydesk_user)
 
@@ -864,11 +867,11 @@ def _post_handle_report_update(
     ).validate()
 
     try:
-        # Delete trigger, if any was given.
+        # Delete trigger, if any was given. Also, do not validate as it MAY fail.
         slack_web_client().chat_delete(
             channel=payload["container"]["channel_id"],
             ts=payload["container"]["message_ts"],
-        ).validate()
+        )
     except KeyError:
         pass
 

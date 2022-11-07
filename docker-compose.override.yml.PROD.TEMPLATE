@@ -30,6 +30,7 @@ services:
 
   # @TODO: Choose user and use in .env as DJANGO_DATABASE_USER value
   # @TODO: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use in .env as DJANGO_DATABASE_PASSWORD value
+  # To access on command-line: docker-compose -f docker-compose.override.yml exec database psql -U botmydesk_user -h localhost -d botmydesk
   database:
     image: postgres:14
     restart: always

@@ -176,6 +176,8 @@ LOGGING = {
 if DEBUG:
     LOGGING["loggers"]["botmydesk"]["level"] = "DEBUG"
     LOGGING["loggers"]["bookmydesk_client"]["level"] = "DEBUG"
+    # Toggle me when needed.
+#     LOGGING["loggers"]["django.db"]["level"] = "DEBUG"
 
 # Project related.
 BOTMYDESK_USER_AGENT = "BotMyDesk Slack Bot"

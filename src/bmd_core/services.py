@@ -756,7 +756,6 @@ def update_user_app_home(botmydesk_user: BotMyDeskUser):
                 "elements": [
                     {
                         "type": "button",
-                        "style": "primary",
                         "text": {
                             "type": "plain_text",
                             "emoji": True,
@@ -766,6 +765,7 @@ def update_user_app_home(botmydesk_user: BotMyDeskUser):
                     },
                     {
                         "type": "button",
+                        "style": "primary",
                         "text": {
                             "type": "plain_text",
                             "emoji": True,

@@ -51,7 +51,7 @@ def dispatch_botmydesk_notifications():
         .distinct()
         .values_list("slack_tz", flat=True)
     ):
-        botmydesk_logger.debug(f"Processing users in timezone {current_timezone}")
+        botmydesk_logger.info(f"Processing users in timezone {current_timezone}")
 
         # The loop below is a nice candidate for further async processing on a per-user basis if ever needed.
         for current_botmydesk_user in BotMyDeskUser.objects.eligible_for_notification(

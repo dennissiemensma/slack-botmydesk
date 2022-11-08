@@ -51,12 +51,17 @@ def dispatch_botmydesk_notifications():
         .distinct()
         .values_list("slack_tz", flat=True)
     ):
-        botmydesk_logger.info(f"Processing users in timezone {current_timezone}")
+        botmydesk_logger.info(f"Processing users in timezone: {current_timezone}")
 
         # The loop below is a nice candidate for further async processing on a per-user basis if ever needed.
-        for current_botmydesk_user in BotMyDeskUser.objects.eligible_for_notification(
+        eligible_users = BotMyDeskUser.objects.eligible_for_notification(
             current_timezone
-        ):
+        )
+        botmydesk_logger.info(
+            f"Found {eligible_users.count()} user(s) eligible in timezone: {current_timezone}"
+        )
+
+        for current_botmydesk_user in eligible_users:
             botmydesk_logger.info(
                 f"{current_timezone}: User @{current_botmydesk_user.slack_user_id} ({current_botmydesk_user.slack_email}) eligible for notification"
             )
@@ -78,6 +83,10 @@ def dispatch_botmydesk_notifications():
             # Only update here, since this is (for now) the only origin for automated notifications
             current_botmydesk_user.touch_last_notification_sent()
             current_botmydesk_user.save()
+
+            botmydesk_logger.info(
+                f"{current_timezone}: Updated user @{current_botmydesk_user.slack_user_id} last notification sent: {current_botmydesk_user.last_notification_sent}"
+            )
 
 
 @app.task

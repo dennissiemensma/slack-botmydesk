@@ -155,29 +155,33 @@ LOGGING = {
         },
     },
     "loggers": {
+        "django.db": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "celery.task": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
         "botmydesk": {
             "handlers": ["console"],
             "level": "INFO",
-            "propagate": True,
+            "propagate": False,
         },
         "bookmydesk_client": {
             "handlers": ["console"],
             "level": "INFO",
-            " propagate": False,
-        },
-        "django.db": {
-            "handlers": ["console"],
-            "level": "ERROR",
             "propagate": False,
         },
     },
 }
 
 if DEBUG:
+    LOGGING["loggers"]["celery.task"]["level"] = "DEBUG"
     LOGGING["loggers"]["botmydesk"]["level"] = "DEBUG"
     LOGGING["loggers"]["bookmydesk_client"]["level"] = "DEBUG"
-    # Toggle me when needed.
-#     LOGGING["loggers"]["django.db"]["level"] = "DEBUG"
 
 # Project related.
 BOTMYDESK_USER_AGENT = "BotMyDesk Slack Bot"

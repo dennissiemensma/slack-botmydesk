@@ -94,6 +94,7 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
     preferred_notification_time_on_thursdays = models.TimeField(null=True, default=None)
     preferred_notification_time_on_fridays = models.TimeField(null=True, default=None)
     prefer_only_notifications_when_needed = models.BooleanField(default=True)
+
     last_notification_sent = models.DateTimeField(
         null=True, default=None, db_index=True
     )

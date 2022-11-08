@@ -178,22 +178,16 @@ However, note that this guide does NOT include how to run Nginx with Certbot for
 You WILL need it for receiving Slack callbacks. 
 
 An easy workaround is to install another Nginx instance with Certbot on your host.
-Update the nginx docker-compose port config (of this project) from:
+See the default Nginx docker-compose port config (of this project):
 ```shell
     ports:
-     - "80:80"
+     - "8080:80"
 ```
 
-To:
-```shell
-    ports:
-     - "8000:80"
-```
-
-Restart the container and configure the Nginx vhost **on your host** (which receives HTTPS traffic) to pass all requests upstream to the new port 8000.
+Restart the container and configure the Nginx vhost **on your host** (which receives HTTPS traffic) to pass all requests upstream to the new port 8080.
 ```shell
     location / {
-        proxy_pass http://127.0.0.1:8000;
+        proxy_pass http://127.0.0.1:8080;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $host;
         proxy_redirect off;
@@ -238,7 +232,10 @@ app_home_opened
 
 ----
 
-- Do **NOT** run multiple instances of either the web app or the background worker. They are currently **prone to race conditions**!
+- It is supported but **NOT ADVISED** run multiple instances of either the web app or the background worker. They are currently **prone to race conditions**!
+```shell
+docker-compose up -d --scale app=5
+```
 
 - The following processes should run:
 ```shell

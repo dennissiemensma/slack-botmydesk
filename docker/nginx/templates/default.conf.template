@@ -1,5 +1,5 @@
 upstream gunicorn_server {
-    server unix://${GUNICORN_SOCKET} fail_timeout=0;
+    server app:8000 fail_timeout=0 max_fails=0;
 }
 
 server {

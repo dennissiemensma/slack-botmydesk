@@ -26,17 +26,29 @@ RUN python3 -m pip install --upgrade pip && pip3 install poetry
 
 ### Production app.
 FROM base-app AS prod-app
-ARG BUILD_GUNICORN_SOCKET
-ENV GUNICORN_SOCKET=$BUILD_GUNICORN_SOCKET
+ARG BUILD_GUNICORN_WORKERS=1
+ARG BUILD_GUNICORN_MAX_REQUESTS=100
+ARG BUILD_GUNICORN_TIMEOUT=30
+
+ENV GUNICORN_WORKERS=$BUILD_GUNICORN_WORKERS
+ENV GUNICORN_MAX_REQUESTS=$BUILD_GUNICORN_MAX_REQUESTS
+ENV GUNICORN_TIMEOUT=$BUILD_GUNICORN_TIMEOUT
 ENV DJANGO_DEBUG=False
 
 COPY src/poetry.lock src/pyproject.toml /code/
 RUN poetry install --only main
 COPY src/ /code/
 
+# See https://docs.gunicorn.org/en/stable/settings.html#bind
+# Use "--log-level debug" for more details.
 ENTRYPOINT poetry run /code/manage.py migrate --noinput ; \
            poetry run /code/manage.py compilemessages ; \
-           poetry run gunicorn --bind unix:$GUNICORN_SOCKET --workers 1 --max-requests 100 --timeout 30 botmydesk.wsgi
+           poetry run gunicorn \
+                --bind 0.0.0.0:8000 \
+                --workers $GUNICORN_WORKERS \
+                --max-requests $GUNICORN_MAX_REQUESTS \
+                --timeout $GUNICORN_TIMEOUT \
+                botmydesk.wsgi
 
 
 ### Production task scheduler.

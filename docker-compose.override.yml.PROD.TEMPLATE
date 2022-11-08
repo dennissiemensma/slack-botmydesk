@@ -1,43 +1,43 @@
 version: "3.7"
 
-volumes:
-  gunicorn-socket: ~
-
 networks:
   botmydesk-internal: { }
 
 services:
   app:
     build:
+      # See Dockerfile for build arguments available for override
       context: .
       target: prod-app
       dockerfile: Dockerfile
-      args:
-        - BUILD_GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
+    expose:
+      # Expose ensures Docker manages any scaling/mapping internally when using --scale in Compose deploys.
+      - "8000"
     restart: always
     depends_on:
       - database
       - queue_broker
       - prod_web
-    volumes:
-     - gunicorn-socket:/run/gunicorn/
     networks:
       - botmydesk-internal
     env_file:
       - .env
-    environment:
-      - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
 
-  # @TODO: Choose user and use in .env as DJANGO_DATABASE_USER value
-  # @TODO: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use in .env as DJANGO_DATABASE_PASSWORD value
-  # To access on command-line: docker-compose -f docker-compose.override.yml exec database psql -U botmydesk_user -h localhost -d botmydesk
+  # @TODO 1: Choose database name (e.g. "botmydesk") and use below as POSTGRES_DB and in .env as DJANGO_DATABASE_NAME value for "app" container
+  # @TODO 2: Choose user (e.g. "botmydesk_user") and use below as POSTGRES_USER and in .env as DJANGO_DATABASE_USER value for "app" container
+  # @TODO 3: Generate password (e.g. "xxd -l 30 -ps /dev/urandom") and use below as POSTGRES_PASSWORD and in .env as DJANGO_DATABASE_PASSWORD value for "app" container
   database:
+    # To access on command-line: docker-compose -f docker-compose.override.yml exec database psql -h localhost -d botmydesk -U botmydesk_user
     image: postgres:14
     restart: always
     volumes:
       - ./docker/postgres:/var/lib/postgresql/
     networks:
       - botmydesk-internal
+    environment:
+      - POSTGRES_DB=
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
 
   app_task_scheduler:  # Required for background processing
     build:
@@ -79,11 +79,9 @@ services:
     restart: always
     volumes:
      - ./docker/nginx/templates:/etc/nginx/templates
-     - gunicorn-socket:/run/gunicorn/
-#    networks:  #  @TODO required or does volume suffice?
-#      - botmydesk-internal
+    networks:
+      - botmydesk-internal
     ports:
-    # @TODO: Check whether you need to map port 80, 443 or (like below) 8000 for another proxy in front of this one...
-     - "8000:80"
-    environment:
-     - GUNICORN_SOCKET=/run/gunicorn/botmydesk.socket
+    # @TODO: Check whether you need to map port 80, 443 or (like below) 8080 for another proxy in front of this one...
+     - "8080:80"
+

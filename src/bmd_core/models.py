@@ -1,14 +1,10 @@
 import zoneinfo
-import logging
 
 from django.db import models
 from django.db.models import QuerySet, Q
 from django.utils import timezone
 
 from bmd_core.mixins import ModelUpdateMixin
-
-
-botmydesk_logger = logging.getLogger("botmydesk")
 
 
 class BotMyDeskSlackUserManager(models.Manager):
@@ -53,10 +49,6 @@ class BotMyDeskSlackUserManager(models.Manager):
                 },
             )
         )
-
-        botmydesk_logger.info(
-            "Query eligible_for_notification: %s", results.query
-        )  # Temp debug.
 
         return results
 

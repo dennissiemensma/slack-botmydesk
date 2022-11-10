@@ -40,6 +40,8 @@ RUN poetry install --only main
 COPY src/ /code/
 
 COPY docker-entrypoint.sh /opt/
+RUN chmod +x /opt/docker-entrypoint.sh
+
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]
 CMD ["gunicorn"]
 

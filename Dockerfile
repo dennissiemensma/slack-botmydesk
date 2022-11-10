@@ -40,7 +40,7 @@ RUN poetry install --only main
 COPY src/ /code/
 
 COPY docker-entrypoint.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["gunicorn"]
 
 ### Production task scheduler.

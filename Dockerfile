@@ -39,7 +39,7 @@ COPY src/poetry.lock src/pyproject.toml /code/
 RUN poetry install --only main
 COPY src/ /code/
 
-COPY ./docker-entrypoint.sh /
+COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["gunicorn"]
 

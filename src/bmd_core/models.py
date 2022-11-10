@@ -1,10 +1,14 @@
 import zoneinfo
+import logging
 
 from django.db import models
 from django.db.models import QuerySet, Q
 from django.utils import timezone
 
 from bmd_core.mixins import ModelUpdateMixin
+
+
+botmydesk_logger = logging.getLogger("botmydesk")
 
 
 class BotMyDeskSlackUserManager(models.Manager):
@@ -31,8 +35,7 @@ class BotMyDeskSlackUserManager(models.Manager):
             return self.none()
 
         local_midnight = local_now.replace(hour=0, minute=0, second=0, microsecond=0)
-
-        return (
+        results = (
             self.with_session()
             .filter(
                 # Notification not yet sent today (or at all)? Prevent duplicate notifications.
@@ -50,6 +53,12 @@ class BotMyDeskSlackUserManager(models.Manager):
                 },
             )
         )
+
+        botmydesk_logger.debug(
+            "Query eligible_for_notification: %s", results.query
+        )  # Temp debug.
+
+        return results
 
     def by_slack_id(self, slack_user_id: str) -> "BotMyDeskUser":
         return self.get(slack_user_id=slack_user_id)
@@ -95,7 +104,7 @@ class BotMyDeskUser(ModelUpdateMixin, models.Model):
     preferred_notification_time_on_fridays = models.TimeField(null=True, default=None)
     prefer_only_notifications_when_needed = models.BooleanField(default=True)
 
-    last_notification_sent = models.DateTimeField(
+    last_notification_sent = models.DateTimeField(  # Deprecated for now
         null=True, default=None, db_index=True
     )
 

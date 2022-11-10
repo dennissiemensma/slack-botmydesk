@@ -67,9 +67,6 @@ def dispatch_botmydesk_notifications():
             )
 
             current_botmydesk_user.refresh_from_db()
-
-            # @TODO: Take current_botmydesk_user.prefer_only_notifications_when_needed into account as well
-
             blocks = bmd_core.services.gui_status_notification(current_botmydesk_user)
 
             title = gettext("Your BookMyDesk status")
@@ -80,13 +77,13 @@ def dispatch_botmydesk_notifications():
                 blocks=blocks,
             ).validate()
 
+            botmydesk_logger.info(
+                f"{current_timezone}: Dispatched notification to user @{current_botmydesk_user.slack_user_id}"
+            )
+
             # Only update here, since this is (for now) the only origin for automated notifications
             current_botmydesk_user.touch_last_notification_sent()
             current_botmydesk_user.save()
-
-            botmydesk_logger.info(
-                f"{current_timezone}: Updated user @{current_botmydesk_user.slack_user_id} last notification sent: {current_botmydesk_user.last_notification_sent}"
-            )
 
 
 @app.task

@@ -54,7 +54,7 @@ class BotMyDeskSlackUserManager(models.Manager):
             )
         )
 
-        botmydesk_logger.debug(
+        botmydesk_logger.info(
             "Query eligible_for_notification: %s", results.query
         )  # Temp debug.
 

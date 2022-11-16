@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-16 19:29+0000\n"
-"PO-Revision-Date: 2022-11-16 20:29+0100\n"
+"PO-Revision-Date: 2022-11-16 21:15+0100\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -495,91 +495,3 @@ msgstr "Laat maar, blijf gekoppeld"
 #. Translators: This is a debug message
 msgid "BotMyDesk debug message"
 msgstr "BotMyDesk debug bericht"
-
-#~ msgid "Notification test"
-#~ msgstr "Notificatietest"
-
-#~ msgid "_Refreshing your reservations..._"
-#~ msgstr "_Jouw reserveringen aan het verversen..._"
-
-#~ msgid "at"
-#~ msgstr "op"
-
-#~ msgid "In about"
-#~ msgstr "Over"
-
-#~ msgid "Yes, skip"
-#~ msgstr "Ja, sla over"
-
-#~ msgid "No, notify me"
-#~ msgstr "Nee, stuur notificatie"
-
-#~ msgid "However, should I not *not bother you* when you already seem to have booked and checked in for the day(s) above?"
-#~ msgstr "Echter, zal ik je *niet storen* wanneer je al iets geboekt hebt/ingecheckt bent op een dag?"
-
-#~ msgid "Skip notification when booked/checked in?"
-#~ msgstr "Sla notificatie over wanneer al geboekt/ingecheckt?"
-
-#~ msgid ""
-#~ "_Triggered by_:\n"
-#~ "\n"
-#~ "```{error_trace}```"
-#~ msgstr ""
-#~ "_Veroorzaakt door_:\n"
-#~ "\n"
-#~ "```{error_trace}```"
-
-#~ msgid "⚙️ {settings.BOTMYDESK_NAME} preferences"
-#~ msgstr "⚙️ {settings.BOTMYDESK_NAME}-voorkeuren"
-
-#~ msgid "Connecting {settings.BOTMYDESK_NAME}"
-#~ msgstr "{settings.BOTMYDESK_NAME} koppelen"
-
-#~ msgid "Check your mailbox for *{botmydesk_user.slack_email}*. Enter the BookMyDesk login code you've received."
-#~ msgstr "Controleer je mailbox voor *{botmydesk_user.slack_email}*. Vul de BookMyDesk-logincode in die je hebt ontvangen."
-
-#~ msgid "{settings.BOTMYDESK_NAME} disconnected 👋"
-#~ msgstr "{settings.BOTMYDESK_NAME} ontkoppeld 👋"
-
-#~ msgid ""
-#~ "Request BookMyDesk login code by email for *{botmydesk_user.slack_email}*?\n"
-#~ "\n"
-#~ "_You can enter the code on the next screen._"
-#~ msgstr ""
-#~ "Vraag een BookMyDesk-inlogcode aan per e-mail voor *{botmydesk_user.slack_email}*?\n"
-#~ "\n"
-#~ "_Je kunt de inlogcode op het volgende scherm invoeren._"
-
-#~ msgid "Disconnect {settings.BOTMYDESK_NAME}"
-#~ msgstr "Ontkoppel {settings.BOTMYDESK_NAME}"
-
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "\n"
-#~ "{emoji} *{reservation_start_text}* from {current_from} to {current_to}\n"
-#~ "_In about {natural_time_until_start} at *{location}*_"
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "\n"
-#~ "{emoji} *{reservation_start_text}* van {current_from} tot {current_to}\n"
-#~ "_Over zo'n {natural_time_until_start} op *{location}*_"
-
-#~ msgid "🏡 You have a *home reservation* for {today_text} ({reservation_start} - {reservation_end})"
-#~ msgstr "🏡 Je hebt een *thuisreservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
-
-#~ msgid "🏢 You have an *office reservation* for {today_text} ({reservation_start} - {reservation_end})"
-#~ msgstr "🏢 Je hebt een *kantoorreservering* staan voor {today_text} ({reservation_start} - {reservation_end})"
-
-#~ msgid ""
-#~ ".\n"
-#~ "\n"
-#~ "_Where are you today?_"
-#~ msgstr ""
-#~ ".\n"
-#~ "\n"
-#~ "_Waar ben je vandaag?_"
-
-#~ msgid "Dutch"
-#~ msgstr "Nederlands"

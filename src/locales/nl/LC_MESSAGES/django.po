@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-06 21:33+0000\n"
-"PO-Revision-Date: 2022-11-06 22:34+0100\n"
+"POT-Creation-Date: 2022-11-16 19:29+0000\n"
+"PO-Revision-Date: 2022-11-16 20:29+0100\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -313,9 +313,6 @@ msgstr ""
 msgid "Preferences"
 msgstr "Voorkeuren"
 
-msgid "Notification test"
-msgstr "Notificatietest"
-
 msgid "Link BookMyDesk"
 msgstr "Koppel BookMyDesk"
 
@@ -498,6 +495,9 @@ msgstr "Laat maar, blijf gekoppeld"
 #. Translators: This is a debug message
 msgid "BotMyDesk debug message"
 msgstr "BotMyDesk debug bericht"
+
+#~ msgid "Notification test"
+#~ msgstr "Notificatietest"
 
 #~ msgid "_Refreshing your reservations..._"
 #~ msgstr "_Jouw reserveringen aan het verversen..._"

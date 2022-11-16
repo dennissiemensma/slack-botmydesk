@@ -762,17 +762,7 @@ def update_user_app_home(botmydesk_user: BotMyDeskUser):
                             "text": "⚙️ " + gettext("Preferences"),
                         },
                         "value": "open_preferences",
-                    },
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "text": {
-                            "type": "plain_text",
-                            "emoji": True,
-                            "text": "💬️ " + gettext("Notification test"),
-                        },
-                        "value": "status_notification",
-                    },
+                    }
                 ],
             }
         ]

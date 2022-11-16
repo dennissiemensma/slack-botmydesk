@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3-alpine AS base-app
+FROM python:3.11-alpine AS base-app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1

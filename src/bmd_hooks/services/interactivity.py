@@ -34,6 +34,7 @@ def on_interactive_block_action(
     if action_value:
         try:
             service_module = {
+                "trigger_help": bmd_hooks.services.slash.handle_slash_command_help,
                 "send_bookmydesk_login_code": handle_interactive_send_bookmydesk_login_code,
                 "revoke_botmydesk": handle_interactive_bmd_revoke_botmydesk,
                 "status_notification": bmd_hooks.services.slash.handle_status_notification,  # Alias

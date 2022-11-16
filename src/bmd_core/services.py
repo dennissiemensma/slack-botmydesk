@@ -99,7 +99,7 @@ def gui_list_upcoming_reservations(botmydesk_user: BotMyDeskUser) -> Optional[li
     if not botmydesk_user.has_authorized_bot():
         return _unauthorized_reply_shortcut(botmydesk_user)
 
-    title = gettext("Upcoming BookMyDesk reservations")
+    title = gettext("Upcoming reservations")
     start = timezone.localtime(
         timezone.now(), timezone=botmydesk_user.user_tz_instance()
     )
@@ -762,7 +762,16 @@ def update_user_app_home(botmydesk_user: BotMyDeskUser):
                             "text": "⚙️ " + gettext("Preferences"),
                         },
                         "value": "open_preferences",
-                    }
+                    },
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "emoji": True,
+                            "text": gettext("Help / Commands"),
+                        },
+                        "value": "trigger_help",
+                    },
                 ],
             }
         ]

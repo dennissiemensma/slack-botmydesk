@@ -52,9 +52,11 @@ def handle_slash_command_help(botmydesk_user: BotMyDeskUser, *_):
     help_text = ""
 
     if botmydesk_user.has_authorized_bot():
+        help_text += (
+            "\nYou can *type* the following commands at any moment, at any chat.\n\n"
+        )
         help_text += f"*`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_STATUS}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_STATUS_ALIAS_2}`*\n"
         help_text += "_Show your BookMyDesk status today. Allows you to choose what to book for you today. Similar to notifications sent by BotMyDesk._\n\n\n"
-        help_text += "\nYou can **type** the following commands at any moment, at any chat, without having to wait for my notification(s) first.\n\n"
         help_text += f"🏡 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_HOME_ALIAS_2}`* \n"
         help_text += "_Mark today as *working from home*. Will book a home spot for you, if you don't have one yet. No check-in required._\n\n\n"
         help_text += f"🏢 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_AT_OFFICE_ALIAS_2}`* \n"
@@ -62,7 +64,7 @@ def handle_slash_command_help(botmydesk_user: BotMyDeskUser, *_):
         help_text += f"🚋 *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_EXTERNALLY_ALIAS_2}`* \n"
         help_text += "_Mark today as *working externally* (but not at home). Books an *'external' spot* for you if you don't have one yet. Checks you in as well._\n\n\n"
         help_text += f"❌ *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED}`* or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_ALIAS_2}`*  or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_ALIAS_3}`*  or *`{settings.SLACK_SLASHCOMMAND_BMD} {settings.SLACK_SLASHCOMMAND_BMD_MARK_CANCELLED_ALIAS_4}`* \n"
-        help_text += "_*Removes* any pending reservation you have for today or, if you were checked in already, checks you out._\n\n ⚠️ _Care, each will be *applied*instantly without confirmation*._\n\n\n"
+        help_text += "_*Removes* any pending reservation you have for today or, if you were checked in already, checks you out._\n\n ⚠️ _Care, each will be *applied instantly without confirmation*._\n\n\n"
     else:
         help_text += f"_More commands will be available after you've connected your account by typing *`{settings.SLACK_SLASHCOMMAND_BMD}`*_."
 

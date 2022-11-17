@@ -242,6 +242,13 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
         },
         "value": "07:00",
     }
+    at_730am_option = {
+        "text": {
+            "type": "plain_text",
+            "text": gettext("Around 7:30"),
+        },
+        "value": "07:30",
+    }
     at_8am_option = {
         "text": {
             "type": "plain_text",
@@ -266,6 +273,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
     notification_options = [
         disabled_option,
         at_7am_option,
+        at_730am_option,
         at_8am_option,
         at_830am_option,
         at_9am_option,
@@ -273,6 +281,7 @@ def handle_preferences_gui(botmydesk_user: BotMyDeskUser, payload: dict):
     notification_preference_mapping = {
         None: disabled_option,
         datetime.time(hour=7): at_7am_option,
+        datetime.time(hour=7, minute=30): at_730am_option,
         datetime.time(hour=8): at_8am_option,
         datetime.time(hour=8, minute=30): at_830am_option,
         datetime.time(hour=9): at_9am_option,

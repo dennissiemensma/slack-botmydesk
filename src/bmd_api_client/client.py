@@ -5,6 +5,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.utils import timezone
+from django.core.cache import cache
 import requests
 
 from bmd_api_client.dto import (
@@ -145,12 +146,19 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
     )
 
 
-# @TODO: Cache me
 def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
     """Profile call about current user"""
+
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
+
+    CACHE_KEY = f"me_v3_{botmydesk_user.slack_user_id}"
+    cached_result = cache.get(CACHE_KEY)
+
+    if cached_result is not None:
+        bookmydesk_client_logger.info("Using cached result for: %s", CACHE_KEY)
+        return cached_result
 
     response = requests.get(
         url=f"{settings.BOOKMYDESK_API_URL}/v3/me",
@@ -177,10 +185,12 @@ def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
         )
         raise BookMyDeskException(response.content)
 
-    return V3BookMyDeskProfileResult(response.json()["result"])
+    result = V3BookMyDeskProfileResult(response.json()["result"])
+    cache.set(CACHE_KEY, result)
+
+    return result
 
 
-# @TODO: Cache me shortly
 def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResult:
     """Fetch extended details of the user's company."""
     if botmydesk_user.access_token_expired():
@@ -189,6 +199,13 @@ def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResul
 
     # For now, always use the first company found.
     profile = me_v3(botmydesk_user=botmydesk_user)
+
+    CACHE_KEY = f"me_v3_{botmydesk_user.slack_user_id}"
+    cached_result = cache.get(CACHE_KEY)
+
+    if cached_result is not None:
+        bookmydesk_client_logger.info("Using cached result for: %s", CACHE_KEY)
+        return cached_result
 
     response = requests.get(
         url=f"{settings.BOOKMYDESK_API_URL}/v3/companyExtended",
@@ -218,7 +235,10 @@ def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResul
         )
         raise BookMyDeskException(response.content)
 
-    return V3CompanyExtendedResult(response.json()["result"]["company"])
+    result = V3CompanyExtendedResult(response.json()["result"]["company"])
+    cache.set(CACHE_KEY, result)
+
+    return result
 
 
 def list_reservations_v3(

@@ -741,7 +741,9 @@ def handle_user_working_externally_today(botmydesk_user: BotMyDeskUser, payload)
                 # Try next seat
                 continue
 
-            report_text = gettext("_I booked you a spot externally and checked you in._")
+            report_text = gettext(
+                "_I booked you a spot externally and checked you in._"
+            )
 
             try:
                 # Check in as well.

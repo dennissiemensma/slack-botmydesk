@@ -186,7 +186,7 @@ def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
         raise BookMyDeskException(response.content)
 
     result = V3BookMyDeskProfileResult(response.json()["result"])
-    cache.set(CACHE_KEY, result)
+    cache.set(CACHE_KEY, result, 60)
 
     return result
 
@@ -236,7 +236,7 @@ def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResul
         raise BookMyDeskException(response.content)
 
     result = V3CompanyExtendedResult(response.json()["result"]["company"])
-    cache.set(CACHE_KEY, result)
+    cache.set(CACHE_KEY, result, 3600)
 
     return result
 

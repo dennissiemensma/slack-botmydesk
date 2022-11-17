@@ -46,6 +46,9 @@ class Seat(JsonResponseHolder):
     def id(self) -> str:
         return self._response["id"]
 
+    def map_id(self) -> str:
+        return self._response["map"]["id"] or "-"
+
     def map_name(self) -> str:
         return self._response["map"]["name"] or "-"
 

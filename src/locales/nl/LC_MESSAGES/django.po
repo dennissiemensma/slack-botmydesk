@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-16 20:34+0000\n"
-"PO-Revision-Date: 2022-11-16 21:35+0100\n"
+"POT-Creation-Date: 2022-11-17 21:42+0000\n"
+"PO-Revision-Date: 2022-11-17 22:44+0100\n"
 "Last-Translator: Dennis Siemensma <github@dennissiemensma.nl>\n"
 "Language-Team: nl <LL@li.org>\n"
 "Language: nl\n"
@@ -200,10 +200,10 @@ msgstr "⚠️ _Ik heb niets gedaan, want je lijkt al *uitgecheckt*?_"
 
 #, python-brace-format
 msgid ""
-"⚠️ *Failed to check you in*\n"
+"⚠️ *Failed to check you in for your existing reservation*\n"
 " ```{error}```"
 msgstr ""
-"⚠️ *Fout bij inchecken*\n"
+"⚠️ *Fout bij inchecken op je bestaande reservering*\n"
 " ```{error}```"
 
 #, python-brace-format
@@ -228,8 +228,45 @@ msgstr ""
 msgid "✋ Sorry, not supported at this time"
 msgstr "✋ Sorry, (nog) niet ondersteund"
 
-msgid "Sorry, not yet implemented 🧑‍💻"
-msgstr "Sorry, nog niet werkend 🧑‍💻"
+#, python-brace-format
+msgid "Sorry, an error occurred while requesting company information: ```{error}```"
+msgstr "Sorry, fout bij het ophalen van je werkgever ```{error}```"
+
+msgid "Sorry, failed to find location or map"
+msgstr "Sorry, kan de locatie of kaart niet vinden"
+
+#, python-brace-format
+msgid "✅ _I checked you in at {reservation_location}_"
+msgstr "✅ _Ik heb je ingecheckt op {reservation_location}_"
+
+msgid "⚠️ _Unexpected status, *I ignored your request to make sure not breaking anything*!_"
+msgstr "⚠️ _Onverwachte status, *Ik heb je verzoek genegeerd om zeker niets stuk te maken*!_"
+
+msgid "⚠️ Failed to book you for working externally. Please try manually."
+msgstr "⚠️ Niet gelukt om een externe plek voor je te reserveren, probeer het handmatig."
+
+msgid "_I booked you a spot externally and checked you in._"
+msgstr "_Ik heb een externe plek voor je geboekt en je tevens ingecheckt_"
+
+#, python-brace-format
+msgid ""
+"⚠️ *I booked you a externally spot, but failed to check you in*\n"
+" ```{error}```"
+msgstr ""
+"⚠️ *Ik heb een externe plek voor je geboekt, maar kon je niet inchecken*\n"
+" ```{error}```"
+
+#, python-brace-format
+msgid ""
+"🚋 _You requested me to book and/or check you in for working externally._\n"
+"\n"
+"\n"
+"{report_text}"
+msgstr ""
+"🚋 _Je hebt me verzocht om een externe werkplek te boeken en/of je in te checken._\n"
+"\n"
+"\n"
+"{report_text}"
 
 msgid "✔️ No reservations found anyway"
 msgstr "✔️ Geen reserveringen gevonden"

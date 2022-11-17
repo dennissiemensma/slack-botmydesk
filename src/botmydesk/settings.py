@@ -181,7 +181,7 @@ LOGGING = {
 if DEBUG:
     LOGGING["loggers"]["celery.task"]["level"] = "DEBUG"
     LOGGING["loggers"]["botmydesk"]["level"] = "DEBUG"
-    LOGGING["loggers"]["bookmydesk_client"]["level"] = "DEBUG"
+#     LOGGING["loggers"]["bookmydesk_client"]["level"] = "DEBUG"
 
 # Project related.
 BOTMYDESK_USER_AGENT = "BotMyDesk Slack Bot"

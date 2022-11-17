@@ -1,6 +1,7 @@
 import logging
 import zoneinfo
 from pprint import pformat
+from typing import Optional
 
 from django.conf import settings
 from django.utils import timezone
@@ -31,7 +32,12 @@ def request_login_code(email: str):
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
         },
     )
-    bookmydesk_client_logger.info("(%s) Request sent: %s", email, response.request.url)
+    bookmydesk_client_logger.info(
+        "(%s) Received HTTP %s on: %s",
+        email,
+        response.status_code,
+        response.request.url,
+    )
 
     if response.status_code != 204:
         bookmydesk_client_logger.error(
@@ -58,7 +64,10 @@ def token_login(username: str, otp: str) -> TokenLoginResult:
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", username, response.request.url
+        "(%s) Received HTTP %s on: %s",
+        username,
+        response.status_code,
+        response.request.url,
     )
 
     if response.status_code != 200:
@@ -79,7 +88,10 @@ def logout(botmydesk_user: BotMyDeskUser):
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
+        "(%s) Received HTTP %s on: %s",
+        botmydesk_user.slack_email,
+        response.status_code,
+        response.request.url,
     )
 
     if response.status_code != 200:
@@ -107,7 +119,10 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
+        "(%s) Received HTTP %s on: %s",
+        botmydesk_user.slack_email,
+        response.status_code,
+        response.request.url,
     )
 
     if response.status_code != 200:
@@ -130,6 +145,7 @@ def refresh_session(botmydesk_user: BotMyDeskUser):
     )
 
 
+# @TODO: Cache me
 def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
     """Profile call about current user"""
     if botmydesk_user.access_token_expired():
@@ -144,10 +160,13 @@ def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
+        "(%s) Received HTTP %s on: %s",
+        botmydesk_user.slack_email,
+        response.status_code,
+        response.request.url,
     )
     bookmydesk_client_logger.debug(
-        "(%s) Response:\n%s",
+        "(%s) Response content:\n%s",
         botmydesk_user.slack_email,
         pformat(response.json(), indent=2),
     )
@@ -161,6 +180,7 @@ def me_v3(botmydesk_user: BotMyDeskUser) -> V3BookMyDeskProfileResult:
     return V3BookMyDeskProfileResult(response.json()["result"])
 
 
+# @TODO: Cache me shortly
 def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResult:
     """Fetch extended details of the user's company."""
     if botmydesk_user.access_token_expired():
@@ -181,10 +201,13 @@ def company_extended_v3(botmydesk_user: BotMyDeskUser) -> V3CompanyExtendedResul
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
+        "(%s) Received HTTP %s on: %s",
+        botmydesk_user.slack_email,
+        response.status_code,
+        response.request.url,
     )
     bookmydesk_client_logger.debug(
-        "(%s) Response:\n%s",
+        "(%s) Response content:\n%s",
         botmydesk_user.slack_email,
         pformat(response.json(), indent=2),
     )
@@ -233,10 +256,13 @@ def list_reservations_v3(
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
+        "(%s) Received HTTP %s on: %s",
+        botmydesk_user.slack_email,
+        response.status_code,
+        response.request.url,
     )
     bookmydesk_client_logger.debug(
-        "(%s) Response:\n%s",
+        "(%s) Response content:\n%s",
         botmydesk_user.slack_email,
         pformat(response.json(), indent=2),
     )
@@ -255,34 +281,43 @@ def create_reservation_v3(
     reservation_type: str,
     start: timezone.datetime,
     end: timezone.datetime,
+    seat_id: Optional[str] = None,
 ) -> str:
     """Creates a new reservation. Returns the ID of it when created successful."""
     if botmydesk_user.access_token_expired():
         refresh_session(botmydesk_user)
         botmydesk_user.refresh_from_db()
 
+    profile = me_v3(botmydesk_user=botmydesk_user)
+
     # UTC, just to be sure as we do not know the API input validation used.
     utc = zoneinfo.ZoneInfo("UTC")
+    parameters = {
+        "dateStart": timezone.localtime(start, timezone=utc).isoformat(),
+        "dateEnd": timezone.localtime(end, timezone=utc).isoformat(),
+        "type": reservation_type,
+        "userId": profile.id(),
+    }
 
-    profile = me_v3(botmydesk_user=botmydesk_user)
+    if seat_id:
+        parameters.update({"seatId": seat_id})
+
     response = requests.post(
         url=f"{settings.BOOKMYDESK_API_URL}/v3/reservation",
-        json={
-            "dateStart": timezone.localtime(start, timezone=utc).isoformat(),
-            "dateEnd": timezone.localtime(end, timezone=utc).isoformat(),
-            "type": reservation_type,
-            "userId": profile.id(),
-        },
+        json=parameters,
         headers={
             "User-Agent": settings.BOTMYDESK_USER_AGENT,
             "Authorization": f"Bearer {botmydesk_user.bookmydesk_access_token}",
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
+        "(%s) Received HTTP %s on: %s",
+        botmydesk_user.slack_email,
+        response.status_code,
+        response.request.url,
     )
     bookmydesk_client_logger.debug(
-        "(%s) Response:\n%s",
+        "(%s) Response content:\n%s",
         botmydesk_user.slack_email,
         pformat(response.json(), indent=2),
     )
@@ -316,7 +351,10 @@ def reservation_check_in_out(
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
+        "(%s) Received HTTP %s on: %s",
+        botmydesk_user.slack_email,
+        response.status_code,
+        response.request.url,
     )
 
     expected_status_code = 200 if check_in else 204
@@ -345,7 +383,10 @@ def delete_reservation_v3(botmydesk_user: BotMyDeskUser, reservation_id: str):
         },
     )
     bookmydesk_client_logger.info(
-        "(%s) Request sent: %s", botmydesk_user.slack_email, response.request.url
+        "(%s) Received HTTP %s on: %s",
+        botmydesk_user.slack_email,
+        response.status_code,
+        response.request.url,
     )
 
     if response.status_code != 204:

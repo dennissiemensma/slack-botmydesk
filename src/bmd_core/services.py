@@ -368,9 +368,11 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
             }
         )
 
-    # External shortcut?
-    if not checked_out and (
-        not any_reservation or (has_external_reservation and not checked_in)
+    # External shortcut? (when enabled)
+    if (
+        settings.BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME
+        and not checked_out
+        and (not any_reservation or (has_external_reservation and not checked_in))
     ):
         action_elements.append(
             {
@@ -490,12 +492,13 @@ def handle_user_working_home_today(botmydesk_user: BotMyDeskUser, payload):
         local_start = timezone.localtime(
             timezone.now(), timezone=botmydesk_user.user_tz_instance()
         )
+        local_end = local_start.replace(hour=23, minute=59)
         try:
             bmd_api_client.client.create_reservation_v3(
                 botmydesk_user=botmydesk_user,
                 reservation_type="home",
                 start=local_start,
-                end=local_start.replace(hour=23, minute=59),
+                end=local_end,
             )
         except BookMyDeskException:
             report_text = gettext(
@@ -517,7 +520,10 @@ def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
         return _unauthorized_reply_shortcut(botmydesk_user)
 
     try:
-        reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
+        reservations_result = bmd_api_client.client.list_reservations_v3(
+            botmydesk_user,
+            type="normal",
+        )
         profile = bmd_api_client.client.me_v3(botmydesk_user=botmydesk_user)
     except BookMyDeskException as error:
         slack_web_client().chat_postEphemeral(
@@ -540,8 +546,8 @@ def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
                 # Ignore delegates
                 continue
 
-            # Ignore everything we're not interested in. E.g. visitors or home reservations.
-            if current.seat() is None or current.type() != "normal":
+            # Ignore everything we're not interested in.
+            if current.seat() is None:
                 continue
 
             location = current.seat().map_name()
@@ -569,7 +575,7 @@ def handle_user_working_in_office_today(botmydesk_user: BotMyDeskUser, payload):
                     )
                 except BookMyDeskException as error:
                     report_text = gettext(
-                        f"⚠️ *Failed to check you in*\n ```{error}```"
+                        f"⚠️ *Failed to check you in for your existing reservation*\n ```{error}```"
                     )
                 else:
                     report_text = gettext(f"✅ _I checked you in at {location}_")
@@ -606,7 +612,49 @@ def handle_user_working_externally_today(botmydesk_user: BotMyDeskUser, payload)
         )
 
     try:
-        reservations_result = bmd_api_client.client.list_reservations_v3(botmydesk_user)
+        company_extended_result = bmd_api_client.client.company_extended_v3(
+            botmydesk_user
+        )
+    except BookMyDeskException as error:
+        return (
+            slack_web_client()
+            .chat_postEphemeral(
+                channel=botmydesk_user.slack_user_id,
+                user=botmydesk_user.slack_user_id,
+                text=gettext(
+                    f"Sorry, an error occurred while requesting company information: ```{error}```"
+                ),
+            )
+            .validate()
+        )
+
+    # Find "external" location.
+    matches = [
+        x
+        for x in company_extended_result.locations()
+        if x.name() == settings.BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME
+    ]
+    report_text = ""
+
+    if not matches or not matches[0].maps():
+        return (
+            slack_web_client()
+            .chat_postEphemeral(
+                channel=botmydesk_user.slack_user_id,
+                user=botmydesk_user.slack_user_id,
+                text=gettext("Sorry, failed to find location or map"),
+            )
+            .validate()
+        )
+
+    external_location = matches[0]
+    external_map = external_location.maps()[0]
+
+    try:
+        reservations_result = bmd_api_client.client.list_reservations_v3(
+            botmydesk_user, type="normal", mapId=external_map.id()
+        )
+        profile = bmd_api_client.client.me_v3(botmydesk_user=botmydesk_user)
     except BookMyDeskException as error:
         slack_web_client().chat_postEphemeral(
             channel=botmydesk_user.slack_user_id,
@@ -618,40 +666,98 @@ def handle_user_working_externally_today(botmydesk_user: BotMyDeskUser, payload)
         return
 
     # Check whether we only need to check in.
-    # @TODO
-    reservations_result
+    if reservations_result.reservations():
+        for current in reservations_result.reservations():
+            if current.owner_id() != profile.id():
+                # Ignore delegates
+                continue
 
-    # try:
-    #     company_extended_result = bmd_api_client.client.company_extended_v3(botmydesk_user)
-    # except BookMyDeskException as error:
-    #     return slack_web_client().chat_postEphemeral(
-    #         channel=botmydesk_user.slack_user_id,
-    #         user=botmydesk_user.slack_user_id,
-    #         text=gettext(
-    #             f"Sorry, an error occurred while requesting company information: ```{error}```"
-    #         ),
-    #     ).validate()
-    #
-    # # Find "external" location.
-    # matches = [x for x in company_extended_result.locations() if x.name() == settings.BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME]
-    #
-    # if not matches:
-    #     raise AssertionError('Failed to find location for working externally')
-    #
-    # # First and only floor. Just find any seat available.
-    # seats = matches[0].maps()[0].seats()
+            # Ignore everything we're not interested in.
+            if current.seat() is None:
+                continue
 
-    # message_to_user = gettext(
-    #     f"🚋 _You requested me to check you in for working externally._\n\n\nTODO"
-    # )
-    # _post_handle_report_update(botmydesk_user, message_to_user, payload)
+            reservation_location = current.seat().map_name()
+            current_reservation_id = current.id()
 
-    # @TODO: Implement
-    slack_web_client().chat_postEphemeral(
-        channel=botmydesk_user.slack_user_id,
-        user=botmydesk_user.slack_user_id,
-        text=gettext("Sorry, not yet implemented 🧑‍💻"),
-    ).validate()
+            # The logic below just assumes a single reservation. We may or may not want to have it compatible
+            # with multiple items in the future (which is way more code than it currently already is).
+
+            if current.status() == "checkedIn":
+                report_text = gettext(
+                    "✔️ _I left it as-is, since you're already *checked in*._"
+                )
+                break
+
+            if current.status() == "checkedOut":
+                report_text = gettext(
+                    "⚠️ _I did nothing, as you seem to be *checked out* already?_"
+                )
+                break
+
+            if current.status() == "reserved":
+                try:
+                    bmd_api_client.client.reservation_check_in_out(
+                        botmydesk_user, current_reservation_id, check_in=True
+                    )
+                except BookMyDeskException as error:
+                    report_text = gettext(
+                        f"⚠️ *Failed to check you in for your existing reservation*\n ```{error}```"
+                    )
+                else:
+                    report_text = gettext(
+                        f"✅ _I checked you in at {reservation_location}_"
+                    )
+                break
+
+            # Fail-safe for future statuses.
+            report_text = gettext(
+                "⚠️ _Unexpected status, *I ignored your request to make sure not breaking anything*!_"
+            )
+            break
+
+    # No report, assume we can randomly book a spot.
+    if not report_text:
+        # Worst-case
+        report_text = gettext(
+            "⚠️ Failed to book you for working externally. Please try manually."
+        )
+
+        local_start = timezone.localtime(
+            timezone.now(), timezone=botmydesk_user.user_tz_instance()
+        )
+        local_end = local_start.replace(hour=23, minute=59)
+
+        for current in external_map.seats():
+            try:
+                # Just trial and error.
+                reservation_id = bmd_api_client.client.create_reservation_v3(
+                    botmydesk_user=botmydesk_user,
+                    reservation_type="normal",
+                    start=local_start,
+                    end=local_end,
+                    seat_id=current.id(),
+                )
+            except BookMyDeskException:
+                # Try next seat
+                continue
+
+            report_text = gettext("_I booked you a spot externally and checked you in._")
+
+            try:
+                # Check in as well.
+                bmd_api_client.client.reservation_check_in_out(
+                    botmydesk_user, reservation_id, check_in=True
+                )
+            except BookMyDeskException as error:
+                report_text = gettext(
+                    f"⚠️ *I booked you a externally spot, but failed to check you in*\n ```{error}```"
+                )
+                break
+
+    message_to_user = gettext(
+        f"🚋 _You requested me to book and/or check you in for working externally._\n\n\n{report_text}"
+    )
+    _post_handle_report_update(botmydesk_user, message_to_user, payload)
 
     update_user_app_home(botmydesk_user=botmydesk_user)
 

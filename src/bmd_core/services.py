@@ -294,12 +294,12 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
 
     # Conditionally add actions.
     action_elements = []
-    any_reservation = any(
+    has_any_reservation = any(
         [has_home_reservation, has_office_reservation, has_external_reservation]
     )
 
     # Home shortcut?
-    if not checked_out and not has_home_reservation and not any_reservation:
+    if not checked_in and not checked_out:
         action_elements.append(
             {
                 "type": "button",
@@ -333,9 +333,7 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
         )
 
     # Office shortcut?
-    if not checked_out and (
-        not any_reservation or (has_office_reservation and not checked_in)
-    ):
+    if has_office_reservation and not checked_in and not checked_out:
         action_elements.append(
             {
                 "type": "button",
@@ -371,8 +369,8 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
     # External shortcut? (when enabled)
     if (
         settings.BOTMYDESK_WORK_EXTERNALLY_LOCATION_NAME
+        and not checked_in
         and not checked_out
-        and (not any_reservation or (has_external_reservation and not checked_in))
     ):
         action_elements.append(
             {
@@ -407,7 +405,7 @@ def gui_status_notification(botmydesk_user: BotMyDeskUser, *_) -> Optional[list]
         )
 
     # Only clear when applicable.
-    if not checked_out and any_reservation:
+    if has_any_reservation and not checked_out:
         action_elements.append(
             {
                 "type": "button",

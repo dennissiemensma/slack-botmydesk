@@ -1,6 +1,9 @@
 # Slack: BotMyDesk
 _This project is NOT officially affiliated with BookMyDesk in any way!_
 
+## Development activity
+This project has been **discontinued** in favor of a series of events. 
+
 ## Notes
 - When using the default container setup: Python locales may not work well when switching to a non-English locale.
 
